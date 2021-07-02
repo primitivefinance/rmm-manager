@@ -8,7 +8,14 @@ export type { IPrimitiveLiquidityCallback } from "./IPrimitiveLiquidityCallback"
 export type { IPrimitiveMarginCallback } from "./IPrimitiveMarginCallback";
 export type { IPrimitiveSwapCallback } from "./IPrimitiveSwapCallback";
 export type { IPrimitiveEngineActions } from "./IPrimitiveEngineActions";
+export type { IPrimitiveEngineEvents } from "./IPrimitiveEngineEvents";
 export type { IPrimitiveEngineView } from "./IPrimitiveEngineView";
+export type { IERC3156FlashBorrower } from "./IERC3156FlashBorrower";
+export type { IERC3156FlashLender } from "./IERC3156FlashLender";
+export type { IPrimitiveEngine } from "./IPrimitiveEngine";
+export type { IPrimitiveFactory } from "./IPrimitiveFactory";
+export type { PrimitiveEngine } from "./PrimitiveEngine";
+export type { PrimitiveFactory } from "./PrimitiveFactory";
 export type { IUniswapV3Factory } from "./IUniswapV3Factory";
 export type { IUniswapV3Pool } from "./IUniswapV3Pool";
 export type { IUniswapV3PoolActions } from "./IUniswapV3PoolActions";
@@ -19,6 +26,8 @@ export type { IUniswapV3PoolOwnerActions } from "./IUniswapV3PoolOwnerActions";
 export type { IUniswapV3PoolState } from "./IUniswapV3PoolState";
 export type { IPrimitiveHouse } from "./IPrimitiveHouse";
 export type { PrimitiveHouse } from "./PrimitiveHouse";
+export type { EngineCreate } from "./EngineCreate";
+export type { Token } from "./Token";
 
 export { IERC20__factory } from "./factories/IERC20__factory";
 export { IPrimitiveCreateCallback__factory } from "./factories/IPrimitiveCreateCallback__factory";
@@ -27,7 +36,14 @@ export { IPrimitiveLiquidityCallback__factory } from "./factories/IPrimitiveLiqu
 export { IPrimitiveMarginCallback__factory } from "./factories/IPrimitiveMarginCallback__factory";
 export { IPrimitiveSwapCallback__factory } from "./factories/IPrimitiveSwapCallback__factory";
 export { IPrimitiveEngineActions__factory } from "./factories/IPrimitiveEngineActions__factory";
+export { IPrimitiveEngineEvents__factory } from "./factories/IPrimitiveEngineEvents__factory";
 export { IPrimitiveEngineView__factory } from "./factories/IPrimitiveEngineView__factory";
+export { IERC3156FlashBorrower__factory } from "./factories/IERC3156FlashBorrower__factory";
+export { IERC3156FlashLender__factory } from "./factories/IERC3156FlashLender__factory";
+export { IPrimitiveEngine__factory } from "./factories/IPrimitiveEngine__factory";
+export { IPrimitiveFactory__factory } from "./factories/IPrimitiveFactory__factory";
+export { PrimitiveEngine__factory } from "./factories/PrimitiveEngine__factory";
+export { PrimitiveFactory__factory } from "./factories/PrimitiveFactory__factory";
 export { IUniswapV3Factory__factory } from "./factories/IUniswapV3Factory__factory";
 export { IUniswapV3Pool__factory } from "./factories/IUniswapV3Pool__factory";
 export { IUniswapV3PoolActions__factory } from "./factories/IUniswapV3PoolActions__factory";
@@ -38,3 +54,5 @@ export { IUniswapV3PoolOwnerActions__factory } from "./factories/IUniswapV3PoolO
 export { IUniswapV3PoolState__factory } from "./factories/IUniswapV3PoolState__factory";
 export { IPrimitiveHouse__factory } from "./factories/IPrimitiveHouse__factory";
 export { PrimitiveHouse__factory } from "./factories/PrimitiveHouse__factory";
+export { EngineCreate__factory } from "./factories/EngineCreate__factory";
+export { Token__factory } from "./factories/Token__factory";
