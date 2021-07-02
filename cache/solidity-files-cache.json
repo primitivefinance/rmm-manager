@@ -43,7 +43,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol": {
-      "lastModificationDate": 1625094133679,
+      "lastModificationDate": 1625185104176,
       "contentHash": "5af87a7346ff61919261046d89e6ceb3",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol",
       "solcConfig": {
@@ -77,7 +77,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveLendingCallback.sol": {
-      "lastModificationDate": 1625094133679,
+      "lastModificationDate": 1625185104176,
       "contentHash": "8a111c0621923b25195f41d079c4a25f",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveLendingCallback.sol",
       "solcConfig": {
@@ -111,7 +111,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol": {
-      "lastModificationDate": 1625094133679,
+      "lastModificationDate": 1625185104176,
       "contentHash": "4985896341ebce6b49b2cc9147655ab5",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol",
       "solcConfig": {
@@ -145,7 +145,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveMarginCallback.sol": {
-      "lastModificationDate": 1625094133679,
+      "lastModificationDate": 1625185104176,
       "contentHash": "c3f8dd7601e5cc62e459ebc5653a1f50",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveMarginCallback.sol",
       "solcConfig": {
@@ -179,7 +179,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol": {
-      "lastModificationDate": 1625094133679,
+      "lastModificationDate": 1625185104176,
       "contentHash": "55a241e365be95eafde9dc4374df4ec6",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol",
       "solcConfig": {
@@ -213,7 +213,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol": {
-      "lastModificationDate": 1625094132999,
+      "lastModificationDate": 1625185104176,
       "contentHash": "5dade68f8911629d05e278a0743319b2",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol",
       "solcConfig": {
@@ -249,7 +249,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/SafeCast.sol": {
-      "lastModificationDate": 1625094132999,
+      "lastModificationDate": 1625185104176,
       "contentHash": "1ce1cd6ddaaab5c86848e141f9be1e76",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/SafeCast.sol",
       "solcConfig": {
@@ -439,7 +439,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol": {
-      "lastModificationDate": 1625094133679,
+      "lastModificationDate": 1625185104176,
       "contentHash": "b93f5f6024b80c696b3471a457dc263f",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol",
       "solcConfig": {
@@ -473,7 +473,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol": {
-      "lastModificationDate": 1625094133679,
+      "lastModificationDate": 1625185104176,
       "contentHash": "d5accbad824ec34472b93761f1407ab9",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol",
       "solcConfig": {
@@ -507,7 +507,7 @@
       ]
     },
     "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol": {
-      "lastModificationDate": 1625094132999,
+      "lastModificationDate": 1625185104176,
       "contentHash": "07425e3c3ac59f13893de9d03da82ce1",
       "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol",
       "solcConfig": {
@@ -952,6 +952,706 @@
       ],
       "artifacts": [
         "Position"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/contracts/interfaces/IERC20.sol": {
+      "lastModificationDate": 1625189561187,
+      "contentHash": "f1087681d78f4e0cfb0319c75c2a1c32",
+      "sourceName": "contracts/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/contracts/test/Token.sol": {
+      "lastModificationDate": 1625189535675,
+      "contentHash": "abdfab74e8c9f82d1ff7e9ba8d4d4ff2",
+      "sourceName": "contracts/test/Token.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "Token"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/contracts/test/house/HouseCreate.sol": {
+      "lastModificationDate": 1625190345209,
+      "contentHash": "13cd1ae5378de19f942d54f439e26561",
+      "sourceName": "contracts/test/house/HouseCreate.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../../interfaces/IERC20.sol",
+        "hardhat/console.sol",
+        "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol",
+        "@primitivefinance/primitive-v2-core/contracts/interfaces/IPrimitiveEngine.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "EngineCreate"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/IPrimitiveEngine.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "0dac9b075b11d568188ba8fa21742284",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/IPrimitiveEngine.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./engine/IPrimitiveEngineActions.sol",
+        "./engine/IPrimitiveEngineEvents.sol",
+        "./engine/IPrimitiveEngineView.sol",
+        "./IERC3156FlashLender.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "IPrimitiveEngine"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineEvents.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "4b0e6c3ee62192a653f26e0b3a5b1256",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineEvents.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "IPrimitiveEngineEvents"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/IERC3156FlashLender.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "0cf0584b26a85891f6ec2d07aa93cfb2",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/IERC3156FlashLender.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC3156FlashBorrower.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "IERC3156FlashLender"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/IERC3156FlashBorrower.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "5f4a32c3b5686ffc7f4ca5f544976fdd",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/IERC3156FlashBorrower.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "IERC3156FlashBorrower"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/PrimitiveEngine.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "24405fb54c60314076ea7c8286bf372e",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/PrimitiveEngine.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./libraries/ABDKMath64x64.sol",
+        "./libraries/BlackScholes.sol",
+        "./libraries/Margin.sol",
+        "./libraries/Position.sol",
+        "./libraries/ReplicationMath.sol",
+        "./libraries/Reserve.sol",
+        "./libraries/SafeCast.sol",
+        "./libraries/Transfers.sol",
+        "./libraries/Units.sol",
+        "./interfaces/callback/IPrimitiveLendingCallback.sol",
+        "./interfaces/callback/IPrimitiveLiquidityCallback.sol",
+        "./interfaces/callback/IPrimitiveMarginCallback.sol",
+        "./interfaces/callback/IPrimitiveSwapCallback.sol",
+        "./interfaces/callback/IPrimitiveCreateCallback.sol",
+        "./interfaces/IERC20.sol",
+        "./interfaces/IPrimitiveEngine.sol",
+        "./interfaces/IPrimitiveFactory.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "PrimitiveEngine"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/ABDKMath64x64.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "8c041c48de2fbd2a20737faeae2246a8",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/ABDKMath64x64.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ABDKMath64x64"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/BlackScholes.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "fa87680b60aeba404bf280dbcb16f455",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/BlackScholes.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ABDKMath64x64.sol",
+        "./CumulativeNormalDistribution.sol",
+        "./Units.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "BlackScholes"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/ReplicationMath.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "6da0584d2fb3492556958478f880a2db",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/ReplicationMath.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ABDKMath64x64.sol",
+        "./BlackScholes.sol",
+        "./CumulativeNormalDistribution.sol",
+        "./Units.sol",
+        "hardhat/console.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "ReplicationMath"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/Reserve.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "d0c05a227d130bb503d14c9bbdb5f621",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/Reserve.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./SafeCast.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "Reserve"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/Transfers.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "1181df1c81233b4ac896aea020d28f15",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/Transfers.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../interfaces/IERC20.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "Transfers"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/Units.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "6866e7392db4ab3da630c3dc0c857b02",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/Units.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ABDKMath64x64.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "Units"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/IERC20.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "692c380d7131d1556df88bac1510f0af",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/IERC20.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "IERC20"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/interfaces/IPrimitiveFactory.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "2c63a487f1a5e959bcae7d4c2ecba0fd",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/interfaces/IPrimitiveFactory.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "IPrimitiveFactory"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/libraries/CumulativeNormalDistribution.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "988895af33fda17e57efe31d9bab6a37",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/libraries/CumulativeNormalDistribution.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./ABDKMath64x64.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "CumulativeNormalDistribution"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/node_modules/@primitivefinance/primitive-v2-core/contracts/PrimitiveFactory.sol": {
+      "lastModificationDate": 1625185104176,
+      "contentHash": "79b5fdbf017e74aadd2a0caf1b214cc1",
+      "sourceName": "@primitivefinance/primitive-v2-core/contracts/PrimitiveFactory.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./interfaces/IPrimitiveFactory.sol",
+        "./PrimitiveEngine.sol"
+      ],
+      "versionPragmas": [
+        "0.8.0"
+      ],
+      "artifacts": [
+        "PrimitiveFactory"
+      ]
+    },
+    "/home/matt/Workspace/primitive-v2-periphery/contracts/test/house/imports.sol": {
+      "lastModificationDate": 1625190304221,
+      "contentHash": "c7ba001896ae4cc623a9d404d23cf348",
+      "sourceName": "contracts/test/house/imports.sol",
+      "solcConfig": {
+        "version": "0.8.0",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 400
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@primitivefinance/primitive-v2-core/contracts/PrimitiveEngine.sol",
+        "@primitivefinance/primitive-v2-core/contracts/PrimitiveFactory.sol"
+      ],
+      "versionPragmas": [],
+      "artifacts": [
+        "Import"
       ]
     }
   }

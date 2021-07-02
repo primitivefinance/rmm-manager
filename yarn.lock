@@ -616,10 +616,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.1.0.tgz#baec89a7f5f73e3d8ea582a78f1980134b605375"
   integrity sha512-TihZitscnaHNcZgXGj9zDLDyCqjziytB4tMCwXq0XimfWkAjBYyk5/pOsDbbwcavhlc79HhpTEpQcrMnPVa1mw==
 
-"@primitivefinance/primitive-v2-core@^0.0.1":
-  version "0.0.1"
-  resolved "https://npm.pkg.github.com/download/@primitivefinance/primitive-v2-core/0.0.1/27b7286267dd738fcb62f0f0cebad2e5ad4b50fa402b6978833dc0669e0adc2d#c12397ba6b67ecf440fcefb094eb4a185781fbf3"
-  integrity sha512-36BF2Vd4sWsMBdJKzXqCSt4GGPgu+hEyxwK/dXYN9QH98vU0yqedWgx81iZKAQ1XrYTGlJGnDI4dtayKyt8QHQ==
+"@primitivefinance/primitive-v2-core@^0.0.2":
+  version "0.0.2"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/primitive-v2-core/0.0.2/4ff365a4ab2146908f6ce79cf69ed26e9f97b79acd4d7b4a65733d0decf0c376#78545b23fa95425c72000646a8e8a7b495242cf2"
+  integrity sha512-M4BtwAn+hJr+SSkgL6WURgulD7IoNwH3V6VNxp0WF6/bE5qo+nZFkPTWCPQ3M5ZknymwPAu4aqapkyKyib4aRg==
 
 "@resolver-engine/core@^0.3.3":
   version "0.3.3"
