@@ -2,12 +2,12 @@
 pragma solidity 0.8.0;
 pragma abicoder v2;
 
-import "./callback/IPrimitiveMarginCallback.sol";
-import "./callback/IPrimitiveLendingCallback.sol";
-import "./callback/IPrimitiveLiquidityCallback.sol";
-import "./callback/IPrimitiveSwapCallback.sol";
-import "./callback/IPrimitiveCreateCallback.sol";
-import "../libraries/Margin.sol";
+import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
+import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveLendingCallback.sol";
+import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
+import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveMarginCallback.sol";
+import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
+import "@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol";
 
 interface IPrimitiveHouse is 
   IPrimitiveCreateCallback,
@@ -19,7 +19,7 @@ interface IPrimitiveHouse is
     // init
     function initialize(address engine_, address factory_, uint24 fee_) external;
     // Margin
-    function create(uint strike, uint sigma, uint time, uint riskyPrice, bytes calldata data) external;
+    function create(uint strike, uint64 sigma, uint32 time, uint riskyPrice, bytes calldata data) external;
     function deposit(address owner, uint deltaX, uint deltaY, bytes calldata data) external;
     function withdraw(uint deltaX, uint deltaY) external;
     function borrow(bytes32 pid, address owner, uint deltaL, bytes calldata data) external;
