@@ -57,14 +57,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
         _;
     }
 
-    function initialize(address engine_, address factory_, uint24 fee_) public override {
-        require(address(engine) == address(0), "Already initialized");
+    function initialize(address engine_) public override {
+        require(engine == address(0), "Already initialized");
         engine = engine_;
         risky = IERC20(IPrimitiveEngineView(engine_).risky());
         stable = IERC20(IPrimitiveEngineView(engine_).stable());
-        uniFactory = IUniswapV3Factory(factory_); 
-        uniPool = IUniswapV3Pool(uniFactory.getPool(address(risky), address(stable), fee_));
-        require(address(uniPool) != address(0), "POOL UNINITIALIZED");
     }
 
     function create(uint strike, uint64 sigma, uint32 time, uint riskyPrice, bytes calldata data) public override lock useCallerContext {

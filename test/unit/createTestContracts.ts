@@ -20,7 +20,7 @@ async function deploy(contractName: string, deployer: Wallet): Promise<Contract>
 }
 
 async function initializeTestContract<T extends Contract>(contract: T, loadedContracts: any): Promise<void> {
-  await contract.initialize(loadedContracts.engine.address, loadedContracts.risky.address, loadedContracts.stable.address)
+  await contract.initialize(loadedContracts.house.address)
 }
 
 async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts> {
@@ -37,10 +37,11 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
 export default async function createTestContracts(contracts: ContractName[], deployer: Wallet): Promise<Contracts> {
   const loadedContracts: Contracts = {} as Contracts
 
-  const { factory, engine, risky, stable } = await initializeBaseContracts(deployer)
+  const { factory, engine, risky, stable, house } = await initializeBaseContracts(deployer)
 
   loadedContracts.factory = factory
   loadedContracts.engine = engine
+  loadedContracts.house = house
   loadedContracts.risky = risky
   loadedContracts.stable = stable
 
@@ -48,6 +49,10 @@ export default async function createTestContracts(contracts: ContractName[], dep
     const contractName = contracts[i]
 
     switch (contractName) {
+      case 'houseInitialize':
+        loadedContracts.houseInitialize = (await deploy('HouseInitialize', deployer)) as ContractTypes.HouseInitialize
+        await initializeTestContract(loadedContracts.houseInitialize, loadedContracts)
+        break
       default:
         throw new Error(`Unknown contract name: ${contractName}`)
     }
