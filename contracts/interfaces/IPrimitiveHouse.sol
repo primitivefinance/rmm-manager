@@ -17,7 +17,7 @@ interface IPrimitiveHouse is
   IPrimitiveSwapCallback 
 {
     // init
-    function initialize(address engine_, address factory_, uint24 fee_) external;
+    function initialize(address engine_) external;
     // Margin
     function create(uint strike, uint64 sigma, uint32 time, uint riskyPrice, bytes calldata data) external;
     function deposit(address owner, uint deltaX, uint deltaY, bytes calldata data) external;

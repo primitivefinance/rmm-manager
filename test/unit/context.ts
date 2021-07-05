@@ -1,6 +1,7 @@
 import { createFixtureLoader, MockProvider } from 'ethereum-waffle'
 import { Contracts, Functions, Mocks, ContractName } from '../../types'
 import { Wallet } from 'ethers'
+import createTestContracts from './createTestContracts'
 
 export default async function loadContext(
   provider: MockProvider,
@@ -15,8 +16,7 @@ export default async function loadContext(
       let loadedContracts: Contracts = {} as Contracts
       let loadedFunctions: Functions = {} as Functions
 
-      // TODO: set loaded contracts using a function
-      // TODO: set loaded functions using a function
+      loadedContracts = await createTestContracts(contracts, deployer)
 
       if (action) await action(signers, loadedContracts)
 
