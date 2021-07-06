@@ -10,6 +10,7 @@ export interface Contracts {
   risky: ContractTypes.Token
   stable: ContractTypes.Token
   houseInitialize: ContractTypes.HouseInitialize
+  houseCreate: ContractTypes.HouseCreate
 }
 
 export interface Mocks {}
@@ -23,4 +24,4 @@ declare module 'mocha' {
   }
 }
 
-type ContractName = 'houseInitialize'
+type ContractName = 'houseInitialize' | 'houseCreate'
