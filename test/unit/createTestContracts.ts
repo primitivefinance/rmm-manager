@@ -1,6 +1,6 @@
 import hre, { ethers } from 'hardhat'
 import { Wallet, Contract } from 'ethers'
-import { Contracts, ContractName } from '../../types'
+import { Contracts } from '../../types'
 import { deployContract } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
 import { abi as PrimitiveEngineAbi } from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'

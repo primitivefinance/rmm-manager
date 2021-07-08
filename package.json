@@ -16,7 +16,8 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "test:logs": "hardhat test --logs"
+    "test:logs": "hardhat test --logs",
+    "test:house": "hardhat test ./test/unit/primitiveHouse"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
@@ -29,7 +30,7 @@
     "@types/node": "^14.14.36",
     "@uniswap/v3-core": "^1.0.0",
     "@uniswap/v3-periphery": "^1.0.0",
-    "@primitivefinance/primitive-v2-core": "^0.0.2",
+    "@primitivefinance/primitive-v2-core": "^0.0.3",
     "bignumber.js": "^9.0.1",
     "chai": "^4.3.4",
     "ethereum-waffle": "^3.3.0",
