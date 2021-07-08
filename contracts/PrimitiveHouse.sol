@@ -69,85 +69,87 @@ contract PrimitiveHouse is IPrimitiveHouse {
     }
 
     /**
-     * @notice Adds deltaX and deltaY to internal balance of `msg.sender`.
+     * @notice Adds delRisky and delStable to internal balance of `msg.sender`.
      */
-    function deposit(address owner, uint deltaX, uint deltaY, bytes calldata data) public override lock useCallerContext {
-        IPrimitiveEngineActions(engine).deposit(address(this), deltaX, deltaY, data);
+    function deposit(address owner, uint delRisky, uint delStable, bytes calldata data) public override lock useCallerContext {
+        IPrimitiveEngineActions(engine).deposit(address(this), delRisky, delStable, data);
 
         // Update Margin state
         Margin.Data storage mar = _margins[owner];
-        mar.deposit(deltaX, deltaY);
+        mar.deposit(delRisky, delStable);
     }
 
     /**
-     * @notice Removes deltaX and deltaY to internal balance of `msg.sender`.
+     * @notice Removes delRisky and delStable to internal balance of `msg.sender`.
      */
-    function withdraw(uint deltaX, uint deltaY) public override lock useCallerContext {
-        IPrimitiveEngineActions(engine).withdraw(deltaX, deltaY);
+    function withdraw(uint delRisky, uint delStable) public override lock useCallerContext {
+        IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
 
-        _margins.withdraw(deltaX, deltaY);
+        _margins.withdraw(delRisky, delStable);
 
-        if (deltaX > 0) risky.safeTransfer(CALLER, deltaX);
-        if (deltaY > 0) stable.safeTransfer(CALLER, deltaY);
+        if (delRisky > 0) risky.safeTransfer(CALLER, delRisky);
+        if (delStable > 0) stable.safeTransfer(CALLER, delStable);
     }
 
-    /**
-     * @notice Adds deltaL to global liquidity factor.
-     */
-    function allocateFromMargin(bytes32 pid, address owner, uint deltaL, bytes calldata data) public override lock useCallerContext {
-        (uint deltaX, uint deltaY) = IPrimitiveEngineActions(engine).allocate(pid, address(this),  deltaL, true, data);
-
-        _margins.withdraw(deltaX, deltaY);
-        Position.Data storage pos = _positions.fetch(owner, pid);
-        pos.allocate(deltaL); // Update position liquidity
-    }
-
-    function allocateFromExternal(bytes32 pid, address owner, uint deltaL, bytes calldata data) public override lock useCallerContext {
-        IPrimitiveEngineActions(engine).allocate(pid, address(this),  deltaL, false, data);
-
-        Position.Data storage pos = _positions.fetch(owner, pid);
-        pos.allocate(deltaL); // Update position liquidity
-    }
-
-    function repayFromExternal(bytes32 pid, address owner, uint deltaL, bytes calldata data) public override lock useCallerContext {
-        (uint deltaRisky,,) = IPrimitiveEngineActions(engine).repay(pid, address(this), deltaL, false, data);
-
-        Position.Data storage pos = _positions.fetch(owner, pid);
-        pos.repay(deltaL);
-        
-        Margin.Data storage mar = _margins[owner];
-        mar.deposit(deltaL - deltaRisky, uint(0));
-
-    }
-
-    function repayFromMargin(bytes32 pid, address owner,  uint deltaL, bytes calldata data) public override lock useCallerContext {
-        (uint deltaRisky,,) = IPrimitiveEngineActions(engine).repay(pid, address(this), deltaL, true, data);
+    function allocate(
+      bytes32 poolId,
+      address owner,
+      uint256 delLiquidity,
+      bool fromMargin,
+      bytes calldata data
+    ) external override lock useCallerContext {
+      (uint256 delRisky, uint256 delStable) = fromMargin ? 
+        IPrimitiveEngineActions(engine).allocate(poolId, address(this), delLiquidity, true, data) :
+        IPrimitiveEngineActions(engine).allocate(poolId, address(this), delLiquidity, false, data);
 
 
-        Position.Data storage pos = _positions.fetch(owner, pid);
-        pos.repay(deltaL);
-
-        Margin.Data storage mar = _margins[owner];
-        mar.deposit(deltaL - deltaRisky, uint(0));
-
-    }
-
-    function borrow(bytes32 pid, address owner, uint deltaL, bytes calldata data) public override lock useCallerContext {
-      IPrimitiveEngineActions(engine).borrow(pid, deltaL, type(uint256).max, data);
+      if (fromMargin) _margins.withdraw(delRisky, delStable);
       
-      _positions.borrow(pid, deltaL);
+      Position.Data storage pos = _positions.fetch(owner, poolId);
+      pos.allocate(delLiquidity);
+
+      IPrimitiveEngineActions(engine).lend(poolId, delLiquidity);
+
+      _positions.lend(poolId, delLiquidity);
+
     }
+
+    function borrow(
+      bytes32 poolId, 
+      address owner, 
+      uint256 delLiquidity, 
+      uint256 maxPremium, 
+      bytes calldata data
+    ) public override lock useCallerContext {
+      IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, maxPremium, data);
+      
+      _positions.borrow(poolId, delLiquidity);
+    }
+
+    function repay(
+      bytes32 poolId,
+      address owner,
+      uint256 delLiquidity,
+      bool fromMargin,
+      bytes calldata data
+    ) public override lock useCallerContext {
+      (uint256 delRisky, uint256 delStable, uint256 premium) = fromMargin ? 
+        IPrimitiveEngineActions(engine).repay(poolId, address(this), delLiquidity, true, data) :
+        IPrimitiveEngineActions(engine).repay(poolId, address(this), delLiquidity, false, data);
+
+      console.log('here');
+
+      if (fromMargin) _margins.withdraw(0, delStable);
+
+      Position.Data storage pos = _positions.fetch(owner, poolId);
+      pos.repay(delLiquidity);
+
+      Margin.Data storage mar = _margins[owner];
+      mar.deposit(premium, 0);
+    }
+
     
-    /**
-     * @notice Puts `deltaL` LP shares up to be borrowed.
-     */
-    function lend(bytes32 pid, uint deltaL) public override lock useCallerContext {
-        IPrimitiveEngineActions(engine).lend(pid, deltaL);
-
-        _positions.lend(pid, deltaL);
-    }
-
-    function swap(bytes32 pid, bool addXRemoveY, uint deltaOut, uint deltaInMax, bytes calldata data) public override lock {
+    function swap(bytes32 pid, bool addXRemoveY, uint256 deltaOut, uint256 deltaInMax, bytes calldata data) public override lock {
         CALLER = msg.sender;
         IPrimitiveEngineActions(engine).swap(pid, addXRemoveY, deltaOut, deltaInMax, true, data);
     }
@@ -163,61 +165,46 @@ contract PrimitiveHouse is IPrimitiveHouse {
     }
     
     // ===== Callback Implementations =====
-    function createCallback(uint deltaX, uint deltaY, bytes calldata data) public override executionLock {
-        if (deltaX > 0) risky.safeTransferFrom(CALLER, msg.sender, deltaX);
-        if (deltaY > 0) stable.safeTransferFrom(CALLER, msg.sender, deltaY);
+    function createCallback(uint delRisky, uint delStable, bytes calldata data) public override executionLock {
+        if (delRisky > 0) risky.safeTransferFrom(CALLER, msg.sender, delRisky);
+        if (delStable > 0) stable.safeTransferFrom(CALLER, msg.sender, delStable);
     }
 
-    function depositCallback(uint deltaX, uint deltaY, bytes calldata data) public override executionLock {
-        if (deltaX > 0) risky.safeTransferFrom(CALLER, msg.sender, deltaX);
-        if (deltaY > 0) stable.safeTransferFrom(CALLER, msg.sender, deltaY);
+    function depositCallback(uint delRisky, uint delStable, bytes calldata data) public override executionLock {
+        if (delRisky > 0) risky.safeTransferFrom(CALLER, msg.sender, delRisky);
+        if (delStable > 0) stable.safeTransferFrom(CALLER, msg.sender, delStable);
     }
 
-    function allocateCallback(uint deltaX, uint deltaY, bytes calldata data) public override executionLock {
-        if(deltaX > 0) risky.safeTransferFrom(CALLER, msg.sender, deltaX);
-        if(deltaY > 0) stable.safeTransferFrom(CALLER, msg.sender, deltaY);
+    function allocateCallback(uint delRisky, uint delStable, bytes calldata data) public override executionLock {
+        if(delRisky > 0) risky.safeTransferFrom(CALLER, msg.sender, delRisky);
+        if(delStable > 0) stable.safeTransferFrom(CALLER, msg.sender, delStable);
     }
 
-    function removeCallback(uint deltaX, uint deltaY, bytes calldata data) public override executionLock {
-        if(deltaX > 0) risky.safeTransferFrom(CALLER, msg.sender, deltaX);
-        if(deltaY > 0) stable.safeTransferFrom(CALLER, msg.sender, deltaY);
+    function removeCallback(uint delRisky, uint delStable, bytes calldata data) public override executionLock {
+        if(delRisky > 0) risky.safeTransferFrom(CALLER, msg.sender, delRisky);
+        if(delStable > 0) stable.safeTransferFrom(CALLER, msg.sender, delStable);
     }
 
-    function swapCallback(uint deltaX, uint deltaY, bytes calldata data) public override {
+    function swapCallback(uint delRisky, uint delStable, bytes calldata data) public override {
     }
 
-    function borrowCallback(uint deltaL, uint deltaX, uint deltaY, bytes calldata data) public override executionLock {
-      uint preBY2 = stable.balanceOf(address(this));
-
-      bytes memory placeholder = "0x";
-
-      uint riskyNeeded = deltaL - deltaX;
+    function borrowCallback(
+      uint256 delLiquidity, 
+      uint256 delRisky,
+      uint256 delStable,
+      bytes calldata data
+    ) public override executionLock {
+      console.log('here');
+      uint256 riskyNeeded = delLiquidity - delRisky;
       risky.safeTransferFrom(CALLER, msg.sender, riskyNeeded);
-      stable.safeTransfer(CALLER, deltaY);
-
-      uint postBY2 = stable.balanceOf(address(this));
-      require(postBY2 >= preBY2 - deltaY);
-/*
-      bool zeroForOne = stable > risky ? true : false;
-      (int256 res0, int256 res1) = uniPool.swap(
-        address(this),
-        zeroForOne,
-        int256(deltaY),
-        uint160(0),
-        placeholder
-      );
-
-      uint riskyNeeded = zeroForOne ? deltaL - (deltaX + uint(res0)) : deltaL - (deltaX + uint(res1));
-      risky.safeTransferFrom(CALLER, msg.sender, riskyNeeded);
-      risky.safeTransfer(
-        msg.sender,
-        zeroForOne ? uint(res0) : uint(res1)
-     );
-    */
+      stable.safeTransfer(CALLER, delStable);
     }
 
-    function repayFromExternalCallback(uint deltaStable, bytes calldata data) public override {
-      stable.safeTransferFrom(CALLER, msg.sender, deltaStable);
+    function repayFromExternalCallback(
+      uint256 delStable, 
+      bytes calldata data
+    ) public override {
+      stable.safeTransferFrom(CALLER, msg.sender, delStable);
     }
 
     function uniswapV3SwapCallback(int256 amount0Delta, int256 amount1Delta, bytes calldata date) external {

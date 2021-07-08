@@ -19,19 +19,16 @@ interface IPrimitiveHouse is
     // init
     function initialize(address engine_) external;
     // Margin
-    function create(uint strike, uint64 sigma, uint32 time, uint riskyPrice, bytes calldata data) external;
-    function deposit(address owner, uint deltaX, uint deltaY, bytes calldata data) external;
-    function withdraw(uint deltaX, uint deltaY) external;
-    function borrow(bytes32 pid, address owner, uint deltaL, bytes calldata data) external;
-    function allocateFromMargin(bytes32 pid, address owner, uint deltaL, bytes calldata data) external;
-    function allocateFromExternal(bytes32 pid, address owner, uint deltaL, bytes calldata data) external;
-    function repayFromExternal(bytes32 pid, address owner, uint deltaL, bytes calldata data) external;
-    function repayFromMargin(bytes32 pid, address owner, uint deltaL, bytes calldata data) external;
+    function create(uint256 strike, uint64 sigma, uint32 time, uint256 riskyPrice, bytes calldata data) external;
+    function deposit(address owner, uint delRisky, uint delStable, bytes calldata data) external;
+    function withdraw(uint256 delRisky, uint256 delStable) external;
+    function borrow(bytes32 poolId, address owner, uint delLiquidity, uint256 maxPremium, bytes calldata data) external;
+    function allocate(bytes32 poolId, address owner, uint256 delLiquidity, bool fromMargin, bytes calldata data) external;
+    function repay(bytes32 poolId, address owner, uint256 delLiquidity, bool fromMargin, bytes calldata data) external;
     // Swap
-    function swap(bytes32 pid, bool addXRemoveY, uint deltaOut, uint maxDeltaIn, bytes calldata data) external;
-    function swapXForY(bytes32 pid, uint deltaOut) external;
-    function swapYForX(bytes32 pid, uint deltaOut) external;
+    function swap(bytes32 poolId, bool addXRemoveY, uint256 deltaOut, uint256 maxDeltaIn, bytes calldata data) external;
+    function swapXForY(bytes32 poolId, uint deltaOut) external;
+    function swapYForX(bytes32 poolId, uint deltaOut) external;
     // Lending
-    function lend(bytes32 pid, uint deltaL) external;
     function margins(address owner) external view returns (Margin.Data memory);
 }
