@@ -17,84 +17,102 @@ contract PrimitiveHouse is IPrimitiveHouse {
     using Position for mapping(bytes32 => Position.Data);
     using Position for Position.Data;
 
-    address external constant NO_CALLER = address(21);
+    address engine;
 
-    address external engine;
+    IERC20 risky;
+    IERC20 stable;
+    IUniswapV3Factory uniFactory;
+    IUniswapV3Pool uniPool;
 
-    IERC20 external risky;
-    IERC20 external stable;
-    IUniswapV3Factory external uniFactory;
-    IUniswapV3Pool external uniPool;
-
-    address external CALLER = NO_CALLER;
     uint private reentrant;
 
-    mapping(address => Margin.Data) external _margins;
-    mapping(bytes32 => Position.Data) external _positions;
+    mapping(address => Margin.Data) _margins;
+    mapping(bytes32 => Position.Data) _positions;
 
     constructor() {}
 
     modifier lock() {
-        require(reentrant != 1, "locked");
-        reentrant = 1;
-        _;
-        reentrant = 0;
+      require(reentrant != 1, "locked");
+      reentrant = 1;
+      _;
+      reentrant = 0;
     }
 
     function initialize(
       address engine_
     ) external override {
-        require(engine == address(0), "Already initialized");
-        engine = engine_;
-        risky = IERC20(IPrimitiveEngineView(engine_).risky());
-        stable = IERC20(IPrimitiveEngineView(engine_).stable());
+      require(engine == address(0), "Already initialized");
+      engine = engine_;
+      risky = IERC20(IPrimitiveEngineView(engine_).risky());
+      stable = IERC20(IPrimitiveEngineView(engine_).stable());
     }
 
     function create(
       uint256 strike, 
       uint64 sigma, 
       uint32 time, 
-      uint riskyPrice, 
-      bytes calldata data
+      uint riskyPrice
     ) external override lock  {
-      IPrimitiveEngineActions(engine).create(strike, sigma, time, riskyPrice, 1e18, data);
+      IPrimitiveEngineActions(engine).create(
+        strike, 
+        sigma, 
+        time, 
+        riskyPrice, 
+        1e18, 
+        abi.encode(CreateCallbackData({ payer: msg.sender }))
+      );
     }
 
     function deposit(
       address owner, 
       uint256 delRisky, 
-      uint256 delStable, 
-      bytes calldata data
+      uint256 delStable
     ) external override lock  {
-        IPrimitiveEngineActions(engine).deposit(address(this), delRisky, delStable, data);
+      IPrimitiveEngineActions(engine).deposit(
+        address(this), 
+        delRisky, 
+        delStable, 
+        abi.encode(DepositCallbackData({ payer: msg.sender }))
+      );
 
-        // Update Margin state
-        Margin.Data storage mar = _margins[owner];
-        mar.deposit(delRisky, delStable);
+      // Update Margin state
+      Margin.Data storage mar = _margins[owner];
+      mar.deposit(delRisky, delStable);
     }
 
     function withdraw(
       uint256 delRisky, 
       uint256 delStable
     ) external override lock  {
-        IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
+      IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
 
-        _margins.withdraw(delRisky, delStable);
+      _margins.withdraw(delRisky, delStable);
 
-        if (delRisky > 0) risky.safeTransfer(msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransfer(msg.sender, delStable);
+      if (delRisky > 0) risky.safeTransfer(msg.sender, delRisky);
+      if (delStable > 0) stable.safeTransfer(msg.sender, delStable);
     }
 
     function allocate(
       bytes32 poolId,
       address owner,
       uint256 delLiquidity,
-      bool fromMargin,
-      bytes calldata data
+      bool fromMargin
     ) external override lock  {
       (uint256 delRisky, uint256 delStable) = fromMargin ? 
-        IPrimitiveEngineActions(engine).allocate(poolId, address(this), delLiquidity, true, data) :
-        IPrimitiveEngineActions(engine).allocate(poolId, address(this), delLiquidity, false, data);
+        IPrimitiveEngineActions(engine).allocate(
+          poolId, 
+          address(this), 
+          delLiquidity, 
+          true, 
+          abi.encode(AllocateCallbackData({ payer: msg.sender }))
+      ) :
+        IPrimitiveEngineActions(engine).allocate(
+          poolId, 
+          address(this), 
+          delLiquidity, 
+          false, 
+          abi.encode(AllocateCallbackData({ payer: msg.sender }))
+      );
 
       if (fromMargin) _margins.withdraw(delRisky, delStable);
       
@@ -110,10 +128,14 @@ contract PrimitiveHouse is IPrimitiveHouse {
       bytes32 poolId, 
       address owner, 
       uint256 delLiquidity, 
-      uint256 maxPremium, 
-      bytes calldata data
+      uint256 maxPremium
     ) external override lock  {
-      IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, maxPremium, data);
+      IPrimitiveEngineActions(engine).borrow(
+        poolId, 
+        delLiquidity, 
+        maxPremium, 
+        abi.encode(BorrowCallbackData({ payer: msg.sender })) 
+      );
       
       _positions.borrow(poolId, delLiquidity);
     }
@@ -122,12 +144,24 @@ contract PrimitiveHouse is IPrimitiveHouse {
       bytes32 poolId,
       address owner,
       uint256 delLiquidity,
-      bool fromMargin,
-      bytes calldata data
+      bool fromMargin
     ) external override lock  {
+      bytes memory data = '0x';
       (uint256 delRisky, uint256 delStable, uint256 premium) = fromMargin ? 
-        IPrimitiveEngineActions(engine).repay(poolId, address(this), delLiquidity, true, data) :
-        IPrimitiveEngineActions(engine).repay(poolId, address(this), delLiquidity, false, data);
+        IPrimitiveEngineActions(engine).repay(
+          poolId, 
+          address(this), 
+          delLiquidity, 
+          true, 
+          data
+      ) :
+        IPrimitiveEngineActions(engine).repay(
+          poolId, 
+          address(this), 
+          delLiquidity, 
+          false, 
+          abi.encode(RepayFromExternalCallbackData({ payer: msg.sender })) 
+      );
 
       if (fromMargin) _margins.withdraw(0, delStable);
 
@@ -145,60 +179,89 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 deltaInMax, 
       bytes calldata data
     ) external override lock {
-        IPrimitiveEngineActions(engine).swap(poolId, addXRemoveY, deltaOut, deltaInMax, true, data);
+      IPrimitiveEngineActions(engine).swap(poolId, addXRemoveY, deltaOut, deltaInMax, true, data);
     }
 
     function swapXForY(
       bytes32 poolId, 
       uint256 deltaOut
     ) external override lock {
-        IPrimitiveEngineActions(engine).swap(poolId, true, deltaOut, type(uint256).max, true, new bytes(0));
+      IPrimitiveEngineActions(engine).swap(poolId, true, deltaOut, type(uint256).max, true, new bytes(0));
     }
 
     function swapYForX(
       bytes32 poolId, 
-      uint256 deltaOut) external override lock {
-        IPrimitiveEngineActions(engine).swap(poolId, false, deltaOut, type(uint256).max, true, new bytes(0));
+      uint256 deltaOut
+    ) external override lock {
+      IPrimitiveEngineActions(engine).swap(poolId, false, deltaOut, type(uint256).max, true, new bytes(0));
     }
     
     // ===== Callback Implementations =====
+    struct CreateCallbackData {
+      address payer;
+    }
+
     function createCallback(
       uint256 delRisky, 
       uint256 delStable, 
       bytes calldata data
-    ) external override executionLock {
-        if (delRisky > 0) risky.safeTransferFrom(CALLER, msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransferFrom(CALLER, msg.sender, delStable);
+    ) external override {
+      CreateCallbackData memory decoded = abi.decode(data, (CreateCallbackData));
+      require(msg.sender == engine);
+      if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
+      if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
+    }
+
+    struct DepositCallbackData {
+      address payer;
     }
 
     function depositCallback(
       uint256 delRisky, 
       uint256 delStable, 
       bytes calldata data
-    ) external override executionLock {
-        if (delRisky > 0) risky.safeTransferFrom(CALLER, msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransferFrom(CALLER, msg.sender, delStable);
+    ) external override {
+      DepositCallbackData memory decoded = abi.decode(data, (DepositCallbackData));
+      require(msg.sender == engine);
+      if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
+      if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
+    }
+
+    struct AllocateCallbackData {
+      address payer;
     }
 
     function allocateCallback(
       uint256 delRisky, 
       uint256 delStable, 
       bytes calldata data
-    ) external override executionLock {
-        if (delRisky > 0) risky.safeTransferFrom(CALLER, msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransferFrom(CALLER, msg.sender, delStable);
+    ) external override {
+      AllocateCallbackData memory decoded = abi.decode(data, (AllocateCallbackData));
+      require(msg.sender == engine);
+      if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
+      if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
+    }
+
+    struct RemoveCallbackData {
+      address payer;
     }
 
     function removeCallback(
       uint256 delRisky, 
       uint256 delStable, 
       bytes calldata data
-    ) external override executionLock {
-        if (delRisky > 0) risky.safeTransferFrom(CALLER, msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransferFrom(CALLER, msg.sender, delStable);
+    ) external override {
+      RemoveCallbackData memory decoded = abi.decode(data, (RemoveCallbackData));
+      require(msg.sender == engine);
+      if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
+      if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 
     function swapCallback(uint delRisky, uint delStable, bytes calldata data) external override {
+    }
+
+    struct BorrowCallbackData {
+      address payer;
     }
 
     function borrowCallback(
@@ -206,16 +269,24 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 delRisky,
       uint256 delStable,
       bytes calldata data
-    ) external override executionLock {
+    ) external override {
+      BorrowCallbackData memory decoded = abi.decode(data, (BorrowCallbackData));
+      require(msg.sender == engine);
       uint256 riskyNeeded = delLiquidity - delRisky;
-      risky.safeTransferFrom(CALLER, msg.sender, riskyNeeded);
-      stable.safeTransfer(CALLER, delStable);
+      risky.safeTransferFrom(decoded.payer, msg.sender, riskyNeeded);
+      stable.safeTransfer(decoded.payer, delStable);
+    }
+
+    struct RepayFromExternalCallbackData {
+      address payer;
     }
 
     function repayFromExternalCallback(
       uint256 delStable, 
       bytes calldata data
     ) external override {
-      stable.safeTransferFrom(CALLER, msg.sender, delStable);
+      RepayFromExternalCallbackData memory decoded = abi.decode(data, (RepayFromExternalCallbackData));
+      require(msg.sender == engine);
+      stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 }
