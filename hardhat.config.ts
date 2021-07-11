@@ -7,6 +7,8 @@ import 'hardhat-gas-reporter'
 import 'solidity-coverage'
 import { HardhatUserConfig } from 'hardhat/config'
 
+import './tasks/generateKeys'
+
 const config: HardhatUserConfig = {
   networks: {
     hardhat: {

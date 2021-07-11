@@ -13,11 +13,13 @@ type BaseContracts = {
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token
+  admin: ContractTypes.Admin
+  whitelist: ContractTypes.Whitelist
 }
 
-async function deploy(contractName: string, deployer: Wallet): Promise<Contract> {
+async function deploy(contractName: string, deployer: Wallet, args?: any[]): Promise<Contract> {
   const artifact = await hre.artifacts.readArtifact(contractName)
-  const contract = await deployContract(deployer, artifact, [], { gasLimit: 9500000 })
+  const contract = await deployContract(deployer, artifact, args, { gasLimit: 9500000 })
   return contract
 }
 
@@ -32,19 +34,23 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
   await houseFactory.deploy(engine.address)
   const houseAddr = await houseFactory.getHouse(engine.address)
   const house = (await ethers.getContractAt(PrimitiveHouseAbi, houseAddr)) as unknown as ContractTypes.PrimitiveHouse
-  return { factory, engine, stable, risky, house, houseFactory }
+  const admin = (await deploy('Admin', deployer, [deployer.address])) as ContractTypes.Admin
+  const whitelist = (await deploy('Whitelist', deployer, [deployer.address])) as ContractTypes.Whitelist
+  return { factory, engine, stable, risky, house, houseFactory, admin, whitelist }
 }
 
 export default async function createTestContracts(deployer: Wallet): Promise<Contracts> {
   const loadedContracts: Contracts = {} as Contracts
 
-  const { factory, engine, risky, stable, house } = await initializeBaseContracts(deployer)
+  const { factory, engine, risky, stable, house, admin, whitelist } = await initializeBaseContracts(deployer)
 
   loadedContracts.factory = factory
   loadedContracts.engine = engine
   loadedContracts.house = house
   loadedContracts.risky = risky
   loadedContracts.stable = stable
+  loadedContracts.admin = admin
+  loadedContracts.whitelist = whitelist
 
   return loadedContracts
 }
