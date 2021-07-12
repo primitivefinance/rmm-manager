@@ -38,6 +38,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
       reentrant = 0;
     }
 
+    modifier onlyEngine() {
+      require(msg.sender == engine);
+      _;
+    }
+
     function initialize(
       address engine_
     ) external override {
@@ -98,19 +103,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 delLiquidity,
       bool fromMargin
     ) external override lock  {
-      (uint256 delRisky, uint256 delStable) = fromMargin ? 
-        IPrimitiveEngineActions(engine).allocate(
+      (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
           poolId, 
           address(this), 
           delLiquidity, 
-          true, 
-          abi.encode(AllocateCallbackData({ payer: msg.sender }))
-      ) :
-        IPrimitiveEngineActions(engine).allocate(
-          poolId, 
-          address(this), 
-          delLiquidity, 
-          false, 
+          fromMargin, 
           abi.encode(AllocateCallbackData({ payer: msg.sender }))
       );
 
@@ -147,19 +144,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
       bool fromMargin
     ) external override lock  {
       bytes memory data = '0x';
-      (uint256 delRisky, uint256 delStable, uint256 premium) = fromMargin ? 
-        IPrimitiveEngineActions(engine).repay(
+      (uint256 delRisky, uint256 delStable, uint256 premium) = IPrimitiveEngineActions(engine).repay(
           poolId, 
           address(this), 
           delLiquidity, 
-          true, 
-          data
-      ) :
-        IPrimitiveEngineActions(engine).repay(
-          poolId, 
-          address(this), 
-          delLiquidity, 
-          false, 
+          fromMargin, 
           abi.encode(RepayFromExternalCallbackData({ payer: msg.sender })) 
       );
 
@@ -205,9 +194,8 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 delRisky, 
       uint256 delStable, 
       bytes calldata data
-    ) external override {
+    ) external override onlyEngine{
       CreateCallbackData memory decoded = abi.decode(data, (CreateCallbackData));
-      require(msg.sender == engine);
       if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
       if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
@@ -220,9 +208,8 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 delRisky, 
       uint256 delStable, 
       bytes calldata data
-    ) external override {
+    ) external override onlyEngine {
       DepositCallbackData memory decoded = abi.decode(data, (DepositCallbackData));
-      require(msg.sender == engine);
       if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
       if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
@@ -235,9 +222,8 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 delRisky, 
       uint256 delStable, 
       bytes calldata data
-    ) external override {
+    ) external override onlyEngine {
       AllocateCallbackData memory decoded = abi.decode(data, (AllocateCallbackData));
-      require(msg.sender == engine);
       if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
       if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
@@ -250,9 +236,8 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 delRisky, 
       uint256 delStable, 
       bytes calldata data
-    ) external override {
+    ) external override onlyEngine {
       RemoveCallbackData memory decoded = abi.decode(data, (RemoveCallbackData));
-      require(msg.sender == engine);
       if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
       if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
@@ -269,9 +254,8 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 delRisky,
       uint256 delStable,
       bytes calldata data
-    ) external override {
+    ) external override onlyEngine {
       BorrowCallbackData memory decoded = abi.decode(data, (BorrowCallbackData));
-      require(msg.sender == engine);
       uint256 riskyNeeded = delLiquidity - delRisky;
       risky.safeTransferFrom(decoded.payer, msg.sender, riskyNeeded);
       stable.safeTransfer(decoded.payer, delStable);
@@ -284,9 +268,8 @@ contract PrimitiveHouse is IPrimitiveHouse {
     function repayFromExternalCallback(
       uint256 delStable, 
       bytes calldata data
-    ) external override {
+    ) external override onlyEngine {
       RepayFromExternalCallbackData memory decoded = abi.decode(data, (RepayFromExternalCallbackData));
-      require(msg.sender == engine);
       stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 }
