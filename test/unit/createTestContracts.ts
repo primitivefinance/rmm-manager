@@ -1,5 +1,5 @@
 import hre, { ethers } from 'hardhat'
-import { Wallet, Contract } from 'ethers'
+import { Wallet, Contract, utils } from 'ethers'
 import { Contracts } from '../../types'
 import { deployContract } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
@@ -34,8 +34,10 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
   await houseFactory.deploy(engine.address)
   const houseAddr = await houseFactory.getHouse(engine.address)
   const house = (await ethers.getContractAt(PrimitiveHouseAbi, houseAddr)) as unknown as ContractTypes.PrimitiveHouse
-  const admin = (await deploy('Admin', deployer, [deployer.address])) as ContractTypes.Admin
-  const whitelist = (await deploy('Whitelist', deployer, [deployer.address])) as ContractTypes.Whitelist
+  await house.addKeys([utils.solidityKeccak256(['string'], ['wentoken'])])
+  await house.useKey('wentoken', deployer.address)
+  const admin = (await deploy('Admin', deployer)) as ContractTypes.Admin
+  const whitelist = (await deploy('Whitelist', deployer)) as ContractTypes.Whitelist
   return { factory, engine, stable, risky, house, houseFactory, admin, whitelist }
 }
 
