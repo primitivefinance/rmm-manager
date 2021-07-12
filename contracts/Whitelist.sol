@@ -27,10 +27,10 @@ contract Whitelist is IWhitelist, Admin {
     }
 
 
-    /// EFFECT FUNCTIONS ///
-
-    /// @param _admin The address of the admin
-    constructor(address _admin) Admin(_admin) { }
+    constructor() {
+      initializeAdmin(msg.sender);
+    }
+  
 
     /// @inheritdoc IWhitelist
     function addKeys(bytes32[] memory hashes) external override onlyAdmin() {
