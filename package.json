@@ -1,6 +1,6 @@
 {
   "name": "@primitivefinance/primitive-v2-periphery",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "Primitive V2 periphery smart contracts.",
   "main": "index.js",
   "keywords": [
@@ -12,6 +12,8 @@
   "contracts",
   "artifacts/contracts/PrimitiveEngine.sol/PrimitiveHouse.json",
   "artifacts/contracts/PrimitiveFactory.sol/PrimitiveHouseFactory.json",
+  "artifacts/contracts/Admin.sol/Admin.json",
+  "artifacts/contracts/Whitelist.sol/Whitelist.json",
   "artifacts/contracts/interfaces/**/*.json",
   "!artifacts/contracts/interfaces/**/*.dbg.json"
   ],

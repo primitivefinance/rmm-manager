@@ -2,6 +2,7 @@
 pragma solidity 0.8.0;
 
 import "./interfaces/IPrimitiveHouse.sol";
+import  "./Whitelist.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
@@ -10,7 +11,10 @@ import "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimiti
 import "@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol";
 import "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse {
+contract PrimitiveHouse is 
+  Whitelist, 
+  IPrimitiveHouse 
+  {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
@@ -29,7 +33,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
     mapping(address => Margin.Data) _margins;
     mapping(bytes32 => Position.Data) _positions;
 
-    constructor() {}
+    constructor() Whitelist() {}
 
     modifier lock() {
       require(reentrant != 1, "locked");
@@ -57,7 +61,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint64 sigma, 
       uint32 time, 
       uint riskyPrice
-    ) external override lock  {
+    ) external override lock onlyWhitelisted {
       IPrimitiveEngineActions(engine).create(
         strike, 
         sigma, 
@@ -72,7 +76,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
       address owner, 
       uint256 delRisky, 
       uint256 delStable
-    ) external override lock  {
+    ) external override lock onlyWhitelisted {
       IPrimitiveEngineActions(engine).deposit(
         address(this), 
         delRisky, 
@@ -88,7 +92,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
     function withdraw(
       uint256 delRisky, 
       uint256 delStable
-    ) external override lock  {
+    ) external override lock onlyWhitelisted {
       IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
 
       _margins.withdraw(delRisky, delStable);
@@ -102,7 +106,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
       address owner,
       uint256 delLiquidity,
       bool fromMargin
-    ) external override lock  {
+    ) external override lock onlyWhitelisted {
       (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
           poolId, 
           address(this), 
@@ -126,7 +130,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
       address owner, 
       uint256 delLiquidity, 
       uint256 maxPremium
-    ) external override lock  {
+    ) external override lock onlyWhitelisted {
       IPrimitiveEngineActions(engine).borrow(
         poolId, 
         delLiquidity, 
@@ -142,7 +146,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
       address owner,
       uint256 delLiquidity,
       bool fromMargin
-    ) external override lock  {
+    ) external override lock onlyWhitelisted {
       bytes memory data = '0x';
       (uint256 delRisky, uint256 delStable, uint256 premium) = IPrimitiveEngineActions(engine).repay(
           poolId, 
@@ -167,21 +171,21 @@ contract PrimitiveHouse is IPrimitiveHouse {
       uint256 deltaOut, 
       uint256 deltaInMax, 
       bytes calldata data
-    ) external override lock {
+    ) external override lock onlyWhitelisted {
       IPrimitiveEngineActions(engine).swap(poolId, addXRemoveY, deltaOut, deltaInMax, true, data);
     }
 
     function swapXForY(
       bytes32 poolId, 
       uint256 deltaOut
-    ) external override lock {
+    ) external override lock onlyWhitelisted {
       IPrimitiveEngineActions(engine).swap(poolId, true, deltaOut, type(uint256).max, true, new bytes(0));
     }
 
     function swapYForX(
       bytes32 poolId, 
       uint256 deltaOut
-    ) external override lock {
+    ) external override lock onlyWhitelisted {
       IPrimitiveEngineActions(engine).swap(poolId, false, deltaOut, type(uint256).max, true, new bytes(0));
     }
     
