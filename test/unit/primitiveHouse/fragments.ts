@@ -5,8 +5,6 @@ import { config } from '../context'
 
 const { strike, sigma, maturity, spot } = config
 
-const empty = constants.HashZero
-
 export async function initializeFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
   // do nothing
 }
@@ -21,12 +19,12 @@ export async function createFragment(signers: Wallet[], contracts: Contracts): P
 
 export async function depositFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
   await createFragment(signers, contracts)
-  await contracts.house.create(strike.raw, sigma.raw, maturity.raw, spot.raw, empty)
+  await contracts.house.create(strike.raw, sigma.raw, maturity.raw, spot.raw)
 }
 
 export async function withdrawFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
   await depositFragment(signers, contracts)
-  await contracts.house.deposit(signers[0].address, parseWei('100000').raw, parseWei('100000').raw, empty)
+  await contracts.house.deposit(signers[0].address, parseWei('100000').raw, parseWei('100000').raw)
 }
 
 export async function allocateFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
@@ -36,11 +34,11 @@ export async function allocateFragment(signers: Wallet[], contracts: Contracts):
 export async function borrowFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
   await withdrawFragment(signers, contracts)
   const poolId = await contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
-  await contracts.house.allocate(poolId, signers[0].address, parseWei('10').raw, true, empty)
+  await contracts.house.allocate(poolId, signers[0].address, parseWei('10').raw, true)
 }
 
 export async function repayFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
   await borrowFragment(signers, contracts)
   const poolId = await contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
-  await contracts.house.borrow(poolId, signers[0].address, parseWei('10').raw, constants.MaxUint256, empty)
+  await contracts.house.borrow(poolId, signers[0].address, parseWei('10').raw, constants.MaxUint256)
 }
