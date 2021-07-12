@@ -4,9 +4,11 @@ import { Contracts } from '../../types'
 import { deployContract } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
 import { abi as PrimitiveEngineAbi } from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import { abi as PrimitiveHouseAbi } from '../../artifacts/contracts/PrimitiveHouse.sol/PrimitiveHouse.json'
 
 type BaseContracts = {
   factory: ContractTypes.PrimitiveFactory
+  houseFactory: ContractTypes.PrimitiveHouseFactory
   engine: ContractTypes.PrimitiveEngine
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
@@ -23,11 +25,14 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
   const risky = (await deploy('Token', deployer)) as ContractTypes.Token
   const stable = (await deploy('Token', deployer)) as ContractTypes.Token
   const factory = (await deploy('PrimitiveFactory', deployer)) as ContractTypes.PrimitiveFactory
+  const houseFactory = (await deploy('PrimitiveHouseFactory', deployer)) as ContractTypes.PrimitiveHouseFactory
   await factory.deploy(risky.address, stable.address)
   const addr = await factory.getEngine(risky.address, stable.address)
   const engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as unknown as ContractTypes.PrimitiveEngine
-  const house = (await deploy('PrimitiveHouse', deployer)) as ContractTypes.PrimitiveHouse
-  return { factory, engine, stable, risky, house }
+  await houseFactory.deploy(engine.address)
+  const houseAddr = await houseFactory.getHouse(engine.address)
+  const house = (await ethers.getContractAt(PrimitiveHouseAbi, houseAddr)) as unknown as ContractTypes.PrimitiveHouse
+  return { factory, engine, stable, risky, house, houseFactory }
 }
 
 export default async function createTestContracts(deployer: Wallet): Promise<Contracts> {
