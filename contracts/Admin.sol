@@ -13,9 +13,11 @@ contract Admin is IAdmin {
         _;
     }
 
+    constructor() {}
+
     /// @param _admin The address receiving the admin rights
-    constructor(address _admin) {
-        admin = _admin;
+    function initializeAdmin(address _admin) internal {
+      admin = _admin;
     }
 
     /// @inheritdoc IAdmin
