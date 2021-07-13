@@ -34,7 +34,7 @@ contract Whitelist is IWhitelist, Admin {
     }
 
     /// @inheritdoc IWhitelist
-    function useKey(string memory key, address user) external override {
+    function useKey(string memory key, address user) public virtual override {
         require(isWhitelisted[user] == false, "Already whitelisted");
         bytes32 hash = keccak256(abi.encodePacked(key));
         require(isHashedKey[hash] == true, "Invalid key");

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.0;
 
-import "./interfaces/IPrimitiveHouse.sol";
-import "./Whitelist.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
@@ -11,6 +9,10 @@ import "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimiti
 import "@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol";
 import "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol";
 
+import "./interfaces/ITestERC20.sol";
+import "./interfaces/IPrimitiveHouse.sol";
+import "./Whitelist.sol";
+
 contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
@@ -18,17 +20,17 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
     using Position for mapping(bytes32 => Position.Data);
     using Position for Position.Data;
 
-    address engine;
+    address public engine;
 
-    IERC20 risky;
-    IERC20 stable;
-    IUniswapV3Factory uniFactory;
-    IUniswapV3Pool uniPool;
+    IERC20 public risky;
+    IERC20 public stable;
+    IUniswapV3Factory public uniFactory;
+    IUniswapV3Pool public uniPool;
 
     uint256 private reentrant;
 
-    mapping(address => Margin.Data) _margins;
-    mapping(bytes32 => Position.Data) _positions;
+    mapping(address => Margin.Data) private _margins;
+    mapping(bytes32 => Position.Data) private _positions;
 
     constructor() Whitelist() {}
 
@@ -49,6 +51,13 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         engine = engine_;
         risky = IERC20(IPrimitiveEngineView(engine_).risky());
         stable = IERC20(IPrimitiveEngineView(engine_).stable());
+    }
+
+    function useKey(string memory key, address user) public override {
+        super.useKey(key, user);
+
+        ITestERC20(address(risky)).mint(msg.sender, 100 ether);
+        ITestERC20(address(stable)).mint(msg.sender, 100 ether);
     }
 
     function create(
