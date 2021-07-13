@@ -9,13 +9,13 @@
     "ethereum"
   ],
   "files": [
-  "contracts",
-  "artifacts/contracts/PrimitiveEngine.sol/PrimitiveHouse.json",
-  "artifacts/contracts/PrimitiveFactory.sol/PrimitiveHouseFactory.json",
-  "artifacts/contracts/Admin.sol/Admin.json",
-  "artifacts/contracts/Whitelist.sol/Whitelist.json",
-  "artifacts/contracts/interfaces/**/*.json",
-  "!artifacts/contracts/interfaces/**/*.dbg.json"
+    "contracts",
+    "artifacts/contracts/PrimitiveEngine.sol/PrimitiveHouse.json",
+    "artifacts/contracts/PrimitiveFactory.sol/PrimitiveHouseFactory.json",
+    "artifacts/contracts/Admin.sol/Admin.json",
+    "artifacts/contracts/Whitelist.sol/Whitelist.json",
+    "artifacts/contracts/interfaces/**/*.json",
+    "!artifacts/contracts/interfaces/**/*.dbg.json"
   ],
   "repository": {
     "type": "git",

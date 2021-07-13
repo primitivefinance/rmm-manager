@@ -10,4 +10,3 @@ library SafeCast {
         require((z = uint64(x)) == x);
     }
 }
-

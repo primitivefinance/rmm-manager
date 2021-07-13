@@ -45,4 +45,3 @@ library Margin {
         if (delStable > 0) margin.balanceStable -= delStable.toUint128();
     }
 }
-

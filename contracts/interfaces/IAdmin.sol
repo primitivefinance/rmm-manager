@@ -7,10 +7,7 @@ interface IAdmin {
     /// @notice Emitted when a new admin is set
     /// @param oldAdmin The address of the old admin
     /// @param newAdmin The address of the new admin
-    event AdminSet(
-        address oldAdmin,
-        address newAdmin
-    );
+    event AdminSet(address oldAdmin, address newAdmin);
 
     /// EFFECT FUNCTIONS ///
 

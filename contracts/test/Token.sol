@@ -154,4 +154,3 @@ contract Token is IERC20 {
         uint256 amount
     ) internal virtual {}
 }
-
