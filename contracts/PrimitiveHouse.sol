@@ -11,19 +11,19 @@ import "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol";
 
 import "./interfaces/ITestERC20.sol";
 import "./interfaces/IPrimitiveHouse.sol";
-import "./Whitelist.sol";
+import "./interfaces/IPrimitiveHouseFactory.sol";
 
-contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
+contract PrimitiveHouse is IPrimitiveHouse {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
     using Position for mapping(bytes32 => Position.Data);
     using Position for Position.Data;
 
-    address public engine;
+    address public immutable engine;
+    address public immutable risky;
+    address public immutable stable;
 
-    IERC20 public risky;
-    IERC20 public stable;
     IUniswapV3Factory public uniFactory;
     IUniswapV3Pool public uniPool;
 
@@ -32,7 +32,12 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
     mapping(address => Margin.Data) private _margins;
     mapping(bytes32 => Position.Data) private _positions;
 
-    constructor() Whitelist() {}
+    constructor() {
+        (, address _engine) = IPrimitiveHouseFactory(msg.sender).args();
+        engine = _engine;
+        risky = IPrimitiveEngineView(_engine).risky();
+        stable = IPrimitiveEngineView(_engine).stable();
+    }
 
     modifier lock() {
         require(reentrant != 1, "locked");
@@ -46,26 +51,12 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         _;
     }
 
-    function initialize(address engine_) external override {
-        require(engine == address(0), "Already initialized");
-        engine = engine_;
-        risky = IERC20(IPrimitiveEngineView(engine_).risky());
-        stable = IERC20(IPrimitiveEngineView(engine_).stable());
-    }
-
-    function useKey(string memory key, address user) public override {
-        super.useKey(key, user);
-
-        ITestERC20(address(risky)).mint(msg.sender, 100 ether);
-        ITestERC20(address(stable)).mint(msg.sender, 100 ether);
-    }
-
     function create(
         uint256 strike,
         uint64 sigma,
         uint32 time,
         uint256 riskyPrice
-    ) external override lock onlyWhitelisted {
+    ) public virtual override lock {
         IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
@@ -80,7 +71,7 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         address owner,
         uint256 delRisky,
         uint256 delStable
-    ) external override lock onlyWhitelisted {
+    ) public virtual override lock {
         IPrimitiveEngineActions(engine).deposit(
             address(this),
             delRisky,
@@ -93,13 +84,13 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         mar.deposit(delRisky, delStable);
     }
 
-    function withdraw(uint256 delRisky, uint256 delStable) external override lock onlyWhitelisted {
+    function withdraw(uint256 delRisky, uint256 delStable) public virtual override lock {
         IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
 
         _margins.withdraw(delRisky, delStable);
 
-        if (delRisky > 0) risky.safeTransfer(msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransfer(msg.sender, delStable);
+        if (delRisky > 0) IERC20(risky).safeTransfer(msg.sender, delRisky);
+        if (delStable > 0) IERC20(stable).safeTransfer(msg.sender, delStable);
     }
 
     function allocate(
@@ -107,7 +98,7 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         address owner,
         uint256 delLiquidity,
         bool fromMargin
-    ) external override lock onlyWhitelisted {
+    ) public virtual override lock {
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
             poolId,
             address(this),
@@ -131,7 +122,7 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         address owner,
         uint256 delLiquidity,
         uint256 maxPremium
-    ) external override lock onlyWhitelisted {
+    ) public virtual override lock {
         IPrimitiveEngineActions(engine).borrow(
             poolId,
             delLiquidity,
@@ -147,7 +138,7 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         address owner,
         uint256 delLiquidity,
         bool fromMargin
-    ) external override lock onlyWhitelisted {
+    ) public virtual override lock {
         bytes memory data = "0x";
         (uint256 delRisky, uint256 delStable, uint256 premium) = IPrimitiveEngineActions(engine).repay(
             poolId,
@@ -172,15 +163,15 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         uint256 deltaOut,
         uint256 deltaInMax,
         bytes calldata data
-    ) external override lock onlyWhitelisted {
+    ) public virtual override lock {
         IPrimitiveEngineActions(engine).swap(poolId, addXRemoveY, deltaOut, deltaInMax, true, data);
     }
 
-    function swapXForY(bytes32 poolId, uint256 deltaOut) external override lock onlyWhitelisted {
+    function swapXForY(bytes32 poolId, uint256 deltaOut) public virtual override lock {
         IPrimitiveEngineActions(engine).swap(poolId, true, deltaOut, type(uint256).max, true, new bytes(0));
     }
 
-    function swapYForX(bytes32 poolId, uint256 deltaOut) external override lock onlyWhitelisted {
+    function swapYForX(bytes32 poolId, uint256 deltaOut) public virtual override lock {
         IPrimitiveEngineActions(engine).swap(poolId, false, deltaOut, type(uint256).max, true, new bytes(0));
     }
 
@@ -195,8 +186,8 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         bytes calldata data
     ) external override onlyEngine {
         CreateCallbackData memory decoded = abi.decode(data, (CreateCallbackData));
-        if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) IERC20(risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) IERC20(stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 
     struct DepositCallbackData {
@@ -209,8 +200,8 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         bytes calldata data
     ) external override onlyEngine {
         DepositCallbackData memory decoded = abi.decode(data, (DepositCallbackData));
-        if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) IERC20(risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) IERC20(stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 
     struct AllocateCallbackData {
@@ -223,8 +214,8 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         bytes calldata data
     ) external override onlyEngine {
         AllocateCallbackData memory decoded = abi.decode(data, (AllocateCallbackData));
-        if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) IERC20(risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) IERC20(stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 
     struct RemoveCallbackData {
@@ -237,8 +228,8 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
         bytes calldata data
     ) external override onlyEngine {
         RemoveCallbackData memory decoded = abi.decode(data, (RemoveCallbackData));
-        if (delRisky > 0) risky.safeTransferFrom(decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) IERC20(risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) IERC20(stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 
     function swapCallback(
@@ -259,8 +250,8 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
     ) external override onlyEngine {
         BorrowCallbackData memory decoded = abi.decode(data, (BorrowCallbackData));
         uint256 riskyNeeded = delLiquidity - delRisky;
-        risky.safeTransferFrom(decoded.payer, msg.sender, riskyNeeded);
-        stable.safeTransfer(decoded.payer, delStable);
+        IERC20(risky).safeTransferFrom(decoded.payer, msg.sender, riskyNeeded);
+        IERC20(stable).safeTransfer(decoded.payer, delStable);
     }
 
     struct RepayFromExternalCallbackData {
@@ -269,6 +260,6 @@ contract PrimitiveHouse is Whitelist, IPrimitiveHouse {
 
     function repayFromExternalCallback(uint256 delStable, bytes calldata data) external override onlyEngine {
         RepayFromExternalCallbackData memory decoded = abi.decode(data, (RepayFromExternalCallbackData));
-        stable.safeTransferFrom(decoded.payer, msg.sender, delStable);
+        IERC20(stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 }

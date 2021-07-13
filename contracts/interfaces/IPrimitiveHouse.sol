@@ -16,9 +16,6 @@ interface IPrimitiveHouse is
     IPrimitiveMarginCallback,
     IPrimitiveSwapCallback
 {
-    // init
-    function initialize(address engine_) external;
-
     // Margin
     function create(
         uint256 strike,
