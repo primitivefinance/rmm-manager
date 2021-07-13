@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.0;
 
-/// @title   Primitive House Factory
+/// @title   Primitive Paleo House Factory
 /// @author  Primitive
-/// @dev     Deploy new PrimitiveHouse contracts
+/// @dev     Deploy new PrimitivePaleoHouse contracts
 
 import "./interfaces/IPrimitiveHouseFactory.sol";
-import "./PrimitiveHouse.sol";
+import "./PrimitivePaleoHouse.sol";
 import "./interfaces/IAdmin.sol";
 
-contract PrimitiveHouseFactory is IPrimitiveHouseFactory {
+contract PrimitivePaleoHouseFactory is IPrimitiveHouseFactory {
     /// @inheritdoc IPrimitiveHouseFactory
     address public override owner;
 
