@@ -77,8 +77,8 @@ export async function getEngineEntityFromContract(
   posIds: BytesLike[],
   owners: string[]
 ): Promise<Engine> {
-  const risky = ((await ethers.getContractAt(TokenAbi, await engine.risky())) as unknown) as Token
-  const stable = ((await ethers.getContractAt(TokenAbi, await engine.stable())) as unknown) as Token
+  const risky = (await ethers.getContractAt(TokenAbi, await engine.risky())) as unknown as Token
+  const stable = (await ethers.getContractAt(TokenAbi, await engine.stable())) as unknown as Token
   const settings: SettingRaw[] = await Promise.all(
     poolIds.map(async (poolId) => {
       return { [poolId.toString()]: await engine.settings(poolId) }

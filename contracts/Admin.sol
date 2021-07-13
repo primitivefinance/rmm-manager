@@ -17,7 +17,7 @@ contract Admin is IAdmin {
 
     /// @param _admin The address receiving the admin rights
     function initializeAdmin(address _admin) internal {
-      admin = _admin;
+        admin = _admin;
     }
 
     /// @inheritdoc IAdmin

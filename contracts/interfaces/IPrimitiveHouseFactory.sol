@@ -11,7 +11,7 @@ interface IPrimitiveHouseFactory {
     /// @param  house   Deployed house address
     event Deployed(address indexed from, address indexed engine, address indexed house);
 
-    /// @notice Deploys a new House contract and sets the `getHouse` mapping for the engine 
+    /// @notice Deploys a new House contract and sets the `getHouse` mapping for the engine
     /// @param  engine  Referenced engine address
     /// @return house   Newly deployed house address
     function deploy(address engine) external returns (address house);
@@ -22,20 +22,13 @@ interface IPrimitiveHouseFactory {
     /// @return factory Smart contract deploying the Engine contract
     /// engine  Referenced engine address
     /// factory address of self
-    function args()
-        external
-        view
-        returns (
-            address factory,
-            address engine
-        );
+    function args() external view returns (address factory, address engine);
 
     /// @notice Fetches engine address of a token pair
     /// @param  engine Engine address referenced by the house
-    /// @return house House address for a given engine 
+    /// @return house House address for a given engine
     function getHouse(address engine) external view returns (address house);
 
     /// @return Controlling address of this factory contract
     function owner() external view returns (address);
 }
-

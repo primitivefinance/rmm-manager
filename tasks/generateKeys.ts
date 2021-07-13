@@ -1,12 +1,12 @@
 import { task } from 'hardhat/config'
 import '@nomiclabs/hardhat-waffle'
 import crypto from 'crypto'
-import { BytesLike } from '@ethersproject/bytes';
+import { BytesLike } from '@ethersproject/bytes'
 
 import { Whitelist__factory } from '../typechain'
 
 function generateRandomKey(): string {
-  return crypto.randomBytes(32).toString('hex');
+  return crypto.randomBytes(32).toString('hex')
 }
 
 task('generateKeys', 'Generate keys and saves them on-chain')
@@ -26,9 +26,9 @@ task('generateKeys', 'Generate keys and saves them on-chain')
       hashes.push(hre.ethers.utils.solidityKeccak256(['string'], [key]))
     }
 
-    console.log('\nKeys generated, saving them on-chain...!\n');
+    console.log('\nKeys generated, saving them on-chain...!\n')
 
-    const [deployer] = await hre.ethers.getSigners();
+    const [deployer] = await hre.ethers.getSigners()
     const house = Whitelist__factory.connect(args.house, deployer)
 
     await house.addKeys(hashes)

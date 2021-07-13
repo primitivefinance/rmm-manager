@@ -40,15 +40,11 @@ contract PrimitiveHouseFactory is IPrimitiveHouseFactory {
     ///         "It will compute the address from the address of the creating contract,
     ///         the given salt value, the (creation) bytecode of the created contract and the constructor arguments."
     /// @param  factory The address of the deploying smart contract
-    /// @param  engine  A valid engine contract which was deployed 
+    /// @param  engine  A valid engine contract which was deployed
     /// @return house   The house contract address which was deployed
-    function deploy(
-        address factory,
-        address engine
-    ) internal returns (address house) {
+    function deploy(address factory, address engine) internal returns (address house) {
         args = Args({factory: factory, engine: engine}); // Engines call this to get constructor args
         house = address(new PrimitiveHouse{salt: keccak256(abi.encode(engine))}());
         delete args;
     }
 }
-

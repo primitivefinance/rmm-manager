@@ -13,24 +13,18 @@ contract Whitelist is IWhitelist, Admin {
     /// @inheritdoc IWhitelist
     mapping(bytes32 => bool) public override isHashedKey;
 
-
     /// MODIFIERS ///
 
     /// @notice Restricts the call to a whitelisted sender
     modifier onlyWhitelisted() {
-        require(
-            isWhitelisted[msg.sender] == true,
-            "Caller not whitelisted"
-        );
+        require(isWhitelisted[msg.sender] == true, "Caller not whitelisted");
 
         _;
     }
 
-
     constructor() {
-      initializeAdmin(msg.sender);
+        initializeAdmin(msg.sender);
     }
-  
 
     /// @inheritdoc IWhitelist
     function addKeys(bytes32[] memory hashes) external override onlyAdmin() {
@@ -54,7 +48,6 @@ contract Whitelist is IWhitelist, Admin {
         isWhitelisted[user] = false;
         emit Blacklisted(user);
     }
-
 
     /// VIEW FUNCTIONS ///
 

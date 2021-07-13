@@ -18,7 +18,6 @@ This repository has the high level contracts to interface with the Primitive V2 
 
 The House contract is a higher-level contract that is designed to interact with the Engine on behalf of users.
 
-
 # Testing
 
 ### Compile contracts

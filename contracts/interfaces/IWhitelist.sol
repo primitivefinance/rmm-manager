@@ -14,7 +14,6 @@ interface IWhitelist {
     /// @param user The address of the user
     event Blacklisted(address user);
 
-
     /// EFFECT FUNCTIONS ///
 
     /// @notice Adds new keys
@@ -29,7 +28,6 @@ interface IWhitelist {
     /// @notice Blacklists a user
     /// @param user The address of the user to blacklist
     function blacklist(address user) external;
-
 
     /// VIEW FUNCTIONS ///
 

@@ -11,20 +11,16 @@ describe('addKeys', function () {
 
   describe('when the sender is the admin', async function () {
     it('adds a new key', async function () {
-      await this.contracts.whitelist.addKeys(
-        [utils.solidityKeccak256(['string'], ['foo'])],
-      )
+      await this.contracts.whitelist.addKeys([utils.solidityKeccak256(['string'], ['foo'])])
 
       expect(await this.contracts.whitelist.isKeyValid('foo')).to.be.equal(true)
     })
 
     it('adds a new key', async function () {
-      await this.contracts.whitelist.addKeys(
-        [
-          utils.solidityKeccak256(['string'], ['foo']),
-          utils.solidityKeccak256(['string'], ['bar'])
-        ],
-      )
+      await this.contracts.whitelist.addKeys([
+        utils.solidityKeccak256(['string'], ['foo']),
+        utils.solidityKeccak256(['string'], ['bar']),
+      ])
 
       expect(await this.contracts.whitelist.isKeyValid('foo')).to.be.equal(true)
       expect(await this.contracts.whitelist.isKeyValid('bar')).to.be.equal(true)
@@ -34,9 +30,7 @@ describe('addKeys', function () {
   describe('when the sender is not the admin', async function () {
     it('reverts the transaction', async function () {
       await expect(
-        this.contracts.whitelist.connect(this.signers[1]).addKeys(
-          [utils.solidityKeccak256(['string'], ['foo'])],
-        )
+        this.contracts.whitelist.connect(this.signers[1]).addKeys([utils.solidityKeccak256(['string'], ['foo'])])
       ).to.be.revertedWith('Only admin')
     })
   })

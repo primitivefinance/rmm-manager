@@ -21,18 +21,15 @@ describe('admin', function () {
     })
 
     it('emits the SetAdmin event', async function () {
-      await expect(
-        this.contracts.admin.setAdmin(this.signers[1].address)
-      ).to.emit(this.contracts.admin, "AdminSet").withArgs(
-        this.signers[0].address,
-        this.signers[1].address,
-      )
+      await expect(this.contracts.admin.setAdmin(this.signers[1].address))
+        .to.emit(this.contracts.admin, 'AdminSet')
+        .withArgs(this.signers[0].address, this.signers[1].address)
     })
 
     it('reverts if the sender is not the current admin', async function () {
-      await expect(
-        this.contracts.admin.connect(this.signers[1]).setAdmin(this.signers[1].address)
-      ).to.be.revertedWith("Only admin")
+      await expect(this.contracts.admin.connect(this.signers[1]).setAdmin(this.signers[1].address)).to.be.revertedWith(
+        'Only admin'
+      )
     })
   })
 })
