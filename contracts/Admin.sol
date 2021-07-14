@@ -13,16 +13,14 @@ contract Admin is IAdmin {
         _;
     }
 
-    constructor() {}
-
-    /// @param _admin The address receiving the admin rights
-    function initializeAdmin(address _admin) internal {
-        admin = _admin;
-    }
-
     /// @inheritdoc IAdmin
     function setAdmin(address newAdmin) external override onlyAdmin() {
         emit AdminSet(admin, newAdmin);
         admin = newAdmin;
+    }
+
+    /// @param _admin The address receiving the admin rights
+    function initializeAdmin(address _admin) internal {
+        admin = _admin;
     }
 }

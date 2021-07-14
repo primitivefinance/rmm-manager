@@ -33,7 +33,6 @@ contract PrimitiveHouseFactory is IPrimitiveHouseFactory {
         require(engine != address(0), "Cannot be same token");
         house = deploy(address(this), engine);
         getHouse[engine] = house;
-        IAdmin(house).setAdmin(msg.sender);
         emit Deployed(msg.sender, engine, house);
     }
 
