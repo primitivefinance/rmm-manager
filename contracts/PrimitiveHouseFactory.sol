@@ -3,7 +3,7 @@ pragma solidity 0.8.0;
 
 /// @title   Primitive House Factory
 /// @author  Primitive
-/// @dev     Deploy new PrimitiveHouse contracts
+/// @dev     Deploys new PrimitiveHouse contracts
 
 import "./interfaces/IPrimitiveHouseFactory.sol";
 import "./PrimitiveHouse.sol";

@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.0;
 
+/// @title   Primitive House
+/// @author  Primitive
+/// @dev     Interacts with Primitive Engine contracts
+
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol";
 import "@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol";
@@ -9,20 +13,30 @@ import "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimiti
 import "@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol";
 import "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol";
 
-import "./interfaces/ITestERC20.sol";
 import "./interfaces/IPrimitiveHouse.sol";
+import "./interfaces/IPrimitiveHouseView.sol";
+import "./interfaces/IPrimitiveHouseEvents.sol";
+
+import "./interfaces/ITestERC20.sol";
 import "./interfaces/IPrimitiveHouseFactory.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse {
+contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouseEvents {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
     using Position for mapping(bytes32 => Position.Data);
     using Position for Position.Data;
 
-    address public immutable engine;
-    address public immutable risky;
-    address public immutable stable;
+    /// STORAGE PROPERTIES ///
+
+    /// @inheritdoc IPrimitiveHouseView
+    address public immutable override engine;
+
+    /// @inheritdoc IPrimitiveHouseView
+    address public immutable override risky;
+
+    /// @inheritdoc IPrimitiveHouseView
+    address public immutable override stable;
 
     IUniswapV3Factory public uniFactory;
     IUniswapV3Pool public uniPool;
@@ -32,12 +46,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
     mapping(address => Margin.Data) private _margins;
     mapping(bytes32 => Position.Data) private _positions;
 
-    constructor() {
-        (, address _engine) = IPrimitiveHouseFactory(msg.sender).args();
-        engine = _engine;
-        risky = IPrimitiveEngineView(_engine).risky();
-        stable = IPrimitiveEngineView(_engine).stable();
-    }
+    /// MODIFIERS ///
 
     modifier lock() {
         require(reentrant != 1, "locked");
@@ -47,17 +56,27 @@ contract PrimitiveHouse is IPrimitiveHouse {
     }
 
     modifier onlyEngine() {
-        require(msg.sender == engine);
+        require(msg.sender == engine, "Only engine");
         _;
     }
 
+    /// EFFECT FUNCTIONS ///
+
+    constructor() {
+        (, address _engine) = IPrimitiveHouseFactory(msg.sender).args();
+        engine = _engine;
+        risky = IPrimitiveEngineView(_engine).risky();
+        stable = IPrimitiveEngineView(_engine).stable();
+    }
+
+    /// @inheritdoc IPrimitiveHouse
     function create(
         uint256 strike,
         uint64 sigma,
         uint32 time,
         uint256 riskyPrice
     ) public virtual override lock {
-        IPrimitiveEngineActions(engine).create(
+        (, uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
             time,
@@ -65,8 +84,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
             1e18,
             abi.encode(CreateCallbackData({payer: msg.sender}))
         );
+
+        emit Created(msg.sender, strike, sigma, time, riskyPrice, delRisky, delStable);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function deposit(
         address owner,
         uint256 delRisky,
@@ -82,8 +104,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
         // Update Margin state
         Margin.Data storage mar = _margins[owner];
         mar.deposit(delRisky, delStable);
+
+        emit Deposited(owner, delRisky, delStable);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function withdraw(uint256 delRisky, uint256 delStable) public virtual override lock {
         IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
 
@@ -91,8 +116,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
 
         if (delRisky > 0) IERC20(risky).safeTransfer(msg.sender, delRisky);
         if (delStable > 0) IERC20(stable).safeTransfer(msg.sender, delStable);
+
+        emit Withdrawn(msg.sender, delRisky, delStable);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function allocate(
         bytes32 poolId,
         address owner,
@@ -115,8 +143,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
         IPrimitiveEngineActions(engine).lend(poolId, delLiquidity);
 
         _positions.lend(poolId, delLiquidity);
+
+        emit Allocated(poolId, owner, delLiquidity, fromMargin, delRisky, delStable);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function borrow(
         bytes32 poolId,
         address owner,
@@ -131,8 +162,11 @@ contract PrimitiveHouse is IPrimitiveHouse {
         );
 
         _positions.borrow(poolId, delLiquidity);
+
+        emit Borrowed(poolId, owner, delLiquidity, maxPremium);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function repay(
         bytes32 poolId,
         address owner,
@@ -157,6 +191,7 @@ contract PrimitiveHouse is IPrimitiveHouse {
         mar.deposit(premium, 0);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function swap(
         bytes32 poolId,
         bool addXRemoveY,
@@ -167,10 +202,12 @@ contract PrimitiveHouse is IPrimitiveHouse {
         IPrimitiveEngineActions(engine).swap(poolId, addXRemoveY, deltaOut, deltaInMax, true, data);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function swapXForY(bytes32 poolId, uint256 deltaOut) public virtual override lock {
         IPrimitiveEngineActions(engine).swap(poolId, true, deltaOut, type(uint256).max, true, new bytes(0));
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function swapYForX(bytes32 poolId, uint256 deltaOut) public virtual override lock {
         IPrimitiveEngineActions(engine).swap(poolId, false, deltaOut, type(uint256).max, true, new bytes(0));
     }
