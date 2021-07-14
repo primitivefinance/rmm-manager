@@ -9,8 +9,10 @@ export interface Contracts {
   factory: ContractTypes.PrimitiveFactory
   risky: ContractTypes.Token
   stable: ContractTypes.Token
-  admin: ContractTypes.Admin
+  testAdmin: ContractTypes.TestAdmin
   whitelist: ContractTypes.Whitelist
+  // paleoHouseFactory: ContractTypes.PrimitivePaleoHouseFactory
+  // paleoHouse: ContractTypes.PrimitivePaleoHouse
 }
 
 export interface Mocks {}
