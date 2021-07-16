@@ -17,6 +17,16 @@ describe('withdraw', function () {
     it('withdraws 1000 risky and 1000 stable from margin', async function () {
       await this.contracts.house.withdraw(parseWei('1000').raw, parseWei('1000').raw)
     })
+
+    it('emits the Withdrawn event', async function () {
+      await expect(
+        this.contracts.house.withdraw(parseWei('1000').raw, parseWei('1000').raw)
+      ).to.emit(this.contracts.house, 'Withdrawn').withArgs(
+        this.signers[0].address,
+        parseWei('1000').raw,
+        parseWei('1000').raw
+      )
+    })
   })
 
   describe('when the parameters are not valid', function () {

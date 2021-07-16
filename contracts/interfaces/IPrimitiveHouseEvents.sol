@@ -3,7 +3,8 @@ pragma solidity 0.8.0;
 
 interface IPrimitiveHouseEvents {
     event Created(
-        address indexed payer,
+        address indexed user,
+        bytes32 poolId,
         uint256 strike,
         uint64 sigma,
         uint32 time,
@@ -12,22 +13,42 @@ interface IPrimitiveHouseEvents {
         uint256 delStable
     );
 
-    event Deposited(address indexed owner, uint256 delRisky, uint256 delStable);
+    event Deposited(address indexed user, uint256 delRisky, uint256 delStable);
 
-    event Withdrawn(address indexed owner, uint256 delRisky, uint256 delStable);
+    event Withdrawn(address indexed user, uint256 delRisky, uint256 delStable);
 
-    event Borrowed(bytes32 indexed poolId, address indexed owner, uint256 delLiquidity, uint256 maxPremium);
-
-    event Allocated(
+    event Borrowed(
+        address indexed user,
         bytes32 indexed poolId,
-        address indexed owner,
+        uint256 delLiquidity,
+        uint256 maxPremium,
+        uint256 premium
+    );
+
+    event AllocatedAndLent(
+        address indexed user,
+        bytes32 indexed poolId,
         uint256 delLiquidity,
         bool fromMargin,
         uint256 delRisky,
         uint256 delStable
     );
 
-    event Repaid(bytes32 indexed poolId, address indexed owner, uint256 delLiquidity, bool fromMargin);
+    event Repaid(
+        address indexed user,
+        bytes32 indexed poolId,
+        uint256 delLiquidity,
+        bool fromMargin,
+        uint256 delRisky,
+        uint256 delStable
+    );
 
-    event Swapped(bytes32 indexed poolId, bool addXRemoveY, uint256 deltaOut, uint256 maxDeltaIn);
+    event Swapped(
+        address indexed user,
+        bytes32 poolId,
+        bool riskyForStable,
+        uint256 deltaIn,
+        uint256 deltaOut,
+        bool fromMargin
+    );
 }
