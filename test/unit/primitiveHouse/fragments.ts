@@ -37,3 +37,7 @@ export async function repayFragment(signers: Wallet[], contracts: Contracts): Pr
   const poolId = await contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
   await contracts.house.borrow(poolId, signers[0].address, parseWei('10').raw, constants.MaxUint256)
 }
+
+export async function swapFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
+  await borrowFragment(signers, contracts)
+}

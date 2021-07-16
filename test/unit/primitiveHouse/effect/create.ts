@@ -16,6 +16,15 @@ describe('create', function () {
     it('creates a curve using the house contract', async function () {
       await this.contracts.house.create(strike.raw, sigma.raw, maturity.raw, spot.raw)
     })
+
+    it('emits the Created event', async function () {
+      await expect(
+        this.contracts.house.create(strike.raw, sigma.raw, maturity.raw, spot.raw)
+      ).to.emit(
+        this.contracts.house,
+        'Created'
+      )
+    })
   })
 
   describe('when the parameters are not valid', function () {
