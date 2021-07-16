@@ -56,10 +56,10 @@ interface IPrimitiveHouse is
     // Swap
     function swap(
         bytes32 poolId,
-        bool addXRemoveY,
-        uint256 deltaOut,
-        uint256 maxDeltaIn,
-        bytes memory data
+        bool riskyForStable,
+        uint256 deltaIn,
+        uint256 deltaOutMin,
+        bool fromMargin
     ) external;
 
     function swapXForY(bytes32 poolId, uint256 deltaOut) external;

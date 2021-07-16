@@ -23,6 +23,13 @@ describe('repay', function () {
       const poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
       await this.contracts.house.repay(poolId, this.signers[0].address, parseWei('1').raw, false)
     })
+
+    it('emits the Repaid event', async function () {
+      const poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+      await expect(
+        this.contracts.house.repay(poolId, this.signers[0].address, parseWei('1').raw, false)
+      ).to.emit(this.contracts.house, 'Repaid')
+    })
   })
 
   describe('when the parameters are not valid', function () {

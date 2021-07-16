@@ -20,6 +20,14 @@ describe('borrow', function () {
       const poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
       await this.contracts.house.borrow(poolId, this.signers[0].address, parseWei('1').raw, constants.MaxUint256)
     })
+
+    it('emits the Borrowed event', async function () {
+      const poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+
+      await expect(
+        this.contracts.house.borrow(poolId, this.signers[0].address, parseWei('1').raw, constants.MaxUint256)
+      ).to.emit(this.contracts.house, 'Borrowed')
+    })
   })
 
   describe('when the parameters are not valid', function () {

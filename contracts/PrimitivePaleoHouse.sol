@@ -70,12 +70,12 @@ contract PrimitivePaleoHouse is PrimitiveHouse, Whitelist {
     /// @inheritdoc IPrimitiveHouse
     function swap(
         bytes32 poolId,
-        bool addXRemoveY,
-        uint256 deltaOut,
-        uint256 deltaInMax,
-        bytes calldata data
+        bool riskyForStable,
+        uint256 deltaIn,
+        uint256 deltaOutMin,
+        bool fromMargin
     ) public override onlyWhitelisted {
-        super.swap(poolId, addXRemoveY, deltaOut, deltaInMax, data);
+        super.swap(poolId, riskyForStable, deltaIn, deltaOutMin, fromMargin);
     }
 
     /// @inheritdoc IPrimitiveHouse
