@@ -76,7 +76,11 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
         uint32 time,
         uint256 riskyPrice
     ) public virtual override lock {
-        (, uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).create(
+        (
+            bytes32 poolId,
+            uint256 delRisky,
+            uint256 delStable
+        ) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
             time,
@@ -85,7 +89,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
             abi.encode(CreateCallbackData({payer: msg.sender}))
         );
 
-        emit Created(msg.sender, strike, sigma, time, riskyPrice, delRisky, delStable);
+        emit Created(msg.sender, poolId, strike, sigma, time, riskyPrice, delRisky, delStable);
     }
 
     /// @inheritdoc IPrimitiveHouse
@@ -144,7 +148,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
 
         _positions.lend(poolId, delLiquidity);
 
-        emit Allocated(poolId, owner, delLiquidity, fromMargin, delRisky, delStable);
+        emit AllocatedAndLent(owner, poolId, delLiquidity, fromMargin, delRisky, delStable);
     }
 
     /// @inheritdoc IPrimitiveHouse
@@ -154,7 +158,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
         uint256 delLiquidity,
         uint256 maxPremium
     ) public virtual override lock {
-        IPrimitiveEngineActions(engine).borrow(
+        (uint256 premium) = IPrimitiveEngineActions(engine).borrow(
             poolId,
             delLiquidity,
             maxPremium,
@@ -163,7 +167,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
 
         _positions.borrow(poolId, delLiquidity);
 
-        emit Borrowed(poolId, owner, delLiquidity, maxPremium);
+        emit Borrowed(owner, poolId, delLiquidity, maxPremium, premium);
     }
 
     /// @inheritdoc IPrimitiveHouse
@@ -174,6 +178,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
         bool fromMargin
     ) public virtual override lock {
         bytes memory data = "0x";
+
         (uint256 delRisky, uint256 delStable, uint256 premium) = IPrimitiveEngineActions(engine).repay(
             poolId,
             address(this),
@@ -189,17 +194,28 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
 
         Margin.Data storage mar = _margins[owner];
         mar.deposit(premium, 0);
+
+        emit Repaid(owner, poolId, delLiquidity, fromMargin, delRisky, delStable);
     }
 
     /// @inheritdoc IPrimitiveHouse
     function swap(
         bytes32 poolId,
-        bool addXRemoveY,
-        uint256 deltaOut,
-        uint256 deltaInMax,
-        bytes calldata data
+        bool riskyForStable,
+        uint256 deltaIn,
+        uint256 deltaOutMin,
+        bool fromMargin
     ) public virtual override lock {
-        IPrimitiveEngineActions(engine).swap(poolId, addXRemoveY, deltaOut, deltaInMax, true, data);
+        uint256 deltaOut = IPrimitiveEngineActions(engine).swap(
+            poolId,
+            riskyForStable,
+            deltaIn,
+            deltaOutMin,
+            fromMargin,
+            abi.encode(SwapCallbackData({payer: msg.sender}))
+        );
+
+        emit Swapped(msg.sender, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
     }
 
     /// @inheritdoc IPrimitiveHouse
@@ -269,11 +285,19 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
         if (delStable > 0) IERC20(stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
     }
 
+    struct SwapCallbackData {
+        address payer;
+    }
+
     function swapCallback(
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
-    ) external override {}
+    ) external override {
+        SwapCallbackData memory decoded = abi.decode(data, (SwapCallbackData));
+        if (delRisky > 0) IERC20(risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) IERC20(stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
+    }
 
     struct BorrowCallbackData {
         address payer;
@@ -298,5 +322,11 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
     function repayFromExternalCallback(uint256 delStable, bytes calldata data) external override onlyEngine {
         RepayFromExternalCallbackData memory decoded = abi.decode(data, (RepayFromExternalCallbackData));
         IERC20(stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
+    }
+
+    /// VIEW FUNCTIONS ///
+
+    function marginOf(address owner) external view returns (Margin.Data memory) {
+        return _margins[owner];
     }
 }
