@@ -1,14 +1,19 @@
 import hre, { ethers } from 'hardhat'
-import { Wallet, Contract, utils } from 'ethers'
+import { Wallet, Contract } from 'ethers'
 import { Contracts } from '../../types'
 import { deployContract } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
-import { abi as PrimitiveEngineAbi } from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import PrimitiveFactoryArtifact from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
+import PrimitiveEngineArtifact from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import {
+  PrimitiveEngine,
+  PrimitiveFactory
+} from '@primitivefinance/primitive-v2-core/typechain'
 // import { abi as PaleoHouseAbi } from '../../artifacts/contracts/PrimitivePaleoHouse.sol/PrimitivePaleoHouse.json'
 
 type BaseContracts = {
-  factory: ContractTypes.PrimitiveFactory
-  engine: ContractTypes.PrimitiveEngine
+  factory: PrimitiveFactory
+  engine: PrimitiveEngine
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token
@@ -28,10 +33,11 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
   // Core
   const risky = (await deploy('Token', deployer)) as ContractTypes.Token
   const stable = (await deploy('Token', deployer)) as ContractTypes.Token
-  const factory = (await deploy('PrimitiveFactory', deployer)) as ContractTypes.PrimitiveFactory
+
+  const factory = (await deployContract(deployer, PrimitiveFactoryArtifact)) as PrimitiveFactory
   await factory.deploy(risky.address, stable.address)
   const addr = await factory.getEngine(risky.address, stable.address)
-  const engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as unknown as ContractTypes.PrimitiveEngine
+  const engine = (await ethers.getContractAt(PrimitiveEngineArtifact.abi, addr)) as PrimitiveEngine
 
   // Periphery
   const house = (await deploy('PrimitiveHouse', deployer)) as ContractTypes.PrimitiveHouse
