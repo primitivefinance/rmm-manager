@@ -1,12 +1,16 @@
 import { Wallet } from 'ethers'
+import {
+  PrimitiveEngine,
+  PrimitiveFactory
+} from '@primitivefinance/primitive-v2-core/typechain'
 import * as ContractTypes from '../typechain'
 
 export interface Functions {}
 
 export interface Contracts {
+  engine: PrimitiveEngine
+  factory: PrimitiveFactory
   house: ContractTypes.PrimitiveHouse
-  engine: ContractTypes.PrimitiveEngine
-  factory: ContractTypes.PrimitiveFactory
   risky: ContractTypes.Token
   stable: ContractTypes.Token
   testAdmin: ContractTypes.TestAdmin
