@@ -16,12 +16,12 @@ describe('create', function () {
     await loadContext(waffle.provider, createFragment)
   })
 
-  describe('when the parameters are valid', function () {
-    beforeEach(async function () {
-      poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
-      posId = utils.solidityKeccak256(['address', 'bytes32'], [this.contracts.house.address, poolId])
-    })
+  beforeEach(async function () {
+    poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    posId = utils.solidityKeccak256(['address', 'bytes32'], [this.contracts.house.address, poolId])
+  })
 
+  describe('when the parameters are valid', function () {
     it('creates a curve using the house contract', async function () {
       await this.contracts.house.create(this.contracts.engine.address, strike.raw, sigma.raw, maturity.raw, spot.raw)
     })
