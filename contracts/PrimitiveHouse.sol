@@ -62,6 +62,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
         address risky = IPrimitiveEngineView(engine).risky();
         address stable = IPrimitiveEngineView(engine).stable();
 
+        // FIXME: Which initial liquidity should we provide?
         (
             bytes32 poolId,
             uint256 delRisky,
@@ -108,7 +109,6 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
             }))
         );
 
-        // TODO: Update margins
         Margin.Data storage mar = _margins[engine][owner];
         mar.deposit(delRisky, delStable);
 
@@ -123,7 +123,6 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
     ) public virtual override lock {
         IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
 
-        // TODO: Update margins
         _margins[engine].withdraw(delRisky, delStable);
 
         // FIXME: Find a better way to perform these calls
@@ -160,10 +159,8 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseView, IPrimitiveHouse
             }))
         );
 
-        // TODO: Update margins
         if (fromMargin) _margins[engine].withdraw(delRisky, delStable);
 
-        // TODO: Update positions
         Position.Data storage pos = _positions[engine].fetch(owner, poolId);
         pos.allocate(delLiquidity);
 
