@@ -35,6 +35,7 @@ describe('create', function () {
     })
 
     it('emits the Created event', async function () {
+      // TODO: Checks the arguments
       await expect(
         this.contracts.house.create(this.contracts.engine.address, strike.raw, sigma.raw, maturity.raw, spot.raw)
       ).to.emit(
@@ -49,7 +50,13 @@ describe('create', function () {
       await this.contracts.house.create(this.contracts.engine.address, strike.raw, sigma.raw, maturity.raw, spot.raw)
       await expect(
         this.contracts.house.create(this.contracts.engine.address, strike.raw, sigma.raw, maturity.raw, spot.raw)
-      ).to.revertedWith('Initialized')
+      ).to.be.revertedWith('Initialized')
+    })
+
+    it('reverts if the sender has insufficient funds', async function () {
+      await expect(
+        this.contracts.house.connect(this.signers[1]).create(this.contracts.engine.address, strike.raw, sigma.raw, maturity.raw, spot.raw)
+      ).to.be.reverted
     })
   })
 })
