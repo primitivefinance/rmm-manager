@@ -14,11 +14,11 @@ describe('allocate', function () {
     await loadContext(waffle.provider, allocateFragment)
   })
 
-  describe('when the parameters are valid', function () {
-    beforeEach(async function () {
-      poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
-    })
+  beforeEach(async function () {
+    poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+  })
 
+  describe('when the parameters are valid', function () {
     describe('when allocating from margin', function () {
       it('allocates 10 LP shares', async function () {
         await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('10').raw, true)
@@ -113,14 +113,12 @@ describe('allocate', function () {
 
   describe('when the parameters are not valid', function () {
     it('fails to allocate more than margin balance', async function () {
-      const poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
       await expect(
         this.contracts.house.connect(this.signers[1]).allocate(this.signers[0].address, this.contracts.engine.address, poolId,parseWei('1').raw, true)
       ).to.be.reverted
     })
 
     it('fails to allocate more than external balances', async function () {
-      const poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
       await expect(
         this.contracts.house.connect(this.signers[1]).allocate(this.signers[0].address, this.contracts.engine.address, poolId,parseWei('1').raw, false)
       ).to.be.reverted
