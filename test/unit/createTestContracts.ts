@@ -4,12 +4,10 @@ import { Contracts } from '../../types'
 import { deployContract } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
 import { abi as PrimitiveEngineAbi } from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
-import { abi as PrimitiveHouseAbi } from '../../artifacts/contracts/PrimitiveHouse.sol/PrimitiveHouse.json'
-import { abi as PaleoHouseAbi } from '../../artifacts/contracts/PrimitivePaleoHouse.sol/PrimitivePaleoHouse.json'
+// import { abi as PaleoHouseAbi } from '../../artifacts/contracts/PrimitivePaleoHouse.sol/PrimitivePaleoHouse.json'
 
 type BaseContracts = {
   factory: ContractTypes.PrimitiveFactory
-  houseFactory: ContractTypes.PrimitiveHouseFactory
   engine: ContractTypes.PrimitiveEngine
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
@@ -36,10 +34,7 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
   const engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as unknown as ContractTypes.PrimitiveEngine
 
   // Periphery
-  const houseFactory = (await deploy('PrimitiveHouseFactory', deployer)) as ContractTypes.PrimitiveHouseFactory
-  await houseFactory.deploy(engine.address)
-  const houseAddr = await houseFactory.getHouse(engine.address)
-  const house = (await ethers.getContractAt(PrimitiveHouseAbi, houseAddr)) as unknown as ContractTypes.PrimitiveHouse
+  const house = (await deploy('PrimitiveHouse', deployer)) as ContractTypes.PrimitiveHouse
 
   // Paleo
   const testAdmin = (await deploy('TestAdmin', deployer)) as ContractTypes.TestAdmin
@@ -56,7 +51,7 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
 
   */
 
-  return { factory, engine, stable, risky, house, houseFactory, testAdmin, whitelist }
+  return { factory, engine, stable, risky, house, testAdmin, whitelist }
 }
 
 export default async function createTestContracts(deployer: Wallet): Promise<Contracts> {
