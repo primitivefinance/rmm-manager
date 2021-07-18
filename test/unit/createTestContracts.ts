@@ -40,22 +40,11 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
   const engine = (await ethers.getContractAt(PrimitiveEngineArtifact.abi, addr)) as PrimitiveEngine
 
   // Periphery
-  const house = (await deploy('PrimitiveHouse', deployer)) as ContractTypes.PrimitiveHouse
+  const house = (await deploy('PrimitiveHouse', deployer, [factory.address])) as ContractTypes.PrimitiveHouse
 
   // Paleo
   const testAdmin = (await deploy('TestAdmin', deployer)) as ContractTypes.TestAdmin
   const whitelist = (await deploy('Whitelist', deployer)) as ContractTypes.Whitelist
-
-  /*
-  const paleoHouseFactory = (await deploy('PaleoHouseFactory', deployer)) as ContractTypes.PrimitiveHouseFactory
-  await paleoHouseFactory.deploy(engine.address)
-  const paleoHouseAddress = await paleoHouseFactory.getHouse(engine.address)
-  const paleoHouse = (await ethers.getContractAt(PaleoHouseAbi, paleoHouseAddress)) as unknown as ContractTypes.PrimitivePaleoHouse
-
-  // await paleoHouse.addKeys([utils.solidityKeccak256(['string'], ['wentoken'])])
-  // await paleoHouse.useKey('wentoken', deployer.address)
-
-  */
 
   return { factory, engine, stable, risky, house, testAdmin, whitelist }
 }
