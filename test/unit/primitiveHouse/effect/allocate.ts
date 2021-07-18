@@ -5,9 +5,12 @@ import { parseWei } from '../../../shared/Units'
 import loadContext, { config } from '../../context'
 
 import { allocateFragment } from '../fragments'
+import { Token } from '../../../../typechain'
 
 const { strike, sigma, maturity } = config
 let poolId: string
+let risky: Token
+let stable: Token
 
 describe('allocate', function () {
   before(async function () {
@@ -16,17 +19,20 @@ describe('allocate', function () {
 
   beforeEach(async function () {
     poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    ;({ risky, stable } = this.contracts)
   })
 
   describe('when the parameters are valid', function () {
     describe('when allocating from margin', function () {
       it('allocates 10 LP shares', async function () {
-        await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('10').raw, true)
+        await this.contracts.house.allocate(
+          this.signers[0].address, risky.address, stable.address, poolId, parseWei('10').raw, true
+        )
       })
 
       it('updates the position of the sender', async function () {
-        const initialPosition = await this.contracts.house.positionOf(this.signers[0].address, this.contracts.engine.address, poolId)
-        await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('10').raw, true)
+        const initialPosition = await this.contracts.house.position(this.signers[0].address, this.contracts.engine.address, poolId)
+        await this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId, parseWei('10').raw, true)
         const newPosition = await this.contracts.house.positionOf(this.signers[0].address, this.contracts.engine.address, poolId)
         expect(newPosition.liquidity).to.equal(initialPosition.liquidity.add(parseWei('10').raw))
       })
@@ -36,7 +42,7 @@ describe('allocate', function () {
         const deltaRisky = parseWei('10').mul(reserve.reserveRisky).div(reserve.liquidity)
         const deltaStable = parseWei('10').mul(reserve.reserveStable).div(reserve.liquidity)
         const initialMargin = await this.contracts.house.marginOf(this.signers[0].address, this.contracts.engine.address)
-        await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('10').raw, true)
+        await this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId, parseWei('10').raw, true)
         const newMargin = await this.contracts.house.marginOf(this.signers[0].address, this.contracts.engine.address)
 
         expect(newMargin.balanceRisky).to.equal(initialMargin.balanceRisky.sub(deltaRisky.raw))
@@ -46,7 +52,7 @@ describe('allocate', function () {
       it('does not reduces the balances of the sender', async function () {
         const riskyBalance = await this.contracts.risky.balanceOf(this.signers[0].address)
         const stableBalance = await this.contracts.stable.balanceOf(this.signers[0].address)
-        await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('10').raw, true)
+        await this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId, parseWei('10').raw, true)
 
         expect(
           await this.contracts.risky.balanceOf(this.signers[0].address)
@@ -59,7 +65,7 @@ describe('allocate', function () {
       it('emits the AllocatedAndLent event', async function () {
         // TODO: Checks the args
         await expect(
-          this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId,parseWei('10').raw, true)
+          this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId,parseWei('10').raw, true)
         ).to.emit(this.contracts.house, 'AllocatedAndLent')
       })
     })
@@ -67,12 +73,12 @@ describe('allocate', function () {
     describe('when allocating from external', async function () {
       it('allocates 10 LP shares', async function () {
         poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
-        await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId,parseWei('10').raw, false)
+        await this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId,parseWei('10').raw, false)
       })
 
       it('updates the position of the sender', async function () {
         const initialPosition = await this.contracts.house.positionOf(this.signers[0].address, this.contracts.engine.address, poolId)
-        await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('10').raw, true)
+        await this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId, parseWei('10').raw, true)
         const newPosition = await this.contracts.house.positionOf(this.signers[0].address, this.contracts.engine.address, poolId)
         expect(newPosition.liquidity).to.equal(initialPosition.liquidity.add(parseWei('10').raw))
       })
@@ -83,7 +89,7 @@ describe('allocate', function () {
         const deltaStable = parseWei('10').mul(reserve.reserveStable).div(reserve.liquidity)
         const riskyBalance = await this.contracts.risky.balanceOf(this.signers[0].address)
         const stableBalance = await this.contracts.stable.balanceOf(this.signers[0].address)
-        await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('10').raw, false)
+        await this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId, parseWei('10').raw, false)
 
         expect(
           await this.contracts.risky.balanceOf(this.signers[0].address)
@@ -95,7 +101,7 @@ describe('allocate', function () {
 
       it('does not reduces the margin', async function () {
         const initialMargin = await this.contracts.house.marginOf(this.signers[0].address, this.contracts.engine.address)
-        await this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('10').raw, false)
+        await this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId, parseWei('10').raw, false)
         const newMargin = await this.contracts.house.marginOf(this.signers[0].address, this.contracts.engine.address)
 
         expect(initialMargin.balanceRisky).to.equal(newMargin.balanceRisky)
@@ -105,7 +111,7 @@ describe('allocate', function () {
       it('emits the AllocatedAndLent event', async function () {
         // TODO: Checks the args
         await expect(
-          this.contracts.house.allocate(this.signers[0].address, this.contracts.engine.address, poolId,parseWei('10').raw, false)
+          this.contracts.house.allocate(this.signers[0].address, risky.address, stable.address, poolId,parseWei('10').raw, false)
         ).to.emit(this.contracts.house, 'AllocatedAndLent')
       })
     })
@@ -114,13 +120,13 @@ describe('allocate', function () {
   describe('when the parameters are not valid', function () {
     it('fails to allocate more than margin balance', async function () {
       await expect(
-        this.contracts.house.connect(this.signers[1]).allocate(this.signers[0].address, this.contracts.engine.address, poolId,parseWei('1').raw, true)
+        this.contracts.house.connect(this.signers[1]).allocate(this.signers[0].address, risky.address, stable.address, poolId,parseWei('1').raw, true)
       ).to.be.reverted
     })
 
     it('fails to allocate more than external balances', async function () {
       await expect(
-        this.contracts.house.connect(this.signers[1]).allocate(this.signers[0].address, this.contracts.engine.address, poolId,parseWei('1').raw, false)
+        this.contracts.house.connect(this.signers[1]).allocate(this.signers[0].address, risky.address, stable.address, poolId,parseWei('1').raw, false)
       ).to.be.reverted
     })
   })

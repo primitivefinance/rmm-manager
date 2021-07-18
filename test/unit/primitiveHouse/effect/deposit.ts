@@ -2,7 +2,7 @@ import { waffle } from 'hardhat'
 import { expect } from 'chai'
 
 import { parseWei } from '../../../shared/Units'
-import loadContext, { config } from '../../context'
+import loadContext from '../../context'
 
 import { depositFragment } from '../fragments'
 
@@ -15,7 +15,8 @@ describe('deposit', function () {
     it('deposits risky and stable to margin', async function () {
       await this.contracts.house.deposit(
         this.signers[0].address,
-        this.contracts.engine.address,
+        this.contracts.risky.address,
+        this.contracts.stable.address,
         parseWei('1000').raw,
         parseWei('1000').raw)
     })
@@ -23,13 +24,14 @@ describe('deposit', function () {
     it('increases the margin', async function () {
       await this.contracts.house.deposit(
         this.signers[0].address,
-        this.contracts.engine.address,
+        this.contracts.risky.address,
+        this.contracts.stable.address,
         parseWei('1000').raw,
         parseWei('1000').raw)
 
-      const margin = await this.contracts.house.marginOf(
-        this.signers[0].address,
-        this.contracts.engine.address
+      const margin = await this.contracts.house.margins(
+        this.contracts.engine.address,
+        this.signers[0].address
       )
 
       expect(margin.balanceRisky).to.equal(parseWei('1000').raw)
@@ -40,7 +42,8 @@ describe('deposit', function () {
       await expect(
         this.contracts.house.deposit(
           this.signers[0].address,
-          this.contracts.engine.address,
+          this.contracts.risky.address,
+          this.contracts.stable.address,
           parseWei('1000').raw,
           parseWei('1000').raw)
       ).to.emit(this.contracts.house, 'Deposited').withArgs(
@@ -57,7 +60,8 @@ describe('deposit', function () {
       await expect(
         this.contracts.house.connect(this.signers[1]).deposit(
           this.signers[0].address,
-          this.contracts.engine.address,
+          this.contracts.risky.address,
+          this.contracts.stable.address,
           parseWei('1000').raw,
           parseWei('1000').raw)
       ).to.be.reverted
