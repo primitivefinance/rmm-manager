@@ -47,9 +47,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
 
     /// EFFECT FUNCTIONS ///
 
-    constructor(
-        address _factory
-    ) {
+    constructor(address _factory) {
         factory = IPrimitiveFactory(_factory);
     }
 
@@ -75,16 +73,9 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({
-            engine: engine,
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
 
-        (
-            bytes32 poolId, uint256 delRisky, uint256 delStable
-        ) = IPrimitiveEngineActions(engine).create(
+        (bytes32 poolId, uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
             time,
@@ -93,9 +84,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
             empty
         );
 
-        positions[engine][Position.getPositionId(msg.sender, poolId)].allocate(
-            delLiquidity - 1000
-        );
+        positions[engine][Position.getPositionId(msg.sender, poolId)].allocate(delLiquidity - 1000);
 
         emit Created(msg.sender, engine, poolId, strike, sigma, time, riskyPrice, delRisky, delStable);
     }
@@ -110,19 +99,9 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({
-            engine: engine,
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
 
-        IPrimitiveEngineActions(engine).deposit(
-            address(this),
-            delRisky,
-            delStable,
-            empty
-        );
+        IPrimitiveEngineActions(engine).deposit(address(this), delRisky, delStable, empty);
 
         Margin.Data storage mar = margins[engine][owner];
         mar.deposit(delRisky, delStable);
@@ -160,12 +139,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({
-            engine: engine,
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
             poolId,
@@ -184,12 +158,9 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
 
         positions[engine].lend(poolId, delLiquidity);
 
-        emit AllocatedAndLent(
-            owner, engine, poolId, delLiquidity, delRisky, delStable, fromMargin
-        );
+        emit AllocatedAndLent(owner, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
 
-    // TODO: remove should be the opposite of allocate (claim + remove)
     function remove(
         address risky,
         address stable,
@@ -199,12 +170,11 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({
-            engine: engine,
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        IPrimitiveEngineActions(engine).claim(poolId, delLiquidity);
+
+        positions[engine].claim(poolId, delLiquidity);
+
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(
             poolId,
@@ -218,7 +188,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
             mar.deposit(delRisky, delStable);
         }
 
-        // TODO: Update the position
+        positions[engine].remove(poolId, delLiquidity);
 
         // TODO: Emit the Removed event
     }
@@ -234,19 +204,9 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({
-            engine: engine,
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
 
-        (uint256 premium) = IPrimitiveEngineActions(engine).borrow(
-            poolId,
-            delLiquidity,
-            maxPremium,
-            empty
-        );
+        uint256 premium = IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, maxPremium, empty);
 
         positions[engine].borrow(poolId, delLiquidity);
 
@@ -264,12 +224,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({
-            engine: engine,
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
 
         (uint256 delRisky, uint256 delStable, uint256 premium) = IPrimitiveEngineActions(engine).repay(
             poolId,
@@ -304,12 +259,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({
-            engine: engine,
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
 
         uint256 deltaOut = IPrimitiveEngineActions(engine).swap(
             poolId,
@@ -394,7 +344,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
         bytes calldata data
     ) external override {
         require(callbackData.engine == msg.sender, "Not engine");
-        if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
-        if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
+        if (delRisky > 0) IERC20(callbackData.risky).safeTransfer(callbackData.payer, delRisky);
+        if (delStable > 0) IERC20(callbackData.stable).safeTransfer(callbackData.payer, delStable);
     }
 }
