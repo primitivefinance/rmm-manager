@@ -1,90 +1,112 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.0;
 
+/// @title Primitive Paleo House
+/// @author Primitive
+/// @dev House contract tailored for the Paleo testnet release
+
 import "./PrimitiveHouse.sol";
 import "./Whitelist.sol";
+import "./test/Token.sol";
 
 contract PrimitivePaleoHouse is PrimitiveHouse, Whitelist {
-    /// @inheritdoc IWhitelist
-    function useKey(string memory key, address user) public override {
+    constructor(address _factory) PrimitiveHouse(_factory) {}
+
+    function useKey(
+        string memory key,
+        address user,
+        address risky,
+        address stable
+    ) public {
         super.useKey(key, user);
 
-        ITestERC20(risky).mint(user, 100 ether);
-        ITestERC20(stable).mint(user, 100 ether);
+        Token(risky).mint(user, 1000 ether);
+        Token(stable).mint(user, 1000 ether);
     }
 
-    /// @inheritdoc IPrimitiveHouse
     function create(
+        address risky,
+        address stable,
+        uint256 delLiquidity,
         uint256 strike,
         uint64 sigma,
         uint32 time,
         uint256 riskyPrice
     ) public override onlyWhitelisted {
-        super.create(strike, sigma, time, riskyPrice);
+        super.create(risky, stable, delLiquidity, strike, sigma, time, riskyPrice);
     }
 
-    /// @inheritdoc IPrimitiveHouse
     function deposit(
         address owner,
+        address risky,
+        address stable,
         uint256 delRisky,
         uint256 delStable
     ) public override onlyWhitelisted {
-        super.deposit(owner, delRisky, delStable);
+        super.deposit(owner, risky, stable, delRisky, delStable);
     }
 
-    /// @inheritdoc IPrimitiveHouse
-    function withdraw(uint256 delRisky, uint256 delStable) public override onlyWhitelisted {
-        super.withdraw(delRisky, delStable);
+    function withdraw(
+        address risky,
+        address stable,
+        uint256 delRisky,
+        uint256 delStable
+    ) public override onlyWhitelisted {
+        super.withdraw(risky, stable, delRisky, delStable);
     }
 
-    /// @inheritdoc IPrimitiveHouse
     function allocate(
-        bytes32 poolId,
         address owner,
+        address risky,
+        address stable,
+        bytes32 poolId,
         uint256 delLiquidity,
         bool fromMargin
     ) public override onlyWhitelisted {
-        super.allocate(poolId, owner, delLiquidity, fromMargin);
+        super.allocate(owner, risky, stable, poolId, delLiquidity, fromMargin);
     }
 
-    /// @inheritdoc IPrimitiveHouse
-    function borrow(
+    function remove(
+        address risky,
+        address stable,
         bytes32 poolId,
+        uint256 delLiquidity,
+        bool toMargin
+    ) public override onlyWhitelisted {
+        super.remove(risky, stable, poolId, delLiquidity, toMargin);
+    }
+
+    function borrow(
         address owner,
+        address risky,
+        address stable,
+        bytes32 poolId,
         uint256 delLiquidity,
         uint256 maxPremium
     ) public override onlyWhitelisted {
-        super.borrow(poolId, owner, delLiquidity, maxPremium);
+        super.borrow(owner, risky, stable, poolId, delLiquidity, maxPremium);
     }
 
-    /// @inheritdoc IPrimitiveHouse
     function repay(
-        bytes32 poolId,
         address owner,
+        address risky,
+        address stable,
+        bytes32 poolId,
         uint256 delLiquidity,
         bool fromMargin
     ) public override onlyWhitelisted {
-        super.repay(poolId, owner, delLiquidity, fromMargin);
+        super.repay(owner, risky, stable, poolId, delLiquidity, fromMargin);
     }
 
-    /// @inheritdoc IPrimitiveHouse
     function swap(
+        address risky,
+        address stable,
         bytes32 poolId,
         bool riskyForStable,
         uint256 deltaIn,
         uint256 deltaOutMin,
         bool fromMargin
     ) public override onlyWhitelisted {
-        super.swap(poolId, riskyForStable, deltaIn, deltaOutMin, fromMargin);
-    }
-
-    /// @inheritdoc IPrimitiveHouse
-    function swapXForY(bytes32 poolId, uint256 deltaOut) public override onlyWhitelisted {
-        super.swapXForY(poolId, deltaOut);
-    }
-
-    /// @inheritdoc IPrimitiveHouse
-    function swapYForX(bytes32 poolId, uint256 deltaOut) public override onlyWhitelisted {
-        super.swapYForX(poolId, deltaOut);
+        super.swap(risky, stable, poolId, riskyForStable, deltaIn, deltaOutMin, fromMargin);
     }
 }

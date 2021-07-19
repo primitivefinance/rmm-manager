@@ -1,16 +1,19 @@
 import hre, { ethers } from 'hardhat'
-import { Wallet, Contract, utils } from 'ethers'
+import { Wallet, Contract } from 'ethers'
 import { Contracts } from '../../types'
 import { deployContract } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
-import { abi as PrimitiveEngineAbi } from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
-import { abi as PrimitiveHouseAbi } from '../../artifacts/contracts/PrimitiveHouse.sol/PrimitiveHouse.json'
-import { abi as PaleoHouseAbi } from '../../artifacts/contracts/PrimitivePaleoHouse.sol/PrimitivePaleoHouse.json'
+import PrimitiveFactoryArtifact from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
+import PrimitiveEngineArtifact from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import {
+  PrimitiveEngine,
+  PrimitiveFactory
+} from '@primitivefinance/primitive-v2-core/typechain'
+// import { abi as PaleoHouseAbi } from '../../artifacts/contracts/PrimitivePaleoHouse.sol/PrimitivePaleoHouse.json'
 
 type BaseContracts = {
-  factory: ContractTypes.PrimitiveFactory
-  houseFactory: ContractTypes.PrimitiveHouseFactory
-  engine: ContractTypes.PrimitiveEngine
+  factory: PrimitiveFactory
+  engine: PrimitiveEngine
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token
@@ -30,33 +33,20 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
   // Core
   const risky = (await deploy('Token', deployer)) as ContractTypes.Token
   const stable = (await deploy('Token', deployer)) as ContractTypes.Token
-  const factory = (await deploy('PrimitiveFactory', deployer)) as ContractTypes.PrimitiveFactory
+
+  const factory = (await deployContract(deployer, PrimitiveFactoryArtifact)) as PrimitiveFactory
   await factory.deploy(risky.address, stable.address)
   const addr = await factory.getEngine(risky.address, stable.address)
-  const engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as unknown as ContractTypes.PrimitiveEngine
+  const engine = (await ethers.getContractAt(PrimitiveEngineArtifact.abi, addr)) as PrimitiveEngine
 
   // Periphery
-  const houseFactory = (await deploy('PrimitiveHouseFactory', deployer)) as ContractTypes.PrimitiveHouseFactory
-  await houseFactory.deploy(engine.address)
-  const houseAddr = await houseFactory.getHouse(engine.address)
-  const house = (await ethers.getContractAt(PrimitiveHouseAbi, houseAddr)) as unknown as ContractTypes.PrimitiveHouse
+  const house = (await deploy('PrimitiveHouse', deployer, [factory.address])) as ContractTypes.PrimitiveHouse
 
   // Paleo
   const testAdmin = (await deploy('TestAdmin', deployer)) as ContractTypes.TestAdmin
   const whitelist = (await deploy('Whitelist', deployer)) as ContractTypes.Whitelist
 
-  /*
-  const paleoHouseFactory = (await deploy('PaleoHouseFactory', deployer)) as ContractTypes.PrimitiveHouseFactory
-  await paleoHouseFactory.deploy(engine.address)
-  const paleoHouseAddress = await paleoHouseFactory.getHouse(engine.address)
-  const paleoHouse = (await ethers.getContractAt(PaleoHouseAbi, paleoHouseAddress)) as unknown as ContractTypes.PrimitivePaleoHouse
-
-  // await paleoHouse.addKeys([utils.solidityKeccak256(['string'], ['wentoken'])])
-  // await paleoHouse.useKey('wentoken', deployer.address)
-
-  */
-
-  return { factory, engine, stable, risky, house, houseFactory, testAdmin, whitelist }
+  return { factory, engine, stable, risky, house, testAdmin, whitelist }
 }
 
 export default async function createTestContracts(deployer: Wallet): Promise<Contracts> {

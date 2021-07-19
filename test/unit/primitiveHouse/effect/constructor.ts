@@ -1,6 +1,5 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-
 import loadContext from '../../context'
 
 describe('constructor', function () {
@@ -8,13 +7,9 @@ describe('constructor', function () {
     await loadContext(waffle.provider)
   })
 
-  describe('when the parameters are valid', function () {
-    it('sets the right parameters', async function () {
-      expect(await this.contracts.house.engine()).to.equal(this.contracts.engine.address)
-
-      expect(await this.contracts.house.risky()).to.equal(this.contracts.risky.address)
-
-      expect(await this.contracts.house.stable()).to.equal(this.contracts.stable.address)
+  describe('success cases', function () {
+    it('sets the address of the factory', async function () {
+      expect(await this.house.factory()).to.equal(this.factory.address)
     })
   })
 })
