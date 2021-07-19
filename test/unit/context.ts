@@ -1,5 +1,5 @@
 import { createFixtureLoader, MockProvider } from 'ethereum-waffle'
-import { Contracts, Functions, Mocks } from '../../types'
+import { Contracts } from '../../types'
 import { Wallet } from 'ethers'
 import createTestContracts from './createTestContracts'
 import { parseWei } from '../shared/Units'
@@ -31,22 +31,18 @@ export default async function loadContext(
     const loadedFixture = await loadFixture(async function (signers: Wallet[]) {
       const [deployer] = signers
       let loadedContracts: Contracts = {} as Contracts
-      let loadedFunctions: Functions = {} as Functions
 
       loadedContracts = await createTestContracts(deployer)
 
       if (action) await action(signers, loadedContracts)
 
-      return { contracts: loadedContracts, functions: loadedFunctions }
+      return { contracts: loadedContracts }
     })
 
-    this.contracts = {} as Contracts
-    this.functions = {} as Functions
-    this.mocks = {} as Mocks
     this.signers = provider.getWallets()
     this.deployer = this.signers[0]
+    this.bob = this.signers[1]
 
-    Object.assign(this.contracts, loadedFixture.contracts)
-    Object.assign(this.functions, loadedFixture.functions)
+    Object.assign(this, loadedFixture.contracts)
   })
 }

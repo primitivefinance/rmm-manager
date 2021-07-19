@@ -2,8 +2,6 @@ import { Wallet } from 'ethers'
 import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/primitive-v2-core/typechain'
 import * as ContractTypes from '../typechain'
 
-export interface Functions {}
-
 export interface Contracts {
   engine: PrimitiveEngine
   factory: PrimitiveFactory
@@ -15,13 +13,10 @@ export interface Contracts {
   // paleoHouse: ContractTypes.PrimitivePaleoHouse
 }
 
-export interface Mocks {}
-
 declare module 'mocha' {
-  export interface Context {
+  export interface Context extends Contracts {
+    deployer: Wallet
+    bob: Wallet
     signers: Wallet[]
-    contracts: Contracts
-    functions: Functions
-    mocks: Mocks
   }
 }
