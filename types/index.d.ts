@@ -1,8 +1,5 @@
 import { Wallet } from 'ethers'
-import {
-  PrimitiveEngine,
-  PrimitiveFactory
-} from '@primitivefinance/primitive-v2-core/typechain'
+import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/primitive-v2-core/typechain'
 import * as ContractTypes from '../typechain'
 
 export interface Functions {}
@@ -15,7 +12,6 @@ export interface Contracts {
   stable: ContractTypes.Token
   testAdmin: ContractTypes.TestAdmin
   whitelist: ContractTypes.Whitelist
-  // paleoHouseFactory: ContractTypes.PrimitivePaleoHouseFactory
   // paleoHouse: ContractTypes.PrimitivePaleoHouse
 }
 
