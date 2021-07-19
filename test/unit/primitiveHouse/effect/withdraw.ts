@@ -1,10 +1,13 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
+import { BytesLike, constants } from 'ethers'
 
 import { parseWei } from '../../../shared/Units'
 import loadContext from '../../context'
 
 import { withdrawFragment } from '../fragments'
+
+const empty: BytesLike = constants.HashZero
 
 describe('withdraw', function () {
   before(async function () {
@@ -43,23 +46,26 @@ describe('withdraw', function () {
           parseWei('1000').raw,
           parseWei('1000').raw
         )
-      ).to.emit(this.contracts.house, 'Withdrawn').withArgs(
-        this.signers[0].address,
-        this.contracts.engine.address,
-        parseWei('1000').raw,
-        parseWei('1000').raw
       )
+        .to.emit(this.contracts.house, 'Withdrawn')
+        .withArgs(this.signers[0].address, this.contracts.engine.address, parseWei('1000').raw, parseWei('1000').raw)
     })
   })
 
-  describe('when the parameters are not valid', function () {
+  describe('fail cases', function () {
     it('fails on attempt to withdraw more than margin balance', async function () {
-      await expect(this.contracts.house.withdraw(
-        this.contracts.risky.address,
-        this.contracts.stable.address,
-        parseWei('100001').raw,
-        parseWei('100001').raw)
+      await expect(
+        this.contracts.house.withdraw(
+          this.contracts.risky.address,
+          this.contracts.stable.address,
+          parseWei('100001').raw,
+          parseWei('100001').raw
+        )
       ).to.be.reverted
+    })
+
+    it('reverts if the callback function is called directly', async function () {
+      await expect(this.contracts.house.depositCallback(0, 0, empty)).to.be.revertedWith('Not engine')
     })
   })
 })

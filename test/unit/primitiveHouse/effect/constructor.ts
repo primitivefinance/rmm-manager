@@ -2,16 +2,14 @@ import { waffle } from 'hardhat'
 import { expect } from 'chai'
 import loadContext from '../../context'
 
-describe('allocate', function () {
+describe('constructor', function () {
   before(async function () {
     await loadContext(waffle.provider)
   })
 
-  describe('when the parameters are valid', function () {
+  describe('success cases', function () {
     it('sets the address of the factory', async function () {
-      expect(
-        await this.contracts.house.factory()
-      ).to.equal(this.contracts.factory.address)
+      expect(await this.contracts.house.factory()).to.equal(this.contracts.factory.address)
     })
   })
 })
