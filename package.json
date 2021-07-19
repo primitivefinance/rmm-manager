@@ -1,6 +1,6 @@
 {
   "name": "@primitivefinance/primitive-v2-periphery",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Primitive V2 periphery smart contracts.",
   "main": "index.js",
   "keywords": [
