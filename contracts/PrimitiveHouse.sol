@@ -15,8 +15,6 @@ import "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol";
 import "./interfaces/IPrimitiveHouse.sol";
 import "./interfaces/IPrimitiveHouseEvents.sol";
 
-import "hardhat/console.sol";
-
 contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
