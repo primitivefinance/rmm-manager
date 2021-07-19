@@ -18,6 +18,9 @@ interface IPrimitiveHouse is
 {
     // Margin
     function create(
+        address risky,
+        address stable,
+        uint256 delLiquidity,
         uint256 strike,
         uint64 sigma,
         uint32 time,
@@ -25,44 +28,55 @@ interface IPrimitiveHouse is
     ) external;
 
     function deposit(
+        address risky,
+        address stable,
         address owner,
         uint256 delRisky,
         uint256 delStable
     ) external;
 
-    function withdraw(uint256 delRisky, uint256 delStable) external;
-
-    function borrow(
-        bytes32 poolId,
-        address owner,
-        uint256 delLiquidity,
-        uint256 maxPremium
+    function withdraw(
+        address risky,
+        address stable,
+        uint256 delRisky,
+        uint256 delStable
     ) external;
 
     function allocate(
-        bytes32 poolId,
         address owner,
+        address risky,
+        address stable,
+        bytes32 poolId,
         uint256 delLiquidity,
         bool fromMargin
     ) external;
 
-    function repay(
-        bytes32 poolId,
+    function borrow(
         address owner,
+        address risky,
+        address stable,
+        bytes32 poolId,
+        uint256 delLiquidity,
+        uint256 maxPremium
+    ) external;
+
+    function repay(
+        address owner,
+        address risky,
+        address stable,
+        bytes32 poolId,
         uint256 delLiquidity,
         bool fromMargin
     ) external;
 
     // Swap
     function swap(
+        address risky,
+        address stable,
         bytes32 poolId,
         bool riskyForStable,
         uint256 deltaIn,
         uint256 deltaOutMin,
         bool fromMargin
     ) external;
-
-    function swapXForY(bytes32 poolId, uint256 deltaOut) external;
-
-    function swapYForX(bytes32 poolId, uint256 deltaOut) external;
 }
