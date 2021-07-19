@@ -9,7 +9,9 @@ import { HardhatUserConfig } from 'hardhat/config'
 
 const config: HardhatUserConfig = {
   networks: {
-    hardhat: {},
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
   },
   solidity: {
     version: '0.8.0',
