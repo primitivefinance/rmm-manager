@@ -1,13 +1,12 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-import { utils, Wallet } from 'ethers'
+import { utils, Wallet, BytesLike, constants } from 'ethers'
+import { PrimitiveEngine } from '@primitivefinance/primitive-v2-core/typechain'
 
 import { parseWei } from '../../../shared/Units'
 import loadContext, { config } from '../../context'
-
 import { createFragment } from '../fragments'
 import { PrimitiveHouse, Token } from '../../../../typechain'
-import { PrimitiveEngine } from '@primitivefinance/primitive-v2-core/typechain'
 
 const { strike, sigma, maturity, spot } = config
 
@@ -19,6 +18,7 @@ let stable: Token
 let engine: PrimitiveEngine
 let house: PrimitiveHouse
 let user: Wallet
+let empty: BytesLike = constants.HashZero
 
 describe('create', function () {
   before(async function () {
@@ -27,22 +27,34 @@ describe('create', function () {
 
   beforeEach(async function () {
     ;({ risky, stable, engine, house } = this.contracts)
-    ;([user] = this.signers)
+    ;[user] = this.signers
     poolId = await engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
     housePosId = utils.solidityKeccak256(['address', 'bytes32'], [house.address, poolId])
     userPosId = utils.solidityKeccak256(['address', 'bytes32'], [this.signers[0].address, poolId])
   })
 
-  describe('when the parameters are valid', function () {
+  describe('success cases', function () {
     it('creates a curve using the house contract', async function () {
       await this.contracts.house.create(
-        risky.address, stable.address, parseWei('1').raw, strike.raw, sigma.raw, maturity.raw, spot.raw
+        risky.address,
+        stable.address,
+        parseWei('1').raw,
+        strike.raw,
+        sigma.raw,
+        maturity.raw,
+        spot.raw
       )
     })
 
     it('updates the sender position', async function () {
       await this.contracts.house.create(
-        risky.address, stable.address, parseWei('1').raw, strike.raw, sigma.raw, maturity.raw, spot.raw
+        risky.address,
+        stable.address,
+        parseWei('1').raw,
+        strike.raw,
+        sigma.raw,
+        maturity.raw,
+        spot.raw
       )
       const enginePosition = await this.contracts.engine.positions(housePosId)
       const ownerPosition = await this.contracts.house.positions(engine.address, userPosId)
@@ -54,33 +66,52 @@ describe('create', function () {
       // TODO: Checks the arguments
       await expect(
         this.contracts.house.create(
-          risky.address, stable.address, parseWei('1').raw, strike.raw, sigma.raw, maturity.raw, spot.raw
+          risky.address,
+          stable.address,
+          parseWei('1').raw,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          spot.raw
         )
-      ).to.emit(
-        this.contracts.house,
-        'Created'
-      )
+      ).to.emit(this.contracts.house, 'Created')
     })
   })
 
-  describe('when the parameters are not valid', function () {
+  describe('fail cases', function () {
     it('reverts if the curve is already created', async function () {
       await this.contracts.house.create(
-        risky.address, stable.address, parseWei('1').raw, strike.raw, sigma.raw, maturity.raw, spot.raw
+        risky.address,
+        stable.address,
+        parseWei('1').raw,
+        strike.raw,
+        sigma.raw,
+        maturity.raw,
+        spot.raw
       )
       await expect(
         this.contracts.house.create(
-          risky.address, stable.address, parseWei('1').raw, strike.raw, sigma.raw, maturity.raw, spot.raw
+          risky.address,
+          stable.address,
+          parseWei('1').raw,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          spot.raw
         )
       ).to.be.revertedWith('Initialized')
     })
 
     it('reverts if the sender has insufficient funds', async function () {
       await expect(
-        this.contracts.house.connect(this.signers[1]).create(
-          risky.address, stable.address, parseWei('1').raw, strike.raw, sigma.raw, maturity.raw, spot.raw
-        )
+        this.contracts.house
+          .connect(this.signers[1])
+          .create(risky.address, stable.address, parseWei('1').raw, strike.raw, sigma.raw, maturity.raw, spot.raw)
       ).to.be.reverted
+    })
+
+    it('reverts if the callback function is called directly', async function () {
+      await expect(house.createCallback(0, 0, empty)).to.be.revertedWith('Not engine')
     })
   })
 })

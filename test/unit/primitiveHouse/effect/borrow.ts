@@ -1,14 +1,24 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
+import { utils, Wallet, BytesLike, constants } from 'ethers'
+import { PrimitiveEngine } from '@primitivefinance/primitive-v2-core/typechain'
 
-import { constants, parseWei } from '../../../shared/Units'
+import { parseWei } from '../../../shared/Units'
 import loadContext, { config } from '../../context'
 
 import { borrowFragment } from '../fragments'
+import { PrimitiveHouse, Token } from '../../../../typechain'
 
 const { strike, sigma, maturity } = config
-
 let poolId: string
+let userPosId: string
+let risky: Token
+let stable: Token
+let house: PrimitiveHouse
+let user: Wallet
+let engine: PrimitiveEngine
+
+const empty: BytesLike = constants.HashZero
 
 describe('borrow', function () {
   before(async function () {
@@ -16,63 +26,57 @@ describe('borrow', function () {
   })
 
   beforeEach(async function () {
-    poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    ;({ risky, stable, house, engine } = this.contracts)
+    ;[user] = this.signers
+    poolId = await engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    userPosId = utils.solidityKeccak256(['address', 'bytes32'], [user.address, poolId])
   })
 
-  describe('when the parameters are valid', function () {
+  describe('success cases', function () {
     it('originates one long option', async function () {
-      await this.contracts.house.borrow(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('1').raw, constants.MaxUint256)
+      await house.borrow(user.address, risky.address, stable.address, poolId, parseWei('1').raw, constants.MaxUint256)
     })
 
     it('increases the position of the sender', async function () {
-      await this.contracts.house.borrow(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('1').raw, constants.MaxUint256)
-      const newPosition = await this.contracts.house.positionOf(this.signers[0].address, this.contracts.engine.address, poolId)
-
+      await house.borrow(user.address, risky.address, stable.address, poolId, parseWei('1').raw, constants.MaxUint256)
+      const newPosition = await house.positions(engine.address, userPosId)
       expect(newPosition.debt).to.equal(parseWei('1').raw)
     })
 
     it('transfers the premium, risky and stable', async function () {
-      const reserve = await this.contracts.engine.reserves(poolId)
+      const reserve = await engine.reserves(poolId)
       const delRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const delStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
       const premium = parseWei('1').sub(delRisky.raw)
 
-      const engineRiskyBalance = await this.contracts.risky.balanceOf(this.contracts.engine.address)
-      const engineStableBalance = await this.contracts.stable.balanceOf(this.contracts.engine.address)
+      const engineRiskyBalance = await risky.balanceOf(engine.address)
+      const engineStableBalance = await stable.balanceOf(engine.address)
 
-      const payerRiskyBalance = await this.contracts.risky.balanceOf(this.signers[0].address)
-      const payerStableBalance = await this.contracts.stable.balanceOf(this.signers[0].address)
+      const payerRiskyBalance = await risky.balanceOf(user.address)
+      const payerStableBalance = await stable.balanceOf(user.address)
 
-      await this.contracts.house.borrow(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('1').raw, constants.MaxUint256)
+      await house.borrow(user.address, risky.address, stable.address, poolId, parseWei('1').raw, constants.MaxUint256)
 
-      expect(
-        await this.contracts.risky.balanceOf(this.contracts.engine.address)
-      ).to.equal(engineRiskyBalance.add(premium.raw))
+      expect(await risky.balanceOf(engine.address)).to.equal(engineRiskyBalance.add(premium.raw))
 
-      expect(
-        await this.contracts.stable.balanceOf(this.contracts.engine.address)
-      ).to.equal(engineStableBalance.sub(delStable.raw))
+      expect(await stable.balanceOf(engine.address)).to.equal(engineStableBalance.sub(delStable.raw))
 
-      expect(
-        await this.contracts.risky.balanceOf(this.signers[0].address)
-      ).to.equal(payerRiskyBalance.sub(premium.raw))
+      expect(await risky.balanceOf(user.address)).to.equal(payerRiskyBalance.sub(premium.raw))
 
-      expect(
-        await this.contracts.stable.balanceOf(this.signers[0].address)
-      ).to.equal(payerStableBalance.add(delStable.raw))
+      expect(await stable.balanceOf(user.address)).to.equal(payerStableBalance.add(delStable.raw))
     })
 
     it('emits the Borrowed event', async function () {
       await expect(
-        this.contracts.house.borrow(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('1').raw, constants.MaxUint256)
-      ).to.emit(this.contracts.house, 'Borrowed')
+        await house.borrow(user.address, risky.address, stable.address, poolId, parseWei('1').raw, constants.MaxUint256)
+      ).to.emit(house, 'Borrowed')
     })
   })
 
-  describe('when the parameters are not valid', function () {
+  describe('fail cases', function () {
     it('fails to borrow more than there is liquidity on the curve', async function () {
       await expect(
-        this.contracts.house.borrow(this.signers[0].address, this.contracts.engine.address, poolId, parseWei('100000').raw, constants.MaxUint256)
+        house.borrow(user.address, risky.address, stable.address, poolId, parseWei('100000').raw, constants.MaxUint256)
       ).to.be.reverted
     })
   })
