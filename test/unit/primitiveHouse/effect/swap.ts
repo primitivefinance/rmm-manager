@@ -14,21 +14,26 @@ describe('swap', function () {
   })
 
   beforeEach(async function () {
-    poolId = await this.contracts.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
   })
 
   describe('when the parameters are valid', function () {
     it('swaps risky for stable', async function () {
-      await this.contracts.house.swap(this.contracts.engine.address, poolId, true, parseWei('1').raw, parseWei('1').raw, false)
+      await this.house.swap(
+        this.risky.address,
+        this.stable.address,
+        poolId,
+        true,
+        parseWei('1').raw,
+        parseWei('1').raw,
+        false
+      )
     })
 
     it('emits the Swapped event', async function () {
       await expect(
-        this.contracts.house.swap(this.contracts.engine.address, poolId, true, parseWei('1').raw, parseWei('1').raw, false)
-      ).to.emit(
-        this.contracts.house,
-        'Swapped'
-      )
+        this.house.swap(this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, parseWei('1').raw, false)
+      ).to.emit(this.house, 'Swapped')
     })
   })
 })

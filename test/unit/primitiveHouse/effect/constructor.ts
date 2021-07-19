@@ -9,7 +9,7 @@ describe('constructor', function () {
 
   describe('success cases', function () {
     it('sets the address of the factory', async function () {
-      expect(await this.contracts.house.factory()).to.equal(this.contracts.factory.address)
+      expect(await this.house.factory()).to.equal(this.factory.address)
     })
   })
 })
