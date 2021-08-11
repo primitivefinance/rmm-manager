@@ -6,6 +6,8 @@ pragma solidity 0.8.6;
 /// @dev     Interacts with Primitive Engine contracts
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
@@ -14,7 +16,7 @@ import "@primitivefinance/v2-core/contracts/libraries/Position.sol";
 import "./interfaces/IPrimitiveHouse.sol";
 import "./interfaces/IPrimitiveHouseEvents.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
+contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
@@ -44,7 +46,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
 
     /// EFFECT FUNCTIONS ///
 
-    constructor(address _factory) {
+    constructor(address _factory) ERC721("Primitive V2 Positions", "PRIM-V2-POS") {
         factory = IPrimitiveFactory(_factory);
     }
 
