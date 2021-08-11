@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.0;
+pragma solidity 0.8.6;
 
 interface IPrimitiveHouseEvents {
     event Created(
@@ -8,10 +8,7 @@ interface IPrimitiveHouseEvents {
         bytes32 poolId,
         uint256 strike,
         uint64 sigma,
-        uint32 time,
-        uint256 riskyPrice,
-        uint256 delRisky,
-        uint256 delStable
+        uint32 maturity
     );
 
     event Deposited(
@@ -28,7 +25,7 @@ interface IPrimitiveHouseEvents {
         uint256 delStable
     );
 
-    event AllocatedAndLent(
+    event AllocatedAndSupply(
         address indexed owner,
         address indexed engine,
         bytes32 indexed poolId,
