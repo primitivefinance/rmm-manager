@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.0;
+pragma solidity 0.8.6;
 
 /// @title   Primitive House
 /// @author  Primitive
 /// @dev     Interacts with Primitive Engine contracts
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/IPrimitiveFactory.sol";
-import "@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol";
-import "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
+import "@primitivefinance/v2-core/contracts/libraries/Position.sol";
 
 import "./interfaces/IPrimitiveHouse.sol";
 import "./interfaces/IPrimitiveHouseEvents.sol";
@@ -24,7 +23,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
 
     /// STORAGE PROPERTIES ///
 
-    IPrimitiveFactory public factory;
+    IPrimitiveFactory public override factory;
 
     // engine => user => Margin.Data
     mapping(address => mapping(address => Margin.Data)) public margins;
@@ -54,6 +53,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
         address payer;
         address risky;
         address stable;
+        bool fromMargin;
     }
 
     CallbackData private callbackData;
@@ -63,28 +63,28 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     function create(
         address risky,
         address stable,
-        uint256 delLiquidity,
         uint256 strike,
         uint64 sigma,
-        uint32 time,
-        uint256 riskyPrice
+        uint32 maturity,
+        uint256 delta,
+        uint256 delLiquidity
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
 
         (bytes32 poolId, uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
-            time,
-            riskyPrice,
+            maturity,
+            delta,
             delLiquidity,
             empty
         );
 
         positions[engine][Position.getPositionId(msg.sender, poolId)].allocate(delLiquidity - 1000);
 
-        emit Created(msg.sender, engine, poolId, strike, sigma, time, riskyPrice, delRisky, delStable);
+        emit Created(msg.sender, engine, poolId, strike, sigma, maturity);
     }
 
     /// @inheritdoc IPrimitiveHouse
@@ -97,7 +97,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
 
         IPrimitiveEngineActions(engine).deposit(address(this), delRisky, delStable, empty);
 
@@ -116,9 +116,10 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
-
+        // Reverts the call early if margins are insufficient
         margins[engine].withdraw(delRisky, delStable);
+
+        IPrimitiveEngineActions(engine).withdraw(msg.sender, delRisky, delStable);
 
         if (delRisky > 0) IERC20(risky).safeTransfer(msg.sender, delRisky);
         if (delStable > 0) IERC20(stable).safeTransfer(msg.sender, delStable);
@@ -137,7 +138,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
             poolId,
@@ -152,39 +153,34 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
         Position.Data storage pos = positions[engine].fetch(owner, poolId);
         pos.allocate(delLiquidity);
 
-        IPrimitiveEngineActions(engine).lend(poolId, delLiquidity);
+        IPrimitiveEngineActions(engine).supply(poolId, delLiquidity);
 
-        positions[engine].lend(poolId, delLiquidity);
+        positions[engine].supply(poolId, delLiquidity);
 
-        emit AllocatedAndLent(owner, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
+        emit AllocatedAndSupply(owner, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
 
     function remove(
         address risky,
         address stable,
         bytes32 poolId,
-        uint256 delLiquidity,
-        bool toMargin
-    ) public virtual lock {
+        uint256 delLiquidity
+    ) public override virtual lock {
         address engine = factory.getEngine(risky, stable);
 
         IPrimitiveEngineActions(engine).claim(poolId, delLiquidity);
 
         positions[engine].claim(poolId, delLiquidity);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(
             poolId,
-            delLiquidity,
-            toMargin,
-            empty
+            delLiquidity
         );
 
-        if (toMargin) {
-            Margin.Data storage mar = margins[engine][msg.sender];
-            mar.deposit(delRisky, delStable);
-        }
+        Margin.Data storage mar = margins[engine][msg.sender];
+        mar.deposit(delRisky, delStable);
 
         positions[engine].remove(poolId, delLiquidity);
 
@@ -198,13 +194,16 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
         address stable,
         bytes32 poolId,
         uint256 delLiquidity,
+        bool fromMargin,
         uint256 maxPremium
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
 
-        uint256 premium = IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, maxPremium, empty);
+        uint256 premium = IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, fromMargin, empty);
+
+        require(maxPremium >= premium, "Premium too high");
 
         positions[engine].borrow(poolId, delLiquidity);
 
@@ -222,7 +221,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
 
         (uint256 delRisky, uint256 delStable, uint256 premium) = IPrimitiveEngineActions(engine).repay(
             poolId,
@@ -257,16 +256,17 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
+        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
 
         uint256 deltaOut = IPrimitiveEngineActions(engine).swap(
             poolId,
             riskyForStable,
             deltaIn,
-            deltaOutMin,
             fromMargin,
             abi.encode(callbackData)
         );
+
+        require(deltaOut >= deltaOutMin, "Delta out too low");
 
         emit Swapped(msg.sender, engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
     }
@@ -317,11 +317,17 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
     ) external override {
         require(callbackData.engine == msg.sender, "Not engine");
         uint256 riskyNeeded = delLiquidity - delRisky;
-        IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, riskyNeeded);
+
+        if (callbackData.fromMargin) {
+            margins[callbackData.payer].withdraw(riskyNeeded, 0);
+        } else {
+            IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, riskyNeeded);
+        }
+
         IERC20(callbackData.stable).safeTransfer(callbackData.payer, delStable);
     }
 
-    function repayFromExternalCallback(uint256 delStable, bytes calldata data) external override {
+    function repayCallback(uint256 delStable, bytes calldata data) external override {
         require(callbackData.engine == msg.sender, "Not engine");
         IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
     }

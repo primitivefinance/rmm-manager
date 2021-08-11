@@ -1,30 +1,37 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.0;
-pragma abicoder v2;
+pragma solidity 0.8.6;
 
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveLendingCallback.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveMarginCallback.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
-import "@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveBorrowCallback.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveRepayCallback.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/IPrimitiveFactory.sol";
 
 interface IPrimitiveHouse is
+    IPrimitiveBorrowCallback,
     IPrimitiveCreateCallback,
-    IPrimitiveLendingCallback,
+    IPrimitiveDepositCallback,
     IPrimitiveLiquidityCallback,
-    IPrimitiveMarginCallback,
+    IPrimitiveRepayCallback,
     IPrimitiveSwapCallback
 {
-    // Margin
+    /// VIEW FUNCTIONS ///
+
+    /// @notice Returns the factory contract
+    function factory() external view returns (IPrimitiveFactory);
+
+    /// EFFECT FUNCTIONS ///
+
     function create(
         address risky,
         address stable,
-        uint256 delLiquidity,
         uint256 strike,
         uint64 sigma,
-        uint32 time,
-        uint256 riskyPrice
+        uint32 maturity,
+        uint256 delta,
+        uint256 delLiquidity
     ) external;
 
     function deposit(
@@ -51,12 +58,20 @@ interface IPrimitiveHouse is
         bool fromMargin
     ) external;
 
+    function remove(
+        address risky,
+        address stable,
+        bytes32 poolId,
+        uint256 delLiquidity
+    ) external;
+
     function borrow(
         address owner,
         address risky,
         address stable,
         bytes32 poolId,
         uint256 delLiquidity,
+        bool fromMargin,
         uint256 maxPremium
     ) external;
 
@@ -69,7 +84,6 @@ interface IPrimitiveHouse is
         bool fromMargin
     ) external;
 
-    // Swap
     function swap(
         address risky,
         address stable,

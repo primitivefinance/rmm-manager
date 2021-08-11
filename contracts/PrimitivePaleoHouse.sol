@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.0;
+pragma solidity 0.8.6;
 
 /// @title Primitive Paleo House
 /// @author Primitive
@@ -27,13 +27,13 @@ contract PrimitivePaleoHouse is PrimitiveHouse, Whitelist {
     function create(
         address risky,
         address stable,
-        uint256 delLiquidity,
         uint256 strike,
         uint64 sigma,
-        uint32 time,
-        uint256 riskyPrice
+        uint32 maturity,
+        uint256 delta,
+        uint256 delLiquidity
     ) public override onlyWhitelisted {
-        super.create(risky, stable, delLiquidity, strike, sigma, time, riskyPrice);
+        super.create(risky, stable, strike, sigma, maturity, delta, delLiquidity);
     }
 
     function deposit(
@@ -70,10 +70,9 @@ contract PrimitivePaleoHouse is PrimitiveHouse, Whitelist {
         address risky,
         address stable,
         bytes32 poolId,
-        uint256 delLiquidity,
-        bool toMargin
+        uint256 delLiquidity
     ) public override onlyWhitelisted {
-        super.remove(risky, stable, poolId, delLiquidity, toMargin);
+        super.remove(risky, stable, poolId, delLiquidity);
     }
 
     function borrow(
@@ -82,9 +81,10 @@ contract PrimitivePaleoHouse is PrimitiveHouse, Whitelist {
         address stable,
         bytes32 poolId,
         uint256 delLiquidity,
+        bool fromMargin,
         uint256 maxPremium
     ) public override onlyWhitelisted {
-        super.borrow(owner, risky, stable, poolId, delLiquidity, maxPremium);
+        super.borrow(owner, risky, stable, poolId, delLiquidity, fromMargin, maxPremium);
     }
 
     function repay(
