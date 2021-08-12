@@ -11,27 +11,28 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
-import "@primitivefinance/v2-core/contracts/libraries/Position.sol";
 
 import "./interfaces/IPrimitiveHouse.sol";
 import "./interfaces/IPrimitiveHouseEvents.sol";
+
+import "./libraries/PositionHouse.sol";
 
 contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
-    using Position for mapping(bytes32 => Position.Data);
-    using Position for Position.Data;
+    using PositionHouse for PositionHouse.Data;
 
     /// STORAGE PROPERTIES ///
 
+    /// @inheritdoc IPrimitiveHouse
     IPrimitiveFactory public override factory;
 
-    // engine => user => Margin.Data
-    mapping(address => mapping(address => Margin.Data)) public margins;
+    /// @inheritdoc IPrimitiveHouse
+    mapping(address => mapping(address => Margin.Data)) public override margins;
 
-    // engine => posId => Position.Data
-    mapping(address => mapping(bytes32 => Position.Data)) public positions;
+    // engine => posId => PositionHouse.Data
+    mapping(address => mapping(bytes32 => PositionHouse.Data)) public positions;
 
     uint256 private reentrant;
 
@@ -73,7 +74,13 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
+        callbackData = CallbackData({
+            engine: engine,
+            payer: msg.sender,
+            risky: risky,
+            stable: stable,
+            fromMargin: false
+        });
 
         (bytes32 poolId, uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).create(
             strike,
@@ -99,7 +106,13 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
+        callbackData = CallbackData({
+            engine: engine,
+            payer: msg.sender,
+            risky: risky,
+            stable: stable,
+            fromMargin: false
+        });
 
         IPrimitiveEngineActions(engine).deposit(address(this), delRisky, delStable, empty);
 
@@ -140,7 +153,13 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
+        callbackData = CallbackData({
+            engine: engine,
+            payer: msg.sender,
+            risky: risky,
+            stable: stable,
+            fromMargin: false
+        });
 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
             poolId,
@@ -167,19 +186,22 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         address stable,
         bytes32 poolId,
         uint256 delLiquidity
-    ) public override virtual lock {
+    ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
         IPrimitiveEngineActions(engine).claim(poolId, delLiquidity);
 
         positions[engine].claim(poolId, delLiquidity);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
+        callbackData = CallbackData({
+            engine: engine,
+            payer: msg.sender,
+            risky: risky,
+            stable: stable,
+            fromMargin: false
+        });
 
-        (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(
-            poolId,
-            delLiquidity
-        );
+        (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
 
         Margin.Data storage mar = margins[engine][msg.sender];
         mar.deposit(delRisky, delStable);
@@ -201,11 +223,18 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
+        callbackData = CallbackData({
+            engine: engine,
+            payer: msg.sender,
+            risky: risky,
+            stable: stable,
+            fromMargin: false
+        });
 
         uint256 premium = IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, fromMargin, empty);
 
-        require(maxPremium >= premium, "Premium too high");
+        // Reverts if the premium is higher than the maximum premium
+        if (premium > maxPremium) revert MaxPremiumError(maxPremium, premium);
 
         positions[engine].borrow(poolId, delLiquidity);
 
@@ -223,7 +252,13 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
+        callbackData = CallbackData({
+            engine: engine,
+            payer: msg.sender,
+            risky: risky,
+            stable: stable,
+            fromMargin: false
+        });
 
         (uint256 delRisky, uint256 delStable, uint256 premium) = IPrimitiveEngineActions(engine).repay(
             poolId,
@@ -235,11 +270,9 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
 
         if (fromMargin) margins[engine].withdraw(0, delStable);
 
-        // TODO: Update position
         Position.Data storage pos = positions[engine].fetch(owner, poolId);
         pos.repay(delLiquidity);
 
-        // TODO: Update position
         Margin.Data storage mar = margins[engine][owner];
         mar.deposit(premium, 0);
 
@@ -258,7 +291,13 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable, fromMargin: false});
+        callbackData = CallbackData({
+            engine: engine,
+            payer: msg.sender,
+            risky: risky,
+            stable: stable,
+            fromMargin: false
+        });
 
         uint256 deltaOut = IPrimitiveEngineActions(engine).swap(
             poolId,
@@ -268,7 +307,8 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
             abi.encode(callbackData)
         );
 
-        require(deltaOut >= deltaOutMin, "Delta out too low");
+        // Reverts if the delta out is lower than the minimum
+        if (deltaOutMin > deltaOut) revert DeltaOutMinError(deltaOutMin, deltaOut);
 
         emit Swapped(msg.sender, engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
     }
@@ -280,7 +320,8 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
+        if (callbackData.engine != msg.sender) revert NotEngineError(callbackData.engine, msg.sender);
+
         if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
         if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
     }
@@ -296,7 +337,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
+        if (callbackData.engine != msg.sender) revert NotEngineError(callbackData.engine, msg.sender);
         if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
         if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
     }
@@ -306,7 +347,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
+        if (callbackData.engine != msg.sender) revert NotEngineError(callbackData.engine, msg.sender);
         if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
         if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
     }
@@ -317,7 +358,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
+        if (callbackData.engine != msg.sender) revert NotEngineError(callbackData.engine, msg.sender);
         uint256 riskyNeeded = delLiquidity - delRisky;
 
         if (callbackData.fromMargin) {
@@ -330,7 +371,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     }
 
     function repayCallback(uint256 delStable, bytes calldata data) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
+        if (callbackData.engine != msg.sender) revert NotEngineError(callbackData.engine, msg.sender);
         IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
     }
 
@@ -339,7 +380,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
+        if (callbackData.engine != msg.sender) revert NotEngineError(callbackData.engine, msg.sender);
         if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
         if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
     }
@@ -349,7 +390,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
+        if (callbackData.engine != msg.sender) revert NotEngineError(callbackData.engine, msg.sender);
         if (delRisky > 0) IERC20(callbackData.risky).safeTransfer(callbackData.payer, delRisky);
         if (delStable > 0) IERC20(callbackData.stable).safeTransfer(callbackData.payer, delStable);
     }
