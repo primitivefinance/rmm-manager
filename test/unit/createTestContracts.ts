@@ -3,12 +3,9 @@ import { Wallet, Contract } from 'ethers'
 import { Contracts } from '../../types'
 import { deployContract } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
-import PrimitiveFactoryArtifact from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
-import PrimitiveEngineArtifact from '@primitivefinance/primitive-v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
-import {
-  PrimitiveEngine,
-  PrimitiveFactory
-} from '@primitivefinance/primitive-v2-core/typechain'
+import PrimitiveFactoryArtifact from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
+import PrimitiveEngineArtifact from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
 // import { abi as PaleoHouseAbi } from '../../artifacts/contracts/PrimitivePaleoHouse.sol/PrimitivePaleoHouse.json'
 
 type BaseContracts = {

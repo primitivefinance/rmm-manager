@@ -4,6 +4,7 @@ import { utils, BytesLike, constants } from 'ethers'
 
 import { parseWei } from '../../../shared/Units'
 import loadContext, { config } from '../../context'
+import { computePoolId } from '../../../shared/utilities'
 import { createFragment } from '../fragments'
 
 const { strike, sigma, maturity, spot } = config
@@ -17,7 +18,7 @@ describe('create', function () {
   })
 
   beforeEach(async function () {
-    poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    poolId = computePoolId(this.contracts.factory.address, maturity.raw, sigma.raw, strike.raw)
     housePosId = utils.solidityKeccak256(['address', 'bytes32'], [this.house.address, poolId])
     userPosId = utils.solidityKeccak256(['address', 'bytes32'], [this.deployer.address, poolId])
   })
