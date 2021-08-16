@@ -2,29 +2,80 @@ import { createFixtureLoader, MockProvider } from 'ethereum-waffle'
 import { Contracts } from '../../types'
 import { Wallet } from 'ethers'
 import createTestContracts from './createTestContracts'
-import { parseWei } from '../shared/Units'
-import { Percentage, Wei, Time, YEAR } from '../shared/sdk/Units'
+import { parseWei, Percentage, Time, Wei, toBN, parsePercentage } from 'web3-units'
+import { callDelta, callPremium } from '@primitivefinance/v2-math'
 
-interface Config {
-  strike: Wei
-  sigma: Percentage
-  maturity: Time
-  lastTimestamp: Time
-  spot: Wei
+/**
+ * @notice Calibration Struct; Class representation of each Curve's parameters
+ * @dev    Call options only.
+ */
+export class Calibration {
+  public readonly strike: Wei
+  public readonly sigma: Percentage
+  public readonly maturity: Time
+  public readonly lastTimestamp: Time
+  public readonly spot: Wei
+  public readonly fee: Percentage
+
+  /**
+   *
+   * @param strike Strike price as a float
+   * @param sigma Volatility percentage as a float, e.g. 1 = 100%
+   * @param maturity Timestamp in seconds
+   * @param lastTimestamp Timestamp in seconds
+   * @param spot Value of risky asset in units of riskless asset
+   */
+  constructor(
+    strike: number,
+    sigma: number,
+    maturity: number,
+    lastTimestamp: number,
+    spot: number,
+    fee: Percentage = new Percentage(toBN(0))
+  ) {
+    this.strike = parseWei(strike)
+    this.sigma = new Percentage(toBN(sigma * Percentage.Mantissa))
+    this.maturity = new Time(maturity) // in seconds, because `block.timestamp` is in seconds
+    this.lastTimestamp = new Time(lastTimestamp) // in seconds, because `block.timestamp` is in seconds
+    this.spot = parseWei(spot)
+    this.fee = fee
+  }
+
+  /**
+   * @returns Time until expiry
+   */
+  get tau(): Time {
+    return this.maturity.sub(this.lastTimestamp)
+  }
+
+  /**
+   * @returns Change in option premium wrt change in underlying spot price
+   */
+  get delta(): number {
+    return callDelta(this.strike.float, this.sigma.float, this.tau.years, this.spot.float)
+  }
+
+  /**
+   * @returns Black-Scholes implied premium
+   */
+  get premium(): number {
+    return callPremium(this.strike.float, this.sigma.float, this.tau.years, this.spot.float)
+  }
+
+  /**
+   * @returns Spot price is above strike price
+   */
+  get inTheMoney(): boolean {
+    return this.strike.float >= this.spot.float
+  }
 }
 
-export const config: Config = {
-  strike: parseWei('2500'),
-  sigma: new Percentage(1.1),
-  maturity: new Time(YEAR + +Date.now() / 1000),
-  lastTimestamp: new Time(+Date.now() / 1000),
-  spot: parseWei('1750'),
-}
+export const config: Calibration = new Calibration(10, 1, Time.YearInSeconds + 1, 1, 10, parsePercentage(0.0015))
 
-export default async function loadContext(
+export default function loadContext(
   provider: MockProvider,
   action?: (signers: Wallet[], contracts: Contracts) => Promise<void>
-): Promise<void> {
+): void {
   const loadFixture = createFixtureLoader(provider.getWallets(), provider)
 
   beforeEach(async function () {
@@ -39,10 +90,11 @@ export default async function loadContext(
       return { contracts: loadedContracts }
     })
 
+    this.contracts = {} as Contracts
     this.signers = provider.getWallets()
     this.deployer = this.signers[0]
     this.bob = this.signers[1]
 
-    Object.assign(this, loadedFixture.contracts)
+    Object.assign(this.contracts, loadedFixture.contracts)
   })
 }

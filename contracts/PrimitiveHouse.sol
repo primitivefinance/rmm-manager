@@ -22,6 +22,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
     using PositionHouse for PositionHouse.Data;
+    using PositionHouse for mapping(bytes32 => PositionHouse.Data);
 
     /// STORAGE PROPERTIES ///
 
@@ -91,7 +92,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
             empty
         );
 
-        positions[engine][Position.getPositionId(msg.sender, poolId)].allocate(delLiquidity - 1000);
+        positions[engine].fetch(msg.sender, poolId).allocate(delLiquidity - 1000);
 
         emit Created(msg.sender, engine, poolId, strike, sigma, maturity);
     }
@@ -171,12 +172,12 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
 
         if (fromMargin) margins[engine].withdraw(delRisky, delStable);
 
-        Position.Data storage pos = positions[engine].fetch(owner, poolId);
+        PositionHouse.Data storage pos = positions[engine].fetch(msg.sender, poolId);
         pos.allocate(delLiquidity);
 
         IPrimitiveEngineActions(engine).supply(poolId, delLiquidity);
 
-        positions[engine].supply(poolId, delLiquidity);
+        pos.supply(delLiquidity);
 
         emit AllocatedAndSupply(owner, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
@@ -191,7 +192,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
 
         IPrimitiveEngineActions(engine).claim(poolId, delLiquidity);
 
-        positions[engine].claim(poolId, delLiquidity);
+        positions[engine].fetch(msg.sender, poolId).claim(delLiquidity);
 
         callbackData = CallbackData({
             engine: engine,
@@ -206,7 +207,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         Margin.Data storage mar = margins[engine][msg.sender];
         mar.deposit(delRisky, delStable);
 
-        positions[engine].remove(poolId, delLiquidity);
+        positions[engine].fetch(msg.sender, poolId).remove(delLiquidity);
 
         // TODO: Emit the Removed event
     }
@@ -231,12 +232,12 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
             fromMargin: false
         });
 
-        uint256 premium = IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, fromMargin, empty);
+        (uint256 premium, , ) = IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, fromMargin, empty);
 
         // Reverts if the premium is higher than the maximum premium
         if (premium > maxPremium) revert MaxPremiumError(maxPremium, premium);
 
-        positions[engine].borrow(poolId, delLiquidity);
+        positions[engine].fetch(msg.sender, poolId).borrow(delLiquidity);
 
         emit Borrowed(owner, engine, poolId, delLiquidity, maxPremium, premium);
     }
@@ -270,7 +271,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
 
         if (fromMargin) margins[engine].withdraw(0, delStable);
 
-        Position.Data storage pos = positions[engine].fetch(owner, poolId);
+        PositionHouse.Data storage pos = positions[engine].fetch(owner, poolId);
         pos.repay(delLiquidity);
 
         Margin.Data storage mar = margins[engine][owner];
