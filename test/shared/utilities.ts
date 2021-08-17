@@ -1,7 +1,5 @@
 import { utils, BigNumber, constants } from 'ethers'
 import bn from 'bignumber.js'
-import { Wei } from './Units'
-import { Percentage, Time } from 'web3-units'
 
 bn.config({ EXPONENTIAL_AT: 999999, DECIMAL_PLACES: 40 })
 

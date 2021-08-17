@@ -2,7 +2,7 @@ import { waffle } from 'hardhat'
 import { expect } from 'chai'
 import { utils, BytesLike, constants } from 'ethers'
 
-import { parseWei } from '../../../shared/Units'
+import { parseWei } from 'web3-units'
 import loadContext, { config } from '../../context'
 import { allocateFragment } from '../fragments'
 import { computePoolId } from '../../../shared/utilities'
