@@ -790,6 +790,15 @@
     "@ethersproject/constants" "^5.3.0"
     "@ethersproject/logger" "^5.3.0"
 
+"@ethersproject/units@^5.4.0":
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/@ethersproject/units/-/units-5.4.0.tgz#d57477a4498b14b88b10396062c8cbbaf20c79fe"
+  integrity sha512-Z88krX40KCp+JqPCP5oPv5p750g+uU6gopDYRTBGcDvOASh6qhiEYCRatuM/suC4S2XW9Zz90QI35MfSrTIaFg==
+  dependencies:
+    "@ethersproject/bignumber" "^5.4.0"
+    "@ethersproject/constants" "^5.4.0"
+    "@ethersproject/logger" "^5.4.0"
+
 "@ethersproject/wallet@5.3.0":
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/@ethersproject/wallet/-/wallet-5.3.0.tgz#91946b470bd279e39ade58866f21f92749d062af"
@@ -888,12 +897,20 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.1.0.tgz#baec89a7f5f73e3d8ea582a78f1980134b605375"
   integrity sha512-TihZitscnaHNcZgXGj9zDLDyCqjziytB4tMCwXq0XimfWkAjBYyk5/pOsDbbwcavhlc79HhpTEpQcrMnPVa1mw==
 
-"@primitivefinance/v2-core@0.1.3":
-  version "0.1.3"
-  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-core/0.1.3/cda8c2b634da83698b5543ad0b258b374e1a2893bcec34f600068fca82a9b6c9#2207cbffac8bc7eddc81fbebe887fb68d4dd0095"
-  integrity sha512-HqBJR6Odi2NrEU1pPa5wTWBt+2ANWwxwYLMW9c3zT6K8MxYRfJK9XnEycNHHzv7w0/BRd/qNMJnWZGhvMrVVKg==
+"@primitivefinance/v2-core@^1.2.0":
+  version "1.2.0"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-core/1.2.0/bb8076fbf05726d56c522fe9e9b6aa8cf586c3f8c38205721ae692f99b281c7d#f54a7891bf35233a5f44120350ec3707e6a49be3"
+  integrity sha512-RU2vjd7/BYCNYPDFtA2pPkIPOC7l1X0WzO310XaqQvVj6u/2eDU871AE163mL6euvTVl0+UXiZsKQ/pXT8LvYw==
   dependencies:
     mocha "^9.0.3"
+
+"@primitivefinance/v2-math@^1.3.0":
+  version "1.3.0"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-math/1.3.0/d17086c777d688a097021f1bf6d9466cc50923b4f47a1b7ea507698cc5d467c9#b9885deedc7923a5ae7a948f063d8974023490c6"
+  integrity sha512-A48cuGax4drUhiqfgZtrtE9Ec8ArZC6JfElasl+OBBm+zX9pVypW+MZ3y5vf2atPTe9NwvixWKMOxLAD4vEEpw==
+  dependencies:
+    gaussian "^1.2.0"
+    numeric "^1.2.6"
 
 "@resolver-engine/core@^0.3.3":
   version "0.3.3"
@@ -4886,6 +4903,11 @@ ganache-core@^2.13.2:
   optionalDependencies:
     ethereumjs-wallet "0.6.5"
     web3 "1.2.11"
+
+gaussian@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/gaussian/-/gaussian-1.2.0.tgz#5b081744008c1b0a8eb510da695ed7328fb8913a"
+  integrity sha512-Pz/InFmDZ6VqCbXF+2+O6USIbPUPWhJ7DnqrZKfo9mMHszCd4pBad3WCVa9ruzzrBizYonsv0ZBmuv4rR8NRQg==
 
 get-caller-file@^1.0.1:
   version "1.0.3"
@@ -10383,6 +10405,15 @@ web3-shh@1.3.6:
     web3-core-method "1.3.6"
     web3-core-subscriptions "1.3.6"
     web3-net "1.3.6"
+
+web3-units@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/web3-units/-/web3-units-1.1.2.tgz#0750f46e90c7baa16bbd43580220afb60cd47595"
+  integrity sha512-EEWyafDs9gaVIF/0N678vdqSw1/azbrnBy/bANoVIxf5SEVu9lAomewjAzOvPd2wKM2Agrqic5g+GPnc+eO8NQ==
+  dependencies:
+    "@ethersproject/bignumber" "^5.4.0"
+    "@ethersproject/constants" "^5.4.0"
+    "@ethersproject/units" "^5.4.0"
 
 web3-utils@1.2.11:
   version "1.2.11"

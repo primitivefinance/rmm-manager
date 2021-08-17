@@ -5,6 +5,7 @@ import { utils, BytesLike, constants } from 'ethers'
 import { parseWei } from '../../../shared/Units'
 import loadContext, { config } from '../../context'
 import { allocateFragment } from '../fragments'
+import { computePoolId } from '../../../shared/utilities'
 
 const { strike, sigma, maturity } = config
 let poolId: string
@@ -14,11 +15,11 @@ const empty: BytesLike = constants.HashZero
 
 describe('allocate', function () {
   before(async function () {
-    await loadContext(waffle.provider, allocateFragment)
+    loadContext(waffle.provider, allocateFragment)
   })
 
   beforeEach(async function () {
-    poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    poolId = computePoolId(this.contracts.factory.address, maturity.raw, sigma.raw, strike.raw)
     userPosId = utils.solidityKeccak256(['address', 'bytes32'], [this.deployer.address, poolId])
   })
 
@@ -101,7 +102,7 @@ describe('allocate', function () {
 
     describe('when allocating from external', async function () {
       it('allocates 10 LP shares', async function () {
-        poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+        poolId = computePoolId(this.contracts.factory.address, maturity.raw, sigma.raw, strike.raw)
         await this.house.allocate(
           this.deployer.address,
           this.risky.address,

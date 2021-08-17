@@ -6,6 +6,7 @@ import { parseWei } from '../../../shared/Units'
 import loadContext, { config } from '../../context'
 
 import { removeFragment } from '../fragments'
+import { computePoolId } from '../../../shared/utilities'
 
 const { strike, sigma, maturity } = config
 let poolId, userPosId: string
@@ -18,19 +19,19 @@ describe('remove', function () {
   })
 
   beforeEach(async function () {
-    poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    poolId = computePoolId(this.contracts.factory.address, maturity.raw, sigma.raw, strike.raw)
     userPosId = utils.solidityKeccak256(['address', 'bytes32'], [this.deployer.address, poolId])
   })
 
   describe('success cases', function () {
     describe('when removing to margin', function () {
       it('removes 10 LP shares', async function () {
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, true)
+        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw)
       })
 
       it('updates the position of the sender', async function () {
         const initialPos = await this.house.positions(this.engine.address, userPosId)
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, true)
+        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw)
         const newPos = await this.house.positions(this.engine.address, userPosId)
 
         expect(newPos.liquidity).equal(initialPos.liquidity.sub(parseWei('10').raw))
@@ -41,7 +42,7 @@ describe('remove', function () {
         const deltaRisky = parseWei('10').mul(reserve.reserveRisky).div(reserve.liquidity)
         const deltaStable = parseWei('10').mul(reserve.reserveStable).div(reserve.liquidity)
         const initialMargin = await this.house.margins(this.engine.address, this.deployer.address)
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, true)
+        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw)
         const newMargin = await this.house.margins(this.engine.address, this.deployer.address)
 
         expect(newMargin.balanceRisky).to.equal(initialMargin.balanceRisky.add(deltaRisky.raw))
@@ -51,12 +52,12 @@ describe('remove', function () {
 
     describe('when removing to external', function () {
       it('removes 10 LP shares', async function () {
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, false)
+        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw)
       })
 
       it('updates the position of the sender', async function () {
         const initialPos = await this.house.positions(this.engine.address, userPosId)
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, false)
+        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw)
         const newPos = await this.house.positions(this.engine.address, userPosId)
 
         expect(newPos.liquidity).equal(initialPos.liquidity.sub(parseWei('10').raw))
@@ -68,7 +69,7 @@ describe('remove', function () {
         const deltaStable = parseWei('10').mul(reserve.reserveStable).div(reserve.liquidity)
         const riskyBalance = await this.risky.balanceOf(this.deployer.address)
         const stableBalance = await this.stable.balanceOf(this.deployer.address)
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, false)
+        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw)
 
         expect(await this.risky.balanceOf(this.deployer.address)).to.equal(riskyBalance.add(deltaRisky.raw))
         expect(await this.stable.balanceOf(this.deployer.address)).to.equal(stableBalance.add(deltaStable.raw))
@@ -79,7 +80,7 @@ describe('remove', function () {
   describe('fail cases', function () {
     it('fails to remove more than the position', async function () {
       await expect(
-        this.house.connect(this.signers[1]).remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, true)
+        this.house.connect(this.signers[1]).remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw)
       ).to.be.reverted
     })
 

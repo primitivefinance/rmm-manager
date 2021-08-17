@@ -1,5 +1,5 @@
 import { Wallet } from 'ethers'
-import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/primitive-v2-core/typechain'
+import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
 import * as ContractTypes from '../typechain'
 
 export interface Contracts {
@@ -18,5 +18,6 @@ declare module 'mocha' {
     deployer: Wallet
     bob: Wallet
     signers: Wallet[]
+    contracts: Contracts
   }
 }
