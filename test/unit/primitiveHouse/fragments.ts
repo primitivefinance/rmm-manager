@@ -1,6 +1,7 @@
 import { Wallet, constants } from 'ethers'
+import { parseWei } from 'web3-units'
+
 import { Contracts } from '../../../types'
-import { parseWei } from '../../shared/Units'
 import { config } from '../context'
 import { computePoolId } from '../../shared/utilities'
 

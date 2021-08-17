@@ -1,8 +1,8 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
+import { parseWei } from 'web3-units'
 
 import loadContext, { config } from '../../context'
-import { parseWei } from '../../../shared/Units'
 import { computePoolId } from '../../../shared/utilities'
 import { swapFragment } from '../fragments'
 

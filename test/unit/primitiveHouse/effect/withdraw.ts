@@ -1,8 +1,8 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
 import { BytesLike, constants } from 'ethers'
+import { parseWei } from 'web3-units'
 
-import { parseWei } from '../../../shared/Units'
 import loadContext from '../../context'
 
 import { withdrawFragment } from '../fragments'
