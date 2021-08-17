@@ -3,6 +3,7 @@ import { expect } from 'chai'
 
 import loadContext, { config } from '../../context'
 import { parseWei } from '../../../shared/Units'
+import { computePoolId } from '../../../shared/utilities'
 import { swapFragment } from '../fragments'
 
 const { strike, sigma, maturity } = config
@@ -14,7 +15,7 @@ describe('swap', function () {
   })
 
   beforeEach(async function () {
-    poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    poolId = computePoolId(this.contracts.factory.address, maturity.raw, sigma.raw, strike.raw)
   })
 
   describe('when the parameters are valid', function () {

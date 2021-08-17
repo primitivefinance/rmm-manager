@@ -3,6 +3,7 @@ import { expect } from 'chai'
 import { utils, BytesLike, constants } from 'ethers'
 
 import { parseWei } from '../../../shared/Units'
+import { computePoolId } from '../../../shared/utilities'
 import loadContext, { config } from '../../context'
 
 import { borrowFragment } from '../fragments'
@@ -18,7 +19,7 @@ describe('borrow', function () {
   })
 
   beforeEach(async function () {
-    poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
+    poolId = computePoolId(this.contracts.factory.address, maturity.raw, sigma.raw, strike.raw)
     userPosId = utils.solidityKeccak256(['address', 'bytes32'], [this.deployer.address, poolId])
   })
 
@@ -30,6 +31,7 @@ describe('borrow', function () {
         this.stable.address,
         poolId,
         parseWei('1').raw,
+        true,
         constants.MaxUint256
       )
     })
@@ -41,6 +43,7 @@ describe('borrow', function () {
         this.stable.address,
         poolId,
         parseWei('1').raw,
+        true,
         constants.MaxUint256
       )
       const newPosition = await this.house.positions(this.engine.address, userPosId)
@@ -65,6 +68,7 @@ describe('borrow', function () {
         this.stable.address,
         poolId,
         parseWei('1').raw,
+        true,
         constants.MaxUint256
       )
 
@@ -85,6 +89,7 @@ describe('borrow', function () {
           this.stable.address,
           poolId,
           parseWei('1').raw,
+          true,
           constants.MaxUint256
         )
       ).to.emit(this.house, 'Borrowed')
@@ -100,6 +105,7 @@ describe('borrow', function () {
           this.stable.address,
           poolId,
           parseWei('100000').raw,
+          true,
           constants.MaxUint256
         )
       ).to.be.reverted
