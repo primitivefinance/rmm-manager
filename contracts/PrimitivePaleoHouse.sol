@@ -6,7 +6,7 @@ pragma solidity 0.8.6;
 /// @dev House contract tailored for the Paleo testnet release
 
 import "./PrimitiveHouse.sol";
-import "./Whitelist.sol";
+import "./base/Whitelist.sol";
 import "./test/Token.sol";
 
 contract PrimitivePaleoHouse is PrimitiveHouse, Whitelist {

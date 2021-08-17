@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "./interfaces/IAdmin.sol";
+import "../interfaces/IAdmin.sol";
 
 contract Admin is IAdmin {
     /// @inheritdoc IAdmin
