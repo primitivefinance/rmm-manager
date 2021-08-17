@@ -4,7 +4,7 @@ import loadContext from '../../context'
 
 describe('constructor', function () {
   before(async function () {
-    await loadContext(waffle.provider)
+    loadContext(waffle.provider)
   })
 
   describe('success cases', function () {

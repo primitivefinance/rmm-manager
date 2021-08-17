@@ -13,7 +13,7 @@ let poolId: string
 
 describe('repay', function () {
   before(async function () {
-    await loadContext(waffle.provider, repayFragment)
+    loadContext(waffle.provider, repayFragment)
   })
 
   beforeEach(async function () {

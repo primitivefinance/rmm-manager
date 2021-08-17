@@ -11,7 +11,7 @@ const empty: BytesLike = constants.HashZero
 
 describe('withdraw', function () {
   before(async function () {
-    await loadContext(waffle.provider, withdrawFragment)
+    loadContext(waffle.provider, withdrawFragment)
   })
 
   describe('when the parameters are valid', function () {
