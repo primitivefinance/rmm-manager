@@ -6,7 +6,7 @@ import loadContext from '../../context'
 
 describe('isKeyValid', function () {
   before(async function () {
-    await loadContext(waffle.provider)
+    loadContext(waffle.provider)
   })
 
   describe('when the key is valid', function () {

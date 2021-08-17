@@ -11,7 +11,7 @@ let poolId: string
 
 describe('swap', function () {
   before(async function () {
-    await loadContext(waffle.provider, swapFragment)
+    loadContext(waffle.provider, swapFragment)
   })
 
   beforeEach(async function () {

@@ -15,7 +15,7 @@ const empty: BytesLike = constants.HashZero
 
 describe('remove', function () {
   before(async function () {
-    await loadContext(waffle.provider, removeFragment)
+    loadContext(waffle.provider, removeFragment)
   })
 
   beforeEach(async function () {

@@ -14,7 +14,7 @@ let empty: BytesLike = constants.HashZero
 
 describe('create', function () {
   before(async function () {
-    await loadContext(waffle.provider, createFragment)
+    loadContext(waffle.provider, createFragment)
   })
 
   beforeEach(async function () {
