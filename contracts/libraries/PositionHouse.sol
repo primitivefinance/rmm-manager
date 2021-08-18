@@ -19,14 +19,6 @@ library PositionHouse {
         uint128 debt; // Balance of liquidity debt that must be paid back, also balance of risky in position
     }
 
-    function fetch(
-        mapping(bytes32 => PositionHouse.Data) storage positions,
-        address account,
-        bytes32 poolId
-    ) internal returns (Data storage pos) {
-        pos = positions[keccak256(abi.encodePacked(account, poolId))];
-    }
-
     /// @notice Add to the balance of liquidity
     function allocate(Data storage position, uint256 delLiquidity) internal {
         position.liquidity += delLiquidity.toUint128();

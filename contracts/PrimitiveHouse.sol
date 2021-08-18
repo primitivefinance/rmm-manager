@@ -22,9 +22,21 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
     using PositionHouse for PositionHouse.Data;
-    using PositionHouse for mapping(bytes32 => PositionHouse.Data);
+    // using PositionHouse for mapping(uint256 => PositionHouse.Data);
+
+    /// ERRORS ///
+
+    error NoCurrentPosition(
+        address account,
+        address engine,
+        bytes32 poolId
+    );
+
 
     /// STORAGE PROPERTIES ///
+
+    // Keeps track of the last tokenId (0 doesn't exist)
+    uint256 public lastTokenId = 1;
 
     /// @inheritdoc IPrimitiveHouse
     IPrimitiveFactory public override factory;
@@ -32,8 +44,16 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
     /// @inheritdoc IPrimitiveHouse
     mapping(address => mapping(address => Margin.Data)) public override margins;
 
-    // engine => posId => PositionHouse.Data
-    mapping(address => mapping(bytes32 => PositionHouse.Data)) public positions;
+    // TODO: Delete this line
+    // mapping(address => mapping(bytes32 => PositionHouse.Data)) public positions;
+
+    /// @notice Keeps track of the NFT position of each user for each engine
+    ///         and each poolId. Only 1 token can be owned per poolId and
+    ///         0 means that the user does not have a position yet.
+    ///         user => engine => poolId => tokenId
+    mapping(address => mapping(address => mapping(bytes32 => uint256))) public positionOf;
+
+    mapping(uint256 => PositionHouse.Data) public positions;
 
     uint256 private reentrant;
 
@@ -92,7 +112,10 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
             empty
         );
 
-        positions[engine].fetch(msg.sender, poolId).allocate(delLiquidity - 1000);
+        // Safely mints a new position, no need to check if the
+        // user already has one because it's not possible!
+        uint256 tokenId = mint(msg.sender);
+        positions[tokenId].allocate(delLiquidity - 1000);
 
         emit Created(msg.sender, engine, poolId, strike, sigma, maturity);
     }
@@ -105,6 +128,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delRisky,
         uint256 delStable
     ) public virtual override lock {
+        // TODO: Revert if delRisky || delStable == 0?
         address engine = factory.getEngine(risky, stable);
 
         callbackData = CallbackData({
@@ -130,6 +154,10 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delRisky,
         uint256 delStable
     ) public virtual override lock {
+        if (delRisky == 0 || delStable == 0) {
+            // TODO: Revert the call or not?
+        }
+
         address engine = factory.getEngine(risky, stable);
 
         // Reverts the call early if margins are insufficient
@@ -152,6 +180,8 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         uint256 delLiquidity,
         bool fromMargin
     ) public virtual override lock {
+        // TODO: Revert if delLiquidity == 0?
+
         address engine = factory.getEngine(risky, stable);
 
         callbackData = CallbackData({
@@ -172,12 +202,19 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
 
         if (fromMargin) margins[engine].withdraw(delRisky, delStable);
 
-        PositionHouse.Data storage pos = positions[engine].fetch(msg.sender, poolId);
-        pos.allocate(delLiquidity);
+        // Creates a position if the user doesn't have one
+        uint256 tokenId = positionOf[owner][engine][poolId];
+
+        if (tokenId == 0) {
+            // Mints a new position
+            tokenId = mint(owner);
+        }
+
+        positions[tokenId].allocate(delLiquidity);
 
         IPrimitiveEngineActions(engine).supply(poolId, delLiquidity);
 
-        pos.supply(delLiquidity);
+        positions[tokenId].supply(delLiquidity);
 
         emit AllocatedAndSupply(owner, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
@@ -188,11 +225,20 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         bytes32 poolId,
         uint256 delLiquidity
     ) public virtual override lock {
+        // TODO: Revert if delLiquidity == 0?
+
         address engine = factory.getEngine(risky, stable);
+
+        // Checks if the user has a current position
+        uint256 tokenId = positionOf[msg.sender][engine][poolId];
+
+        if (tokenId == 0) {
+            revert NoCurrentPosition(msg.sender, engine, poolId);
+        }
 
         IPrimitiveEngineActions(engine).claim(poolId, delLiquidity);
 
-        positions[engine].fetch(msg.sender, poolId).claim(delLiquidity);
+        positions[tokenId].claim(delLiquidity);
 
         callbackData = CallbackData({
             engine: engine,
@@ -207,7 +253,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         Margin.Data storage mar = margins[engine][msg.sender];
         mar.deposit(delRisky, delStable);
 
-        positions[engine].fetch(msg.sender, poolId).remove(delLiquidity);
+        positions[tokenId].remove(delLiquidity);
 
         // TODO: Emit the Removed event
     }
@@ -222,7 +268,18 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         bool fromMargin,
         uint256 maxPremium
     ) public virtual override lock {
+        // TODO: Revert if delLiquidity == 0?
+
         address engine = factory.getEngine(risky, stable);
+
+        // Fetches the position
+        uint256 tokenId = positionOf[owner][engine][poolId];
+
+        // Creates a position if the user doesn't have one
+        if (tokenId == 0) {
+            // Mints a new position
+            tokenId = mint(owner);
+        }
 
         callbackData = CallbackData({
             engine: engine,
@@ -237,7 +294,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         // Reverts if the premium is higher than the maximum premium
         if (premium > maxPremium) revert MaxPremiumError(maxPremium, premium);
 
-        positions[engine].fetch(msg.sender, poolId).borrow(delLiquidity);
+        positions[tokenId].borrow(delLiquidity);
 
         emit Borrowed(owner, engine, poolId, delLiquidity, maxPremium, premium);
     }
@@ -252,6 +309,13 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         bool fromMargin
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
+
+        uint256 tokenId = positionOf[owner][engine][poolId];
+
+        // Checks if the user has a current position
+        if (tokenId == 0) {
+            revert NoCurrentPosition(owner, engine, poolId);
+        }
 
         callbackData = CallbackData({
             engine: engine,
@@ -271,8 +335,7 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
 
         if (fromMargin) margins[engine].withdraw(0, delStable);
 
-        PositionHouse.Data storage pos = positions[engine].fetch(owner, poolId);
-        pos.repay(delLiquidity);
+        positions[tokenId].repay(delLiquidity);
 
         Margin.Data storage mar = margins[engine][owner];
         mar.deposit(premium, 0);
@@ -394,5 +457,11 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
         if (callbackData.engine != msg.sender) revert NotEngineError(callbackData.engine, msg.sender);
         if (delRisky > 0) IERC20(callbackData.risky).safeTransfer(callbackData.payer, delRisky);
         if (delStable > 0) IERC20(callbackData.stable).safeTransfer(callbackData.payer, delStable);
+    }
+
+    function mint(address owner) private returns (uint256) {
+        _mint(owner, lastTokenId);
+        lastTokenId += 1;
+        return lastTokenId - 1;
     }
 }
