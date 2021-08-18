@@ -9,13 +9,16 @@ import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveRepayC
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/IPrimitiveFactory.sol";
 
+import "./IMulticall.sol";
+
 interface IPrimitiveHouse is
     IPrimitiveBorrowCallback,
     IPrimitiveCreateCallback,
     IPrimitiveDepositCallback,
     IPrimitiveLiquidityCallback,
     IPrimitiveRepayCallback,
-    IPrimitiveSwapCallback
+    IPrimitiveSwapCallback,
+    IMulticall
 {
     /// ERRORS ///
 

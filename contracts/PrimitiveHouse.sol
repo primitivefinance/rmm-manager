@@ -17,7 +17,9 @@ import "./interfaces/IPrimitiveHouseEvents.sol";
 
 import "./libraries/PositionHouse.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721 {
+import "./base/Multicall.sol";
+
+contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721, Multicall {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
