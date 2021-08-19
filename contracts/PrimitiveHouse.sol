@@ -13,32 +13,18 @@ import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineVi
 import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
 
 import "./interfaces/IPrimitiveHouse.sol";
-import "./interfaces/IPrimitiveHouseEvents.sol";
 
 import "./libraries/PositionHouse.sol";
 
 import "./base/Multicall.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721, Multicall {
+contract PrimitiveHouse is IPrimitiveHouse, ERC721, Multicall {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
     using PositionHouse for PositionHouse.Data;
-    // using PositionHouse for mapping(uint256 => PositionHouse.Data);
-
-    /// ERRORS ///
-
-    error NoCurrentPosition(
-        address account,
-        address engine,
-        bytes32 poolId
-    );
-
 
     /// STORAGE PROPERTIES ///
-
-    // Keeps track of the last tokenId (0 doesn't exist)
-    uint256 public lastTokenId = 1;
 
     /// @inheritdoc IPrimitiveHouse
     IPrimitiveFactory public override factory;
@@ -56,6 +42,9 @@ contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents, ERC721, Multi
     mapping(address => mapping(address => mapping(bytes32 => uint256))) public positionOf;
 
     mapping(uint256 => PositionHouse.Data) public positions;
+
+    // Keeps track of the last tokenId (0 doesn't exist)
+    uint256 private lastTokenId = 1;
 
     uint256 private reentrant;
 
