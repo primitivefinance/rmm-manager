@@ -3,7 +3,7 @@ pragma solidity 0.8.6;
 
 interface IPrimitiveHouseEvents {
     event Created(
-        address indexed owner,
+        address indexed recipient,
         address indexed engine,
         bytes32 poolId,
         uint256 strike,
@@ -12,50 +12,62 @@ interface IPrimitiveHouseEvents {
     );
 
     event Deposited(
-        address indexed owner,
+        address indexed payer,
+        address indexed recipient,
         address indexed engine,
+        address risky,
+        address stable,
         uint256 delRisky,
         uint256 delStable
     );
 
     event Withdrawn(
-        address indexed owner,
+        address indexed payer,
+        address indexed recipient,
         address indexed engine,
         uint256 delRisky,
         uint256 delStable
     );
 
-    event AllocatedAndSupply(
-        address indexed owner,
+    event LiquidityAdded(
+        address indexed payer,
         address indexed engine,
         bytes32 indexed poolId,
         uint256 delLiquidity,
         uint256 delRisky,
         uint256 delStable,
         bool fromMargin
+    );
+
+    event LiquidityRemoved(
+        address indexed payer,
+        address recipient,
+        address engine,
+        bytes32 poolId,
+        address risky,
+        address stable,
+        uint256 delRisky,
+        uint256 delStable
     );
 
     event Borrowed(
-        address indexed owner,
+        address indexed recipient,
         address indexed engine,
         bytes32 indexed poolId,
-        uint256 delLiquidity,
-        uint256 maxPremium,
-        uint256 premium
+        uint256 riskyCollateral,
+        uint256 stableCollateral
     );
 
     event Repaid(
-        address indexed owner,
+        address indexed recipient,
         address indexed engine,
         bytes32 indexed poolId,
-        uint256 delLiquidity,
-        uint256 delRisky,
-        uint256 delStable,
-        bool fromMargin
+        uint256 riskyCollateral,
+        uint256 stableCollateral
     );
 
     event Swapped(
-        address indexed owner,
+        address indexed recipient,
         address indexed engine,
         bytes32 indexed poolId,
         bool riskyForStable,
