@@ -4,7 +4,7 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 abstract contract PositionWrapper is ERC1155 {
-    constructor() ERC1155("") {}
+    constructor(string memory _URI) ERC1155(_URI) {}
 
     enum Token {
         Liquidity,

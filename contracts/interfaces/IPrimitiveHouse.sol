@@ -14,6 +14,8 @@ import "./IPrimitiveHouseErrors.sol";
 import "./IPrimitiveHouseEvents.sol";
 
 import "./IMulticall.sol";
+import "./ICashManager.sol";
+import "./ISelfPermit.sol";
 
 interface IPrimitiveHouse is
     IPrimitiveBorrowCallback,

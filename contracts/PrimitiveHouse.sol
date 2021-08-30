@@ -14,9 +14,11 @@ import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
 import "./interfaces/IPrimitiveHouse.sol";
 
 import "./base/Multicall.sol";
+import "./base/CashManager.sol";
+import "./base/SelfPermit.sol";
 import "./base/PositionWrapper.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse, PositionWrapper, Multicall {
+contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, PositionWrapper {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
@@ -42,7 +44,11 @@ contract PrimitiveHouse is IPrimitiveHouse, PositionWrapper, Multicall {
 
     /// EFFECT FUNCTIONS ///
 
-    constructor(address _factory) PositionWrapper() {
+    constructor(
+        address _factory,
+        address _WETH10,
+        string memory _URI
+    ) PositionWrapper(_URI) CashManager(_WETH10) {
         factory = IPrimitiveFactory(_factory);
     }
 
