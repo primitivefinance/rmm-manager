@@ -47,28 +47,28 @@ interface IPrimitiveHouse is
 
     /// @notice Deposits assets into the margin of a specific engine
     /// @dev The address of the engine is defined by the risky / stable pair
+    /// @param recipient The address of the recipient
     /// @param risky The address of the risky
     /// @param stable The address of the stable
-    /// @param owner The address of the recipient
     /// @param delRisky The amount of risky to deposit
     /// @param delStable The amount of stable to deposit
     function deposit(
+        address recipient,
         address risky,
         address stable,
-        address owner,
         uint256 delRisky,
         uint256 delStable
     ) external;
 
     function withdraw(
+        address recipient,
         address risky,
         address stable,
         uint256 delRisky,
         uint256 delStable
     ) external;
 
-    function allocate(
-        address owner,
+    function addLiquidity(
         address risky,
         address stable,
         bytes32 poolId,
@@ -76,29 +76,32 @@ interface IPrimitiveHouse is
         bool fromMargin
     ) external;
 
-    function remove(
+    function removeLiquidity(
+        address recipient,
         address risky,
         address stable,
         bytes32 poolId,
-        uint256 delLiquidity
+        uint256 delLiquidity,
+        bool toMargin
     ) external;
 
     function borrow(
-        address owner,
         address risky,
         address stable,
         bytes32 poolId,
-        uint256 delLiquidity,
-        bool fromMargin,
-        uint256 maxPremium
+        uint256 riskyCollateral,
+        uint256 stableCollateral,
+        uint256 maxRiskyPremium,
+        uint256 maxStablePremium,
+        bool fromMargin
     ) external;
 
     function repay(
-        address owner,
         address risky,
         address stable,
         bytes32 poolId,
-        uint256 delLiquidity,
+        uint256 riskyCollateral,
+        uint256 stableCollateral,
         bool fromMargin
     ) external;
 
