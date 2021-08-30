@@ -14,8 +14,8 @@ type BaseContracts = {
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token
-  testAdmin: ContractTypes.TestAdmin
-  whitelist: ContractTypes.Whitelist
+  // testAdmin: ContractTypes.TestAdmin
+  // whitelist: ContractTypes.Whitelist
   // paleoHouse: ContractTypes.PrimitivePaleoHouse
   // paleoHouseFactory: ContractTypes.PrimitivePaleoHouseFactory
 }
@@ -37,13 +37,16 @@ async function initializeBaseContracts(deployer: Wallet): Promise<BaseContracts>
   const engine = (await ethers.getContractAt(PrimitiveEngineArtifact.abi, addr)) as PrimitiveEngine
 
   // Periphery
-  const house = (await deploy('PrimitiveHouse', deployer, [factory.address])) as ContractTypes.PrimitiveHouse
+  const house = (await deploy('PrimitiveHouse', deployer, [
+    factory.address,
+    '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F',
+  ])) as ContractTypes.PrimitiveHouse
 
   // Paleo
-  const testAdmin = (await deploy('TestAdmin', deployer)) as ContractTypes.TestAdmin
-  const whitelist = (await deploy('Whitelist', deployer)) as ContractTypes.Whitelist
+  // const testAdmin = (await deploy('TestAdmin', deployer)) as ContractTypes.TestAdmin
+  // const whitelist = (await deploy('Whitelist', deployer)) as ContractTypes.Whitelist
 
-  return { factory, engine, stable, risky, house, testAdmin, whitelist }
+  return { factory, engine, stable, risky, house }
 }
 
 export default async function createTestContracts(deployer: Wallet): Promise<Contracts> {
