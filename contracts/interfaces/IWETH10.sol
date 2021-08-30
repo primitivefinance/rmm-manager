@@ -6,6 +6,11 @@ pragma solidity 0.8.6;
 /// @dev     Simplified interface of WETH10
 
 interface IWETH10 {
+    /**
+     * @dev Returns the amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
     /// @dev `msg.value` of ETH sent to this contract grants caller account a matching increase in WETH10 token balance.
     /// Emits {Transfer} event to reflect WETH10 token mint of `msg.value` from `address(0)` to caller account.
     function deposit() external payable;
