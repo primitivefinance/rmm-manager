@@ -95,6 +95,6 @@ export default function loadContext(
     this.deployer = this.signers[0]
     this.bob = this.signers[1]
 
-    Object.assign(this.contracts, loadedFixture.contracts)
+    Object.assign(this, loadedFixture.contracts)
   })
 }

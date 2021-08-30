@@ -8,8 +8,8 @@ export interface Contracts {
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token
-  testAdmin: ContractTypes.TestAdmin
-  whitelist: ContractTypes.Whitelist
+  // testAdmin: ContractTypes.TestAdmin
+  // whitelist: ContractTypes.Whitelist
   // paleoHouse: ContractTypes.PrimitivePaleoHouse
 }
 
@@ -18,6 +18,5 @@ declare module 'mocha' {
     deployer: Wallet
     bob: Wallet
     signers: Wallet[]
-    contracts: Contracts
   }
 }
