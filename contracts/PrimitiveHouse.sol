@@ -439,8 +439,6 @@ contract PrimitiveHouse is IPrimitiveHouse, PositionWrapper, Multicall {
         }
     }
 
-    error AbovePremium();
-
     function borrowCallback(
         uint256 riskyDeficit,
         uint256 stableDeficit,
@@ -450,8 +448,8 @@ contract PrimitiveHouse is IPrimitiveHouse, PositionWrapper, Multicall {
 
         if (decoded.engine != msg.sender) revert NotEngineError(decoded.engine, msg.sender);
 
-        if (riskyDeficit > decoded.maxRiskyPremium) revert AbovePremium();
-        if (stableDeficit > decoded.maxStablePremium) revert AbovePremium();
+        if (riskyDeficit > decoded.maxRiskyPremium) revert AbovePremiumError(decoded.maxRiskyPremium, riskyDeficit);
+        if (stableDeficit > decoded.maxStablePremium) revert AbovePremiumError(decoded.maxStablePremium, stableDeficit);
 
         if (riskyDeficit > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, riskyDeficit);
         if (stableDeficit > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, stableDeficit);
