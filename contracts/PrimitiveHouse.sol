@@ -96,7 +96,6 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     struct DepositCallbackData {
         address engine;
         address payer;
-        address recipient;
         address risky;
         address stable;
         uint256 delRisky;
@@ -122,7 +121,6 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
                 DepositCallbackData({
                     engine: engine,
                     payer: msg.sender,
-                    recipient: recipient,
                     risky: risky,
                     stable: stable,
                     delRisky: delRisky,
