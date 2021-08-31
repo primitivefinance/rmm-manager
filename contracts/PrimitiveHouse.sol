@@ -18,6 +18,8 @@ import "./base/CashManager.sol";
 import "./base/SelfPermit.sol";
 import "./base/PositionWrapper.sol";
 
+import "hardhat/console.sol";
+
 contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, PositionWrapper {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
@@ -152,10 +154,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         // Reverts the call early if margins are insufficient
         margins[engine].withdraw(delRisky, delStable);
 
-        IPrimitiveEngineActions(engine).withdraw(msg.sender, delRisky, delStable);
-
-        if (delRisky > 0) IERC20(risky).safeTransfer(recipient, delRisky);
-        if (delStable > 0) IERC20(stable).safeTransfer(recipient, delStable);
+        IPrimitiveEngineActions(engine).withdraw(recipient, delRisky, delStable);
 
         emit Withdrawn(msg.sender, recipient, engine, delRisky, delStable);
     }
