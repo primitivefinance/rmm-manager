@@ -16,11 +16,23 @@ describe('withdraw', function () {
 
   describe('when the parameters are valid', function () {
     it('withdraws 1000 risky and 1000 stable from margin', async function () {
-      await this.house.withdraw(this.risky.address, this.stable.address, parseWei('1000').raw, parseWei('1000').raw)
+      await this.house.withdraw(
+        this.deployer.address,
+        this.risky.address,
+        this.stable.address,
+        parseWei('1000').raw,
+        parseWei('1000').raw
+      )
     })
 
     it('reduces the margin of the sender', async function () {
-      await this.house.withdraw(this.risky.address, this.stable.address, parseWei('1000').raw, parseWei('1000').raw)
+      await this.house.withdraw(
+        this.deployer.address,
+        this.risky.address,
+        this.stable.address,
+        parseWei('1000').raw,
+        parseWei('1000').raw
+      )
 
       const margin = await this.house.margins(this.engine.address, this.deployer.address)
 
@@ -29,21 +41,41 @@ describe('withdraw', function () {
     })
 
     it('emits the Withdrawn event', async function () {
-      await expect(this.house.withdraw(this.risky.address, this.stable.address, parseWei('1000').raw, parseWei('1000').raw))
+      await expect(
+        this.house.withdraw(
+          this.deployer.address,
+          this.risky.address,
+          this.stable.address,
+          parseWei('1000').raw,
+          parseWei('1000').raw
+        )
+      )
         .to.emit(this.house, 'Withdrawn')
-        .withArgs(this.deployer.address, this.engine.address, parseWei('1000').raw, parseWei('1000').raw)
+        .withArgs(
+          this.deployer.address,
+          this.deployer.address,
+          this.engine.address,
+          parseWei('1000').raw,
+          parseWei('1000').raw
+        )
     })
   })
 
   describe('fail cases', function () {
     it('fails on attempt to withdraw more than margin balance', async function () {
       await expect(
-        this.house.withdraw(this.risky.address, this.stable.address, parseWei('100001').raw, parseWei('100001').raw)
+        this.house.withdraw(
+          this.deployer.address,
+          this.risky.address,
+          this.stable.address,
+          parseWei('10000000').raw,
+          parseWei('10000000').raw
+        )
       ).to.be.reverted
     })
 
     it('reverts if the callback function is called directly', async function () {
-      await expect(this.house.depositCallback(0, 0, empty)).to.be.revertedWith('Not engine')
+      await expect(this.house.depositCallback(0, 0, empty)).to.be.reverted
     })
   })
 })
