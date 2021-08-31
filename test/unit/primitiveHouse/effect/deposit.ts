@@ -50,12 +50,21 @@ describe('deposit', function () {
         )
       )
         .to.emit(this.house, 'Deposited')
-        .withArgs(this.deployer.address, this.engine.address, parseWei('1000').raw, parseWei('1000').raw)
+        .withArgs(
+          this.deployer.address,
+          this.deployer.address,
+          this.engine.address,
+          this.risky.address,
+          this.stable.address,
+          parseWei('1000').raw,
+          parseWei('1000').raw
+        )
     })
   })
 
   describe('fail cases', function () {
     it('reverts if the owner does not have enough tokens', async function () {
+      // TODO: Update to custom error
       await expect(
         this.house
           .connect(this.bob)
@@ -70,7 +79,8 @@ describe('deposit', function () {
     })
 
     it('reverts if the callback function is called directly', async function () {
-      await expect(this.house.depositCallback(0, 0, empty)).to.be.revertedWith('Not engine')
+      // TODO: Update to custom error
+      await expect(this.house.depositCallback(0, 0, empty)).to.be.reverted
     })
   })
 })
