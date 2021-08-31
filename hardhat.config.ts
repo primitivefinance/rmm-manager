@@ -25,12 +25,13 @@ const config: HardhatUserConfig = {
   },
   contractSizer: {
     alphaSort: true,
-    runOnCompile: true,
+    runOnCompile: false,
     disambiguatePaths: false,
   },
   gasReporter: {
     currency: 'USD',
     gasPrice: 100,
+    enabled: false,
   },
   paths: {
     sources: './contracts',
