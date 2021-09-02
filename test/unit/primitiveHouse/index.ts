@@ -1,4 +1,4 @@
-import './effect/allocate'
+import './effect/addLiquidity'
 import './effect/borrow'
 import './effect/constructor'
 import './effect/create'
