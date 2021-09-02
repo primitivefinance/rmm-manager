@@ -80,7 +80,7 @@ describe('deposit', function () {
 
     it('reverts if the callback function is called directly', async function () {
       // TODO: Update to custom error
-      await expect(this.house.depositCallback(0, 0, empty)).to.be.reverted
+      await expect(this.house.depositCallback(0, 0, empty)).to.be.revertedWith('NotEngineError()')
     })
   })
 })
