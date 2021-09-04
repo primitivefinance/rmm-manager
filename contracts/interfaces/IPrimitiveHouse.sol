@@ -83,8 +83,7 @@ interface IPrimitiveHouse is
         address risky,
         address stable,
         bytes32 poolId,
-        uint256 delLiquidity,
-        bool toMargin
+        uint256 delLiquidity
     ) external;
 
     function borrow(
