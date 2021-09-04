@@ -38,19 +38,18 @@ export async function withdrawFragment(signers: Wallet[], contracts: Contracts):
   )
 }
 
-export async function allocateFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
+export async function addLiquidityFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
   await withdrawFragment(signers, contracts)
 }
 
-export async function removeFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
-  await allocateFragment(signers, contracts)
-  const poolId = computePoolId(contracts.factory.address, strike.raw, sigma.raw, maturity.raw)
-  await contracts.house.allocate(
-    signers[0].address,
+export async function removeLiquidityFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
+  await addLiquidityFragment(signers, contracts)
+  const poolId = computePoolId(contracts.engine.address, strike.raw, sigma.raw, maturity.raw)
+  await contracts.house.addLiquidity(
     contracts.risky.address,
     contracts.stable.address,
     poolId,
-    parseWei('10').raw,
+    parseWei('1').raw,
     true
   )
 }

@@ -1,20 +1,20 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-import { utils, BytesLike, constants } from 'ethers'
+import { BytesLike, constants } from 'ethers'
 
 import { parseWei } from 'web3-units'
 import loadContext, { DEFAULT_CONFIG } from '../../context'
-import { allocateFragment } from '../fragments'
+import { addLiquidityFragment } from '../fragments'
 import { computePoolId, getTokenId } from '../../../shared/utilities'
 
-const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+const { strike, sigma, maturity } = DEFAULT_CONFIG
 let poolId: string
 
 const empty: BytesLike = constants.HashZero
 
-describe('add liquidity', function () {
+describe('addLiquidity', function () {
   before(async function () {
-    loadContext(waffle.provider, allocateFragment)
+    loadContext(waffle.provider, addLiquidityFragment)
   })
 
   beforeEach(async function () {

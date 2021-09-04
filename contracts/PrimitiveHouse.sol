@@ -221,8 +221,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address risky,
         address stable,
         bytes32 poolId,
-        uint256 delLiquidity,
-        bool toMargin
+        uint256 delLiquidity
     ) public virtual override lock {
         // TODO: Revert if delLiquidity == 0?
 
@@ -235,13 +234,8 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
         _remove(msg.sender, engine, poolId, delLiquidity);
 
-        if (toMargin) {
-            Margin.Data storage mar = margins[engine][recipient];
-            mar.deposit(delRisky, delStable);
-        } else {
-            if (delRisky > 0) IERC20(risky).safeTransfer(recipient, delRisky);
-            if (delStable > 0) IERC20(stable).safeTransfer(recipient, delStable);
-        }
+        Margin.Data storage mar = margins[engine][recipient];
+        mar.deposit(delRisky, delStable);
 
         emit LiquidityRemoved(msg.sender, recipient, engine, poolId, risky, stable, delRisky, delStable);
     }
