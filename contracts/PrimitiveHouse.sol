@@ -244,8 +244,6 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address payer;
         address risky;
         address stable;
-        uint256 maxRiskyPremium;
-        uint256 maxStablePremium;
     }
 
     function borrow(
@@ -265,9 +263,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         BorrowCallbackData memory callbackData = BorrowCallbackData({
             payer: msg.sender,
             risky: risky,
-            stable: stable,
-            maxRiskyPremium: maxRiskyPremium,
-            maxStablePremium: maxStablePremium
+            stable: stable
         });
 
         (
@@ -282,6 +278,9 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
             fromMargin,
             abi.encode(callbackData)
         );
+
+        if (riskyDeficit > maxRiskyPremium) revert AbovePremiumError(maxRiskyPremium, riskyDeficit);
+        if (stableDeficit > maxStablePremium) revert AbovePremiumError(maxStablePremium, stableDeficit);
 
         if (fromMargin) {
             margins[_engine].withdraw(riskyDeficit, stableDeficit);
@@ -443,9 +442,6 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         bytes calldata data
     ) external override onlyEngine() {
         BorrowCallbackData memory decoded = abi.decode(data, (BorrowCallbackData));
-
-        if (riskyDeficit > decoded.maxRiskyPremium) revert AbovePremiumError(decoded.maxRiskyPremium, riskyDeficit);
-        if (stableDeficit > decoded.maxStablePremium) revert AbovePremiumError(decoded.maxStablePremium, stableDeficit);
 
         if (riskyDeficit > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, riskyDeficit);
         if (stableDeficit > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, stableDeficit);
