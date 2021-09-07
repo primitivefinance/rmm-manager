@@ -2,12 +2,12 @@ import { waffle } from 'hardhat'
 import { expect } from 'chai'
 import { parseWei } from 'web3-units'
 
-import loadContext, { config } from '../../context'
+import loadContext, { DEFAULT_CONFIG } from '../../context'
 import { computePoolId } from '../../../shared/utilities'
 
 import { repayFragment } from '../fragments'
 
-const { strike, sigma, maturity } = config
+const { strike, sigma, maturity } = DEFAULT_CONFIG
 
 let poolId: string
 
@@ -17,7 +17,7 @@ describe('repay', function () {
   })
 
   beforeEach(async function () {
-    poolId = computePoolId(this.contracts.factory.address, maturity.raw, sigma.raw, strike.raw)
+    poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
   })
 
   describe('when the parameters are valid', function () {
