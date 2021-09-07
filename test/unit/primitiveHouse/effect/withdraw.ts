@@ -14,7 +14,7 @@ describe('withdraw', function () {
     loadContext(waffle.provider, withdrawFragment)
   })
 
-  describe('when the parameters are valid', function () {
+  describe('success cases', function () {
     it('withdraws 1000 risky and 1000 stable from margin', async function () {
       await this.house.withdraw(
         this.deployer.address,
@@ -38,6 +38,48 @@ describe('withdraw', function () {
 
       expect(margin.balanceRisky).to.equal(parseWei('99000').raw)
       expect(margin.balanceStable).to.equal(parseWei('99000').raw)
+    })
+
+    it('reduces the balance of the engine', async function () {
+      const stableBalance = await this.stable.balanceOf(this.engine.address)
+      const riskyBalance = await this.risky.balanceOf(this.engine.address)
+
+      await this.house.withdraw(
+        this.deployer.address,
+        this.risky.address,
+        this.stable.address,
+        parseWei('1000').raw,
+        parseWei('1000').raw
+      )
+
+      expect(
+        await this.stable.balanceOf(this.engine.address)
+      ).to.equal(stableBalance.sub(parseWei('1000').raw))
+
+      expect(
+        await this.risky.balanceOf(this.engine.address)
+      ).to.equal(riskyBalance.sub(parseWei('1000').raw))
+    })
+
+    it('increases the balance of the sender', async function () {
+      const stableBalance = await this.stable.balanceOf(this.signers[0].address)
+      const riskyBalance = await this.risky.balanceOf(this.signers[0].address)
+
+      await this.house.withdraw(
+        this.deployer.address,
+        this.risky.address,
+        this.stable.address,
+        parseWei('1000').raw,
+        parseWei('1000').raw
+      )
+
+      expect(
+        await this.stable.balanceOf(this.signers[0].address)
+      ).to.equal(stableBalance.add(parseWei('1000').raw))
+
+      expect(
+        await this.risky.balanceOf(this.signers[0].address)
+      ).to.equal(riskyBalance.add(parseWei('1000').raw))
     })
 
     it('emits the Withdrawn event', async function () {

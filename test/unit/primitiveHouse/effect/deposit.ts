@@ -39,6 +39,48 @@ describe('deposit', function () {
       expect(margin.balanceStable).to.equal(parseWei('1000').raw)
     })
 
+    it('reduces the balance of the sender', async function () {
+      const stableBalance = await this.stable.balanceOf(this.signers[0].address)
+      const riskyBalance = await this.risky.balanceOf(this.signers[0].address)
+
+      await this.house.deposit(
+        this.deployer.address,
+        this.risky.address,
+        this.stable.address,
+        parseWei('1000').raw,
+        parseWei('1000').raw
+      )
+
+      expect(
+        await this.stable.balanceOf(this.signers[0].address)
+      ).to.equal(stableBalance.sub(parseWei('1000').raw))
+
+      expect(
+        await this.risky.balanceOf(this.signers[0].address)
+      ).to.equal(riskyBalance.sub(parseWei('1000').raw))
+    })
+
+    it('increases the balance of the engine', async function () {
+      const stableBalance = await this.stable.balanceOf(this.engine.address)
+      const riskyBalance = await this.risky.balanceOf(this.engine.address)
+
+      await this.house.deposit(
+        this.deployer.address,
+        this.risky.address,
+        this.stable.address,
+        parseWei('1000').raw,
+        parseWei('1000').raw
+      )
+
+      expect(
+        await this.stable.balanceOf(this.engine.address)
+      ).to.equal(stableBalance.add(parseWei('1000').raw))
+
+      expect(
+        await this.risky.balanceOf(this.engine.address)
+      ).to.equal(riskyBalance.add(parseWei('1000').raw))
+    })
+
     it('emits the Deposited event', async function () {
       await expect(
         this.house.deposit(

@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-
+/// @title EngineGuard
+/// @notice Helper to prevent malicious contracts to call the callbacks
+/// @author Primitive
 contract EngineGuard {
     /// @notice Thrown when the callback msg.sender is not the expected engine
     error NotEngineError();

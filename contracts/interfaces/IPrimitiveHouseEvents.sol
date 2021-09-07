@@ -41,29 +41,12 @@ interface IPrimitiveHouseEvents {
 
     event LiquidityRemoved(
         address indexed payer,
-        address recipient,
         address engine,
         bytes32 poolId,
         address risky,
         address stable,
         uint256 delRisky,
         uint256 delStable
-    );
-
-    event Borrowed(
-        address indexed recipient,
-        address indexed engine,
-        bytes32 indexed poolId,
-        uint256 riskyCollateral,
-        uint256 stableCollateral
-    );
-
-    event Repaid(
-        address indexed recipient,
-        address indexed engine,
-        bytes32 indexed poolId,
-        uint256 riskyCollateral,
-        uint256 stableCollateral
     );
 
     event Swapped(

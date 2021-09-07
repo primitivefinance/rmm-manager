@@ -8,7 +8,6 @@ export interface Contracts {
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token,
-  router: ContractTypes.TestRouter,
   // testAdmin: ContractTypes.TestAdmin
   // whitelist: ContractTypes.Whitelist
   // paleoHouse: ContractTypes.PrimitivePaleoHouse

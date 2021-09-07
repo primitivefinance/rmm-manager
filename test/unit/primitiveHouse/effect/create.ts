@@ -13,8 +13,6 @@ const empty: BytesLike = constants.HashZero
 
 let poolId, housePosId : string
 
-
-
 describe('create', function () {
   before(async function () {
     loadContext(waffle.provider, createFragment)

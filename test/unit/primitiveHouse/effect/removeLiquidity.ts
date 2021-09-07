@@ -1,17 +1,14 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-import { BytesLike, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import loadContext, { DEFAULT_CONFIG } from '../../context'
 
 import { removeLiquidityFragment } from '../fragments'
-import { computePoolId, getTokenId } from '../../../shared/utilities'
+import { computePoolId, getTokenId, computePositionId } from '../../../shared/utilities'
 
 const { strike, sigma, maturity } = DEFAULT_CONFIG
 let poolId: string
-
-const empty: BytesLike = constants.HashZero
 
 describe('removeLiquidity', function () {
   before(async function () {
@@ -23,9 +20,11 @@ describe('removeLiquidity', function () {
   })
 
   describe('success cases', function () {
-    it('removes 1 LP shares', async function () {
+    it('removes 1 LP share', async function () {
+      const position = await this.engine.positions(computePositionId(this.house.address, poolId))
+      console.log(position.liquidity.toString())
+
       await this.house.removeLiquidity(
-        this.signers[0].address,
         this.risky.address,
         this.stable.address,
         poolId,
@@ -33,23 +32,20 @@ describe('removeLiquidity', function () {
       )
     })
 
-    it('decreases the float balance', async function () {
-      const tokenId = getTokenId(this.engine.address, poolId, 1)
-      const oldFloatBalance = await this.house.balanceOf(this.deployer.address, tokenId)
+    it('decreases the position of the sender', async function () {
+      const tokenId = getTokenId(this.engine.address, poolId, 0)
+      const liquidity = await this.house.balanceOf(this.deployer.address, tokenId)
 
       await this.house.removeLiquidity(
-        this.signers[0].address,
         this.risky.address,
         this.stable.address,
         poolId,
         parseWei('1').raw,
       )
 
-      const newFloatBalance = await this.house.balanceOf(this.deployer.address, tokenId)
-
-      expect(newFloatBalance).to.equal(
-        oldFloatBalance.sub(parseWei('1').raw)
-      )
+      expect(
+        await this.house.balanceOf(this.deployer.address, tokenId)
+      ).to.equal(liquidity.sub(parseWei('1').raw))
     })
 
     it('increases the margin of the sender', async function () {
@@ -59,7 +55,6 @@ describe('removeLiquidity', function () {
       const initialMargin = await this.house.margins(this.engine.address, this.deployer.address)
 
       await this.house.removeLiquidity(
-        this.signers[0].address,
         this.risky.address,
         this.stable.address,
         poolId,
@@ -75,7 +70,6 @@ describe('removeLiquidity', function () {
     it('emits the LiquidityRemoved event', async function () {
       // TODO: Check args
       await expect(this.house.removeLiquidity(
-        this.signers[0].address,
         this.risky.address,
         this.stable.address,
         poolId,
@@ -87,11 +81,10 @@ describe('removeLiquidity', function () {
   describe('fail cases', function () {
     it('fails to remove more than the position', async function () {
       await expect(this.house.removeLiquidity(
-        this.signers[0].address,
         this.risky.address,
         this.stable.address,
         poolId,
-        parseWei('2').raw
+        parseWei('10').raw
       )).to.be.reverted
     })
   })

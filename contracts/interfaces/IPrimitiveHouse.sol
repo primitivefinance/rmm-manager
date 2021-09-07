@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveBorrowCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveRepayCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
 
 import "@primitivefinance/v2-core/contracts/interfaces/IPrimitiveFactory.sol";
@@ -18,11 +16,9 @@ import "./ICashManager.sol";
 import "./ISelfPermit.sol";
 
 interface IPrimitiveHouse is
-    IPrimitiveBorrowCallback,
     IPrimitiveCreateCallback,
     IPrimitiveDepositCallback,
     IPrimitiveLiquidityCallback,
-    IPrimitiveRepayCallback,
     IPrimitiveSwapCallback,
     IPrimitiveHouseErrors,
     IPrimitiveHouseEvents,
@@ -79,31 +75,10 @@ interface IPrimitiveHouse is
     ) external;
 
     function removeLiquidity(
-        address recipient,
         address risky,
         address stable,
         bytes32 poolId,
         uint256 delLiquidity
-    ) external;
-
-    function borrow(
-        address risky,
-        address stable,
-        bytes32 poolId,
-        uint256 riskyCollateral,
-        uint256 stableCollateral,
-        uint256 maxRiskyPremium,
-        uint256 maxStablePremium,
-        bool fromMargin
-    ) external;
-
-    function repay(
-        address risky,
-        address stable,
-        bytes32 poolId,
-        uint256 riskyCollateral,
-        uint256 stableCollateral,
-        bool fromMargin
     ) external;
 
     function swap(
