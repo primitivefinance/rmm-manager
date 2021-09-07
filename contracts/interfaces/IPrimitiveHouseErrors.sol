@@ -2,9 +2,6 @@
 pragma solidity 0.8.6;
 
 interface IPrimitiveHouseErrors {
-    /// @notice Thrown when the callback msg.sender is not the expected engine
-    error NotEngineError();
-
     /// @notice Thrown when the actual premium is higher than the maximum
     /// @param expected The maximum premium expected
     /// @param actual The actual premium

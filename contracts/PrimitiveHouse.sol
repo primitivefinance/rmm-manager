@@ -17,10 +17,20 @@ import "./base/Multicall.sol";
 import "./base/CashManager.sol";
 import "./base/SelfPermit.sol";
 import "./base/PositionWrapper.sol";
+import "./base/BorrowCallbackManager.sol";
+import "./base/EngineGuard.sol";
 
 import "hardhat/console.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, PositionWrapper {
+contract PrimitiveHouse is
+    IPrimitiveHouse,
+    Multicall,
+    CashManager,
+    SelfPermit,
+    PositionWrapper,
+    EngineGuard,
+    BorrowCallbackManager
+{
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
@@ -44,20 +54,15 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         reentrant = 0;
     }
 
-    address private _engine;
-
-    modifier onlyEngine() {
-        if (msg.sender != _engine) revert NotEngineError();
-        _;
-    }
 
     /// EFFECT FUNCTIONS ///
 
     constructor(
         address _factory,
         address _WETH10,
+        address _router,
         string memory _URI
-    ) PositionWrapper(_URI) CashManager(_WETH10) {
+    ) PositionWrapper(_URI) CashManager(_WETH10) BorrowCallbackManager(_router) {
         factory = IPrimitiveFactory(_factory);
     }
 
@@ -240,12 +245,6 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         emit LiquidityRemoved(msg.sender, recipient, engine, poolId, risky, stable, delRisky, delStable);
     }
 
-    struct BorrowCallbackData {
-        address payer;
-        address risky;
-        address stable;
-    }
-
     function borrow(
         address risky,
         address stable,
@@ -278,6 +277,9 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
             fromMargin,
             abi.encode(callbackData)
         );
+
+        console.log("Risky deficit:", riskyDeficit);
+        console.log("Stable deficit:", stableDeficit);
 
         if (riskyDeficit > maxRiskyPremium) revert AbovePremiumError(maxRiskyPremium, riskyDeficit);
         if (stableDeficit > maxStablePremium) revert AbovePremiumError(maxStablePremium, stableDeficit);
@@ -434,17 +436,6 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
             if (delRisky > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
             if (delStable > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
         }
-    }
-
-    function borrowCallback(
-        uint256 riskyDeficit,
-        uint256 stableDeficit,
-        bytes calldata data
-    ) external override onlyEngine() {
-        BorrowCallbackData memory decoded = abi.decode(data, (BorrowCallbackData));
-
-        if (riskyDeficit > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, riskyDeficit);
-        if (stableDeficit > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, stableDeficit);
     }
 
     function repayCallback(

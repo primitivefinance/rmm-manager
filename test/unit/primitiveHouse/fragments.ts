@@ -8,8 +8,8 @@ import { computePoolId } from '../../shared/utilities'
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 
 export async function createFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
-  await contracts.stable.mint(signers[0].address, constants.MaxUint256)
-  await contracts.risky.mint(signers[0].address, constants.MaxUint256)
+  await contracts.stable.mint(signers[0].address, parseWei('1000000').raw)
+  await contracts.risky.mint(signers[0].address, parseWei('1000000').raw)
   await contracts.stable.approve(contracts.house.address, constants.MaxUint256)
   await contracts.risky.approve(contracts.house.address, constants.MaxUint256)
 }
@@ -56,14 +56,17 @@ export async function removeLiquidityFragment(signers: Wallet[], contracts: Cont
 
 export async function borrowFragment(signers: Wallet[], contracts: Contracts): Promise<void> {
   await withdrawFragment(signers, contracts)
-  const poolId = computePoolId(contracts.factory.address, strike.raw, sigma.raw, maturity.raw)
-  await contracts.house.allocate(
-    signers[0].address,
+  await contracts.stable.mint(contracts.router.address, parseWei('1000000').raw)
+  await contracts.risky.mint(contracts.router.address, parseWei('1000000').raw)
+  await contracts.risky.approve(contracts.router.address, constants.MaxUint256)
+  await contracts.stable.approve(contracts.router.address, constants.MaxUint256)
+  const poolId = computePoolId(contracts.engine.address, strike.raw, sigma.raw, maturity.raw)
+  await contracts.house.addLiquidity(
     contracts.risky.address,
     contracts.stable.address,
     poolId,
-    parseWei('10').raw,
-    true
+    parseWei('2').raw,
+    false
   )
 }
 
