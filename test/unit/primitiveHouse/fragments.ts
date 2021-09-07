@@ -79,8 +79,8 @@ export async function repayFragment(signers: Wallet[], contracts: Contracts): Pr
     poolId,
     parseWei('10').raw,
     parseWei('10').raw,
-    parseWei('10').raw,
-    parseWei('10').raw,
+    0,
+    0,
     true
   )
 }
