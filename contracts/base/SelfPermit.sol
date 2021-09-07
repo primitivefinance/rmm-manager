@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 
 import "../interfaces/ISelfPermit.sol";
 
+/// @title SelfPermit
+/// @notice Enables the contract to do self approvals
+/// @author Primitive
 abstract contract SelfPermit is ISelfPermit {
     function selfPermit(
         address token,

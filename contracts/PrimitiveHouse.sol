@@ -1,12 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   Primitive House
-/// @author  Primitive
-/// @dev     Interacts with Primitive Engine contracts
-
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
@@ -17,19 +12,20 @@ import "./base/Multicall.sol";
 import "./base/CashManager.sol";
 import "./base/SelfPermit.sol";
 import "./base/PositionWrapper.sol";
-import "./base/BorrowCallbackManager.sol";
 import "./base/EngineGuard.sol";
 
 import "hardhat/console.sol";
 
+/// @title Primitive House
+/// @author Primitive
+/// @dev Interacts with Primitive Engine contracts
 contract PrimitiveHouse is
     IPrimitiveHouse,
     Multicall,
     CashManager,
     SelfPermit,
     PositionWrapper,
-    EngineGuard,
-    BorrowCallbackManager
+    EngineGuard
 {
     using SafeERC20 for IERC20;
     using Margin for mapping(address => Margin.Data);
@@ -54,15 +50,13 @@ contract PrimitiveHouse is
         reentrant = 0;
     }
 
-
     /// EFFECT FUNCTIONS ///
 
     constructor(
         address _factory,
         address _WETH10,
-        address _router,
         string memory _URI
-    ) PositionWrapper(_URI) CashManager(_WETH10) BorrowCallbackManager(_router) {
+    ) PositionWrapper(_URI) CashManager(_WETH10) {
         factory = IPrimitiveFactory(_factory);
     }
 
@@ -213,16 +207,12 @@ contract PrimitiveHouse is
 
         IPrimitiveEngineActions(_engine).supply(poolId, delLiquidity);
 
-        // TODO: Supply only 80% of the liquidity?
-        _supply(msg.sender, _engine, poolId, delLiquidity);
-
         emit LiquidityAdded(msg.sender, _engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
 
         _engine = address(0);
     }
 
     function removeLiquidity(
-        address recipient,
         address risky,
         address stable,
         bytes32 poolId,
@@ -232,128 +222,13 @@ contract PrimitiveHouse is
 
         address engine = factory.getEngine(risky, stable);
 
-        // TODO: Add a check to prevent from removing too much liquidity?
-        _claim(msg.sender, engine, poolId, delLiquidity);
-        IPrimitiveEngineActions(engine).claim(poolId, delLiquidity);
-
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
         _remove(msg.sender, engine, poolId, delLiquidity);
 
-        Margin.Data storage mar = margins[engine][recipient];
+        Margin.Data storage mar = margins[engine][msg.sender];
         mar.deposit(delRisky, delStable);
 
-        emit LiquidityRemoved(msg.sender, recipient, engine, poolId, risky, stable, delRisky, delStable);
-    }
-
-    function borrow(
-        address risky,
-        address stable,
-        bytes32 poolId,
-        uint256 riskyCollateral,
-        uint256 stableCollateral,
-        uint256 maxRiskyPremium,
-        uint256 maxStablePremium,
-        bool fromMargin
-    ) public virtual override lock {
-        // TODO: Revert if riskyCollateral == 0 || stableCollateral == 0?
-
-        _engine = factory.getEngine(risky, stable);
-
-        BorrowCallbackData memory callbackData = BorrowCallbackData({
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
-
-        (
-            uint256 riskyDeficit,
-            uint256 riskySurplus,
-            uint256 stableDeficit,
-            uint256 stableSurplus
-        ) = IPrimitiveEngineActions(_engine).borrow(
-            poolId,
-            riskyCollateral,
-            stableCollateral,
-            fromMargin,
-            abi.encode(callbackData)
-        );
-
-        console.log("Risky deficit:", riskyDeficit);
-        console.log("Stable deficit:", stableDeficit);
-
-        if (riskyDeficit > maxRiskyPremium) revert AbovePremiumError(maxRiskyPremium, riskyDeficit);
-        if (stableDeficit > maxStablePremium) revert AbovePremiumError(maxStablePremium, stableDeficit);
-
-        if (fromMargin) {
-            margins[_engine].withdraw(riskyDeficit, stableDeficit);
-            margins[_engine][msg.sender].deposit(riskySurplus, stableSurplus);
-        } else {
-            if (riskySurplus > 0) sweep(risky);
-            if (stableSurplus > 0) sweep(stable);
-        }
-
-        _borrow(msg.sender, _engine, poolId, riskyCollateral, stableCollateral);
-
-        emit Borrowed(msg.sender, _engine, poolId, riskyCollateral, stableCollateral);
-
-        _engine = address(0);
-    }
-
-    function sweep(address token) private {
-        IERC20(token).safeTransfer(msg.sender, IERC20(token).balanceOf(address(this)));
-    }
-
-    struct RepayCallbackData {
-        address payer;
-        address risky;
-        address stable;
-    }
-
-    function repay(
-        address risky,
-        address stable,
-        bytes32 poolId,
-        uint256 riskyCollateral,
-        uint256 stableCollateral,
-        bool fromMargin
-    ) public virtual override lock {
-        // TODO: Revert if riskyCollateral == 0 || stableCollateral == 0?
-
-        _engine = factory.getEngine(risky, stable);
-
-        RepayCallbackData memory callbackData = RepayCallbackData({
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
-
-        (
-            uint256 riskyDeficit,
-            uint256 riskySurplus,
-            uint256 stableDeficit,
-            uint256 stableSurplus
-        ) = IPrimitiveEngineActions(_engine).repay(
-            poolId,
-            address(this),
-            riskyCollateral,
-            stableCollateral,
-            fromMargin,
-            abi.encode(callbackData)
-        );
-
-        _repay(msg.sender, _engine, poolId, riskyCollateral, stableCollateral);
-
-        if (fromMargin) {
-            margins[_engine].withdraw(riskyDeficit, stableDeficit);
-            margins[msg.sender][_engine].deposit(riskySurplus, stableSurplus);
-        } else {
-            if (riskySurplus > 0) IERC20(risky).safeTransfer(msg.sender, riskySurplus);
-            if (stableSurplus > 0) IERC20(stable).safeTransfer(msg.sender, stableSurplus);
-        }
-
-        emit Repaid(msg.sender, _engine, poolId, riskyCollateral, stableCollateral);
-
-        _engine = address(0);
+        emit LiquidityRemoved(msg.sender, engine, poolId, risky, stable, delRisky, delStable);
     }
 
     struct SwapCallbackData {
@@ -394,8 +269,11 @@ contract PrimitiveHouse is
             margins[_engine].withdraw(riskyForStable ? deltaIn : 0, riskyForStable ? 0 : deltaIn);
         }
 
-        IERC20(riskyForStable ? risky : stable).safeTransfer(msg.sender, deltaOut);
+        console.log("Transferring", deltaOut);
+        uint256 balance = IERC20(riskyForStable ? stable : risky).balanceOf(address(this));
 
+        console.log("Balance", balance);
+        IERC20(riskyForStable ? stable : risky).safeTransfer(msg.sender, deltaOut);
         emit Swapped(msg.sender, _engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
 
         _engine = address(0);
@@ -436,17 +314,6 @@ contract PrimitiveHouse is
             if (delRisky > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
             if (delStable > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
         }
-    }
-
-    function repayCallback(
-        uint256 riskyDeficit,
-        uint256 stableDeficit,
-        bytes calldata data
-    ) external override onlyEngine() {
-        RepayCallbackData memory decoded = abi.decode(data, (RepayCallbackData));
-
-        if (riskyDeficit > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, riskyDeficit);
-        if (stableDeficit > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, stableDeficit);
     }
 
     function swapCallback(

@@ -3,9 +3,11 @@ pragma solidity 0.8.6;
 
 import "../libraries/TransferHelper.sol";
 import "../interfaces/IWETH10.sol";
-
 import "../interfaces/ICashManager.sol";
 
+/// @title CashManager
+/// @notice Utils to manage ETH and tokens
+/// @author Primitive
 abstract contract CashManager is ICashManager {
     address public override WETH10;
 

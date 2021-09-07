@@ -22,8 +22,8 @@ describe('addLiquidity', function () {
   })
 
   describe('success cases', function () {
-    describe('when adding supply from margin', function () {
-      it('allocates 1 LP shares', async function () {
+    describe('when adding liquidity from margin', function () {
+      it('allocates 1 LP share', async function () {
         await this.house.addLiquidity(
           this.risky.address,
           this.stable.address,
@@ -33,7 +33,10 @@ describe('addLiquidity', function () {
         )
       })
 
-      it('updates the sender position', async function () {
+      it('increases the position of the sender', async function () {
+        const tokenId = getTokenId(this.engine.address, poolId, 0)
+        const liquidity = await this.house.balanceOf(this.deployer.address, tokenId)
+
         await this.house.addLiquidity(
           this.risky.address,
           this.stable.address,
@@ -42,9 +45,9 @@ describe('addLiquidity', function () {
           true
         )
 
-        const tokenId = getTokenId(this.engine.address, poolId, 1)
-        const float = await this.house.balanceOf(this.deployer.address, tokenId)
-        expect(float).to.equal(parseWei('1').raw)
+        expect(
+          await this.house.balanceOf(this.deployer.address, tokenId)
+        ).to.equal(liquidity.add(parseWei('1').raw))
       })
 
       it('reduces the margin of the sender', async function () {
@@ -105,7 +108,10 @@ describe('addLiquidity', function () {
         )
       })
 
-      it('updates the sender position', async function () {
+      it('increases the position of the sender', async function () {
+        const tokenId = getTokenId(this.engine.address, poolId, 0)
+        const liquidity = await this.house.balanceOf(this.deployer.address, tokenId)
+
         await this.house.addLiquidity(
           this.risky.address,
           this.stable.address,
@@ -114,9 +120,9 @@ describe('addLiquidity', function () {
           false
         )
 
-        const tokenId = getTokenId(this.engine.address, poolId, 1)
-        const float = await this.house.balanceOf(this.deployer.address, tokenId)
-        expect(float).to.equal(parseWei('1').raw)
+        expect(
+          await this.house.balanceOf(this.deployer.address, tokenId)
+        ).to.equal(liquidity.add(parseWei('1').raw))
       })
 
       it('reduces the balances of the sender', async function () {
