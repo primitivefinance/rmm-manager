@@ -1,15 +1,15 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-import { utils, BytesLike, constants } from 'ethers'
+import { BytesLike, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
-import { computePoolId } from '../../../shared/utilities'
-import loadContext, { config } from '../../context'
+import { computePoolId, getTokenId } from '../../../shared/utilities'
+import loadContext, { DEFAULT_CONFIG } from '../../context'
 
 import { borrowFragment } from '../fragments'
 
-const { strike, sigma, maturity } = config
-let poolId, userPosId: string
+const { strike, sigma, maturity } = DEFAULT_CONFIG
+let poolId: string
 
 const empty: BytesLike = constants.HashZero
 
@@ -19,36 +19,126 @@ describe('borrow', function () {
   })
 
   beforeEach(async function () {
-    poolId = computePoolId(this.contracts.factory.address, maturity.raw, sigma.raw, strike.raw)
-    userPosId = utils.solidityKeccak256(['address', 'bytes32'], [this.deployer.address, poolId])
+    poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
   })
 
   describe('success cases', function () {
-    it('originates one long option', async function () {
-      await this.house.borrow(
-        this.deployer.address,
-        this.risky.address,
-        this.stable.address,
-        poolId,
-        parseWei('1').raw,
-        true,
-        constants.MaxUint256
-      )
+    describe('from external', async function () {
+      it('borrows risky', async function () {
+        await this.house.borrow(
+          this.risky.address,
+          this.stable.address,
+          poolId,
+          parseWei('1').raw,
+          '0',
+          constants.MaxUint256,
+          constants.MaxUint256,
+          false,
+        )
+      })
+    })
+  })
+})
+/*
+    describe('from margin', function () {
+      describe('success cases', function () {
+        it('borrows risky', async function () {
+          await this.house.borrow(
+            this.risky.address,
+            this.stable.address,
+            poolId,
+            parseWei('1').raw,
+            '0',
+            constants.MaxUint256,
+            constants.MaxUint256,
+            true,
+          )
+        })
+
+        it('borrows stable', async function () {
+          await this.house.borrow(
+            this.risky.address,
+            this.stable.address,
+            poolId,
+            '0',
+            parseWei('1').raw,
+            constants.MaxUint256,
+            constants.MaxUint256,
+            true,
+          )
+        })
+
+        it('borrows risky and stable', async function () {
+          await this.house.borrow(
+            this.risky.address,
+            this.stable.address,
+            poolId,
+            parseWei('1').raw,
+            parseWei('1').raw,
+            constants.MaxUint256,
+            constants.MaxUint256,
+            true,
+          )
+        })
+
+        it('increases the risky balance of the sender', async function () {
+          const tokenId = getTokenId(this.engine.address, poolId, 2)
+          const oldRiskyBalance = await this.house.balanceOf(this.deployer.address, tokenId)
+
+          await this.house.borrow(
+            this.risky.address,
+            this.stable.address,
+            poolId,
+            parseWei('1').raw,
+            '0',
+            constants.MaxUint256,
+            constants.MaxUint256,
+            true,
+          )
+
+          const newRiskyBalance = await this.house.balanceOf(this.deployer.address, tokenId)
+          expect(newRiskyBalance).to.equal(oldRiskyBalance.add(parseWei('1').raw))
+        })
+
+        it('increases the stable balance of the sender', async function () {
+          const tokenId = getTokenId(this.engine.address, poolId, 3)
+          const oldStableBalance = await this.house.balanceOf(this.deployer.address, tokenId)
+
+          await this.house.borrow(
+            this.risky.address,
+            this.stable.address,
+            poolId,
+            '0',
+            parseWei('1').raw,
+            constants.MaxUint256,
+            constants.MaxUint256,
+            true,
+          )
+
+          const newStableBalance = await this.house.balanceOf(this.deployer.address, tokenId)
+          expect(newStableBalance).to.equal(oldStableBalance.add(parseWei('1').raw))
+        })
+      })
     })
 
-    it('increases the position of the sender', async function () {
-      await this.house.borrow(
-        this.deployer.address,
-        this.risky.address,
-        this.stable.address,
-        poolId,
-        parseWei('1').raw,
-        true,
-        constants.MaxUint256
-      )
-      const newPosition = await this.house.positions(this.engine.address, userPosId)
-      expect(newPosition.debt).to.equal(parseWei('1').raw)
+    describe('fail cases', function () {
+      it('fails if the risky premium is above the max', async function () {
+        await expect(this.house.borrow(
+          this.risky.address,
+          this.stable.address,
+          poolId,
+          parseWei('1').raw,
+          '0',
+          0,
+          0,
+          true,
+        )).to.be.revertedWith('AbovePremiumError()')
+      })
     })
+  })
+})
+
+    /*
 
     it('transfers the premium, risky and stable', async function () {
       const reserve = await this.engine.reserves(poolId)
@@ -80,20 +170,6 @@ describe('borrow', function () {
 
       expect(await this.stable.balanceOf(this.deployer.address)).to.equal(payerStableBalance.add(delStable.raw))
     })
-
-    it('emits the Borrowed event', async function () {
-      await expect(
-        await this.house.borrow(
-          this.deployer.address,
-          this.risky.address,
-          this.stable.address,
-          poolId,
-          parseWei('1').raw,
-          true,
-          constants.MaxUint256
-        )
-      ).to.emit(this.house, 'Borrowed')
-    })
   })
 
   describe('fail cases', function () {
@@ -116,3 +192,4 @@ describe('borrow', function () {
     })
   })
 })
+*/
