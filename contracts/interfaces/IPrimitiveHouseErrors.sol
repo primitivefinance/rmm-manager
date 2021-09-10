@@ -6,4 +6,6 @@ interface IPrimitiveHouseErrors {
     /// @param expected The minimum delta out
     /// @param actual The actual delta out
     error DeltaOutMinError(uint256 expected, uint256 actual);
+
+    error NotEngine();
 }
