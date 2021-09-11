@@ -4,8 +4,6 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
-
 import "@primitivefinance/v2-core/contracts/interfaces/IPrimitiveFactory.sol";
 
 import "./IPrimitiveHouseErrors.sol";
@@ -19,7 +17,6 @@ interface IPrimitiveHouse is
     IPrimitiveCreateCallback,
     IPrimitiveDepositCallback,
     IPrimitiveLiquidityCallback,
-    IPrimitiveSwapCallback,
     IPrimitiveHouseErrors,
     IPrimitiveHouseEvents,
     IMulticall
