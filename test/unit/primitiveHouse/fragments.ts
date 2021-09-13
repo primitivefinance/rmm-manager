@@ -74,6 +74,6 @@ export async function swapFragment(signers: Wallet[], contracts: Contracts): Pro
     sigma.raw,
     maturity.raw,
     parseWei(delta).raw,
-    parseWei('10').raw
+    parseWei('10000').raw
   )
 }

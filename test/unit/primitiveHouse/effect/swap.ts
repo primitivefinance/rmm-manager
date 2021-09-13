@@ -19,76 +19,122 @@ describe('swap', function () {
   })
 
   describe('success cases', function () {
-    describe('when using margins', function () {
+    describe('from margin / to margin', function () {
       beforeEach(async function () {
         await this.house.deposit(
           this.deployer.address,
           this.risky.address,
           this.stable.address,
-          parseWei('100000').raw,
-          parseWei('100000').raw
+          parseWei('1000').raw,
+          parseWei('1000').raw
         )
       })
 
       it('swaps risky for stable', async function () {
         await this.house.swap(
-          this.risky.address,
-          this.stable.address,
-          poolId,
-          true,
-          parseWei('1').raw,
-          0,
-          true
+          this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, 0, true, true
         )
       })
 
       it('swaps stable for risky', async function () {
         await this.house.swap(
-          this.risky.address,
-          this.stable.address,
-          poolId,
-          false,
-          parseWei('1').raw,
-          0,
-          true
+          this.risky.address, this.stable.address, poolId, false, parseWei('1').raw, 0, true, true
         )
       })
 
       it('emits the Swapped event', async function () {
         await expect(
-          this.house.swap(this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, parseWei('1').raw, false)
+          this.house.swap(this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, parseWei('1').raw, true, true)
         ).to.emit(this.house, 'Swapped')
       })
     })
 
-    describe('when using externals', function () {
-      it('swaps risky for stable', async function () {
-        await this.house.swap(
+    describe('from margin / to external', function () {
+      beforeEach(async function () {
+        await this.house.deposit(
+          this.deployer.address,
           this.risky.address,
           this.stable.address,
-          poolId,
-          true,
-          parseWei('1').raw,
-          0,
-          false
+          parseWei('1000').raw,
+          parseWei('1000').raw
+        )
+      })
+
+      it('swaps risky for stable', async function () {
+        await this.house.swap(
+          this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, 0, true, false
         )
       })
 
       it('swaps stable for risky', async function () {
         await this.house.swap(
-          this.risky.address,
-          this.stable.address,
-          poolId,
-          false,
-          parseWei('1').raw,
-          0,
-          false
+          this.risky.address, this.stable.address, poolId, false, parseWei('1').raw, 0, true, false
         )
       })
 
       it('emits the Swapped event', async function () {
         await expect(
-          this.house.swap(this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, parseWei('1').raw, false)
+          this.house.swap(this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, parseWei('1').raw, true, false)
+        ).to.emit(this.house, 'Swapped')
+      })
+    })
+
+    describe('from external / to margin', function () {
+      beforeEach(async function () {
+        await this.house.deposit(
+          this.deployer.address,
+          this.risky.address,
+          this.stable.address,
+          parseWei('1000').raw,
+          parseWei('1000').raw
+        )
+      })
+
+      it('swaps risky for stable', async function () {
+        await this.house.swap(
+          this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, 0, false, true
+        )
+      })
+
+      it('swaps stable for risky', async function () {
+        await this.house.swap(
+          this.risky.address, this.stable.address, poolId, false, parseWei('1').raw, 0, false, true
+        )
+      })
+
+      it('emits the Swapped event', async function () {
+        await expect(
+          this.house.swap(this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, parseWei('1').raw, false, true)
+        ).to.emit(this.house, 'Swapped')
+      })
+    })
+
+    describe('from external / to external', function () {
+      beforeEach(async function () {
+        await this.house.deposit(
+          this.deployer.address,
+          this.risky.address,
+          this.stable.address,
+          parseWei('1000').raw,
+          parseWei('1000').raw
+        )
+      })
+
+      it('swaps risky for stable', async function () {
+        await this.house.swap(
+          this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, 0, false, false
+        )
+      })
+
+      it('swaps stable for risky', async function () {
+        await this.house.swap(
+          this.risky.address, this.stable.address, poolId, false, parseWei('1').raw, 0, false, false
+        )
+      })
+
+      it('emits the Swapped event', async function () {
+        await expect(
+          this.house.swap(this.risky.address, this.stable.address, poolId, true, parseWei('1').raw, parseWei('1').raw, true, false)
         ).to.emit(this.house, 'Swapped')
       })
     })
