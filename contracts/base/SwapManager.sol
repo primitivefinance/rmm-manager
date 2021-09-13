@@ -9,13 +9,16 @@ import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCa
 import "./MarginManager.sol";
 import "./HouseBase.sol";
 
+/// @title SwapManager
+/// @author Primitive
+/// @dev Manages the swaps
 abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseBase, MarginManager {
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
     using SafeERC20 for IERC20;
 
     modifier checkDeadline(uint256 deadline) {
-        require(_blockTimestamp() <= deadline, "Transaction too old");
+        require(block.timestamp <= deadline, "Transaction too old");
         _;
     }
 
@@ -32,7 +35,8 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
         bool riskyForStable,
         uint256 deltaIn,
         uint256 deltaOutMin,
-        bool fromMargin
+        bool fromMargin,
+        bool toMargin
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
@@ -47,6 +51,7 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
             riskyForStable,
             deltaIn,
             fromMargin,
+            toMargin,
             abi.encode(callbackData)
         );
 
