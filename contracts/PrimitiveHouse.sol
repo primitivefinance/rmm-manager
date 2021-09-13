@@ -214,7 +214,7 @@ contract PrimitiveHouse is
     ) external override {
         CreateCallbackData memory decoded = abi.decode(data, (CreateCallbackData));
 
-        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngine();
+        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
 
         if (delRisky > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
         if (delStable > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
@@ -227,7 +227,7 @@ contract PrimitiveHouse is
     ) external override {
         DepositCallbackData memory decoded = abi.decode(data, (DepositCallbackData));
 
-        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngine();
+        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
 
         if (delRisky > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
         if (delStable > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
@@ -240,7 +240,7 @@ contract PrimitiveHouse is
     ) external override {
         AllocateCallbackData memory decoded = abi.decode(data, (AllocateCallbackData));
 
-        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngine();
+        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
 
         if (decoded.fromMargin == false) {
             if (delRisky > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
