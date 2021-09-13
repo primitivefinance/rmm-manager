@@ -1,13 +1,11 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-import { BytesLike, constants, utils } from 'ethers'
+import { utils } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import loadContext from '../../context'
 
 import { withdrawFragment } from '../fragments'
-
-const empty: BytesLike = constants.HashZero
 
 describe('withdraw', function () {
   before(async function () {
