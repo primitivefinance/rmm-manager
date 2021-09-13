@@ -1,6 +1,6 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-import { BytesLike, constants } from 'ethers'
+import { BytesLike, constants, utils } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import loadContext from '../../context'
@@ -117,7 +117,12 @@ describe('withdraw', function () {
     })
 
     it('reverts if the callback function is called directly', async function () {
-      await expect(this.house.depositCallback(0, 0, empty)).to.be.reverted
+      const data = utils.defaultAbiCoder.encode(
+        ['address', 'address', 'address', 'uint256', 'uint256'],
+        [this.house.address, this.risky.address, this.stable.address, '0', '0']
+      );
+
+      await expect(this.house.depositCallback(0, 0, data)).to.be.reverted
     })
   })
 })
