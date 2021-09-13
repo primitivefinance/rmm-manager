@@ -62,6 +62,10 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
             margins[engine].withdraw(riskyForStable ? deltaIn : 0, riskyForStable ? 0 : deltaIn);
         }
 
+        if (toMargin) {
+            margins[msg.sender][engine].deposit(riskyForStable ? deltaIn : 0, riskyForStable ? 0 : deltaIn);
+        }
+
         // uint256 balance = IERC20(riskyForStable ? stable : risky).balanceOf(address(this));
 
         IERC20(riskyForStable ? stable : risky).safeTransfer(msg.sender, deltaOut);
