@@ -1,6 +1,6 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-import { utils, BytesLike, constants, BigNumber } from 'ethers'
+import { utils, BytesLike, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import loadContext, { DEFAULT_CONFIG } from '../../context'
@@ -107,7 +107,12 @@ describe('create', function () {
     })
 
     it('reverts if the callback function is called directly', async function () {
-      await expect(this.house.createCallback(0, 0, empty)).to.be.revertedWith('NotEngineError()')
+      const data = utils.defaultAbiCoder.encode(
+        ['address', 'address', 'address', 'uint256', 'uint256'],
+        [this.house.address, this.risky.address, this.stable.address, '0', '0']
+      );
+
+      await expect(this.house.createCallback(0, 0, data)).to.be.revertedWith('NotEngineError()')
     })
   })
 })

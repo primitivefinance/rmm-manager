@@ -1,13 +1,11 @@
 import { waffle } from 'hardhat'
 import { expect } from 'chai'
-import { BytesLike, constants } from 'ethers'
+import { utils } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import loadContext from '../../context'
 
 import { depositFragment } from '../fragments'
-
-const empty: BytesLike = constants.HashZero
 
 describe('deposit', function () {
   before(async function () {
@@ -121,8 +119,12 @@ describe('deposit', function () {
     })
 
     it('reverts if the callback function is called directly', async function () {
-      // TODO: Update to custom error
-      await expect(this.house.depositCallback(0, 0, empty)).to.be.revertedWith('NotEngineError()')
+      const data = utils.defaultAbiCoder.encode(
+        ['address', 'address', 'address', 'uint256', 'uint256'],
+        [this.house.address, this.risky.address, this.stable.address, '0', '0']
+      );
+
+      await expect(this.house.depositCallback(0, 0, data)).to.be.revertedWith('NotEngineError()')
     })
   })
 })

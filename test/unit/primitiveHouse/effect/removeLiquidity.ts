@@ -21,9 +21,6 @@ describe('removeLiquidity', function () {
 
   describe('success cases', function () {
     it('removes 1 LP share', async function () {
-      const position = await this.engine.positions(computePositionId(this.house.address, poolId))
-      console.log(position.liquidity.toString())
-
       await this.house.removeLiquidity(
         this.risky.address,
         this.stable.address,
