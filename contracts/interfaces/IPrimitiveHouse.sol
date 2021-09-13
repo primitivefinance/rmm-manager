@@ -85,7 +85,8 @@ interface IPrimitiveHouse is
         bool riskyForStable,
         uint256 deltaIn,
         uint256 deltaOutMin,
-        bool fromMargin
+        bool fromMargin,
+        bool toMargin
     ) external;
 
     /// VIEW FUNCTIONS ///

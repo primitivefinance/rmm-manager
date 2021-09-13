@@ -183,8 +183,6 @@ contract PrimitiveHouse is
         // Mints {delLiquidity} of liquidity tokens
         _allocate(msg.sender, engine, poolId, delLiquidity);
 
-        IPrimitiveEngineActions(engine).supply(poolId, delLiquidity);
-
         emit LiquidityAdded(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
 
