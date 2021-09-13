@@ -9,6 +9,8 @@ import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCa
 import "./MarginManager.sol";
 import "./HouseBase.sol";
 
+import "hardhat/console.sol";
+
 /// @title SwapManager
 /// @author Primitive
 /// @dev Manages the swaps
@@ -64,11 +66,10 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
 
         if (toMargin) {
             margins[msg.sender][engine].deposit(riskyForStable ? deltaIn : 0, riskyForStable ? 0 : deltaIn);
+        } else {
+            IERC20(riskyForStable ? stable : risky).safeTransfer(msg.sender, deltaOut);
         }
 
-        // uint256 balance = IERC20(riskyForStable ? stable : risky).balanceOf(address(this));
-
-        IERC20(riskyForStable ? stable : risky).safeTransfer(msg.sender, deltaOut);
         emit Swapped(msg.sender, engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
     }
 
