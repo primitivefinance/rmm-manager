@@ -2,7 +2,7 @@
 pragma solidity 0.8.6;
 
 interface IPrimitiveHouseEvents {
-    event Created(
+    event Create(
         address indexed recipient,
         address indexed engine,
         bytes32 poolId,
@@ -11,7 +11,7 @@ interface IPrimitiveHouseEvents {
         uint32 maturity
     );
 
-    event Deposited(
+    event Deposit(
         address indexed payer,
         address indexed recipient,
         address indexed engine,
@@ -21,7 +21,7 @@ interface IPrimitiveHouseEvents {
         uint256 delStable
     );
 
-    event Withdrawn(
+    event Withdraw(
         address indexed payer,
         address indexed recipient,
         address indexed engine,
@@ -29,7 +29,7 @@ interface IPrimitiveHouseEvents {
         uint256 delStable
     );
 
-    event LiquidityAdded(
+    event Allocate(
         address indexed payer,
         address indexed engine,
         bytes32 indexed poolId,
@@ -39,7 +39,7 @@ interface IPrimitiveHouseEvents {
         bool fromMargin
     );
 
-    event LiquidityRemoved(
+    event Remove(
         address indexed payer,
         address engine,
         bytes32 poolId,
@@ -49,7 +49,7 @@ interface IPrimitiveHouseEvents {
         uint256 delStable
     );
 
-    event Swapped(
+    event Swap(
         address indexed recipient,
         address indexed engine,
         bytes32 indexed poolId,

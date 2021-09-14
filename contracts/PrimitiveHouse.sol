@@ -77,7 +77,7 @@ contract PrimitiveHouse is
         // Mints {delLiquidity - 1000} of liquidity tokens
         _allocate(msg.sender, engine, poolId, delLiquidity - 1000);
 
-        emit Created(msg.sender, engine, poolId, strike, sigma, maturity);
+        emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
 
     struct AllocateCallbackData {
@@ -120,7 +120,7 @@ contract PrimitiveHouse is
         // Mints {delLiquidity} of liquidity tokens
         _allocate(msg.sender, engine, poolId, delLiquidity);
 
-        emit LiquidityAdded(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
+        emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
 
     function removeLiquidity(
@@ -139,7 +139,7 @@ contract PrimitiveHouse is
         Margin.Data storage mar = margins[engine][msg.sender];
         mar.deposit(delRisky, delStable);
 
-        emit LiquidityRemoved(msg.sender, engine, poolId, risky, stable, delRisky, delStable);
+        emit Remove(msg.sender, engine, poolId, risky, stable, delRisky, delStable);
     }
 
     // ===== Callback Implementations =====
