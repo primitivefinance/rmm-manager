@@ -52,7 +52,7 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
         Margin.Data storage mar = margins[engine][recipient];
         mar.deposit(delRisky, delStable);
 
-        emit Deposited(msg.sender, recipient, engine, risky, stable, delRisky, delStable);
+        emit Deposit(msg.sender, recipient, engine, risky, stable, delRisky, delStable);
     }
 
     /// @inheritdoc IPrimitiveHouse
@@ -74,7 +74,7 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
 
         IPrimitiveEngineActions(engine).withdraw(recipient, delRisky, delStable);
 
-        emit Withdrawn(msg.sender, recipient, engine, delRisky, delStable);
+        emit Withdraw(msg.sender, recipient, engine, delRisky, delStable);
     }
 
     function depositCallback(

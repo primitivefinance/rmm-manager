@@ -70,7 +70,7 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
             IERC20(riskyForStable ? stable : risky).safeTransfer(msg.sender, deltaOut);
         }
 
-        emit Swapped(msg.sender, engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
+        emit Swap(msg.sender, engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
     }
 
     function swapCallback(
