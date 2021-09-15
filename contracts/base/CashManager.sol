@@ -6,21 +6,25 @@ import "../interfaces/IWETH10.sol";
 import "../interfaces/ICashManager.sol";
 
 /// @title CashManager
-/// @notice Utils to manage ETH and tokens
+/// @notice Utils contract to manage ETH and token balances
 /// @author Primitive
 abstract contract CashManager is ICashManager {
+    /// @inheritdoc ICashManager
     address public override WETH10;
 
+    /// @param _WETH10 The address of the WEHT10 contract
     constructor(address _WETH10) {
         WETH10 = _WETH10;
     }
 
+    /// @notice Only WETH10 can send ETH to this contract
     receive() external payable {
         if (msg.sender != WETH10) {
             revert WrongSender(WETH10, msg.sender);
         }
     }
 
+    /// @inheritdoc ICashManager
     function unwrap(uint256 amountMin, address recipient) external payable override {
         uint256 balance = IWETH10(WETH10).balanceOf(address(this));
 
@@ -32,6 +36,7 @@ abstract contract CashManager is ICashManager {
         }
     }
 
+    /// @inheritdoc ICashManager
     function sweepToken(
         address token,
         uint256 amountMin,
@@ -45,6 +50,7 @@ abstract contract CashManager is ICashManager {
         }
     }
 
+    /// @inheritdoc ICashManager
     function refundETH() external payable override {
         if (address(this).balance > 0) TransferHelper.safeTransferETH(msg.sender, address(this).balance);
     }
