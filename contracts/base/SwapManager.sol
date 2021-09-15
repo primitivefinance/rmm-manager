@@ -33,6 +33,7 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
     }
 
     function swap(
+        address engine,
         address risky,
         address stable,
         bytes32 poolId,
@@ -42,8 +43,6 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
         bool fromMargin,
         bool toMargin
     ) external override lock {
-        address engine = factory.getEngine(risky, stable);
-
         SwapCallbackData memory callbackData = SwapCallbackData({
             payer: msg.sender,
             risky: risky,

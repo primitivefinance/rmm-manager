@@ -29,13 +29,13 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
     /// @inheritdoc IPrimitiveHouse
     function deposit(
         address recipient,
+        address engine,
         address risky,
         address stable,
         uint256 delRisky,
         uint256 delStable
     ) external override lock {
         // TODO: Revert if delRisky || delStable == 0?
-        address engine = factory.getEngine(risky, stable);
 
         IPrimitiveEngineActions(engine).deposit(
             address(this),
@@ -61,6 +61,7 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
     /// @inheritdoc IPrimitiveHouse
     function withdraw(
         address recipient,
+        address engine,
         address risky,
         address stable,
         uint256 delRisky,
@@ -69,8 +70,6 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
         if (delRisky == 0 || delStable == 0) {
             // TODO: Revert the call or not?
         }
-
-        address engine = factory.getEngine(risky, stable);
 
         // Reverts the call early if margins are insufficient
         margins[engine].withdraw(delRisky, delStable);
