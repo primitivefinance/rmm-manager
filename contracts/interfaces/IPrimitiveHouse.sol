@@ -60,8 +60,6 @@ interface IPrimitiveHouse is
     function withdraw(
         address recipient,
         address engine,
-        address risky,
-        address stable,
         uint256 delRisky,
         uint256 delStable
     ) external;
