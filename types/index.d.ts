@@ -7,7 +7,8 @@ export interface Contracts {
   factory: PrimitiveFactory
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
-  stable: ContractTypes.Token,
+  stable: ContractTypes.Token
+  testEngineAddress: ContractTypes.TestEngineAddress
   // testAdmin: ContractTypes.TestAdmin
   // whitelist: ContractTypes.Whitelist
   // paleoHouse: ContractTypes.PrimitivePaleoHouse
