@@ -52,6 +52,7 @@ contract PrimitiveHouse is
 
     /// @inheritdoc IPrimitiveHouse
     function create(
+        address engine,
         address risky,
         address stable,
         uint256 strike,
@@ -60,8 +61,6 @@ contract PrimitiveHouse is
         uint256 delta,
         uint256 delLiquidity
     ) external override lock {
-        address engine = factory.getEngine(risky, stable);
-
         if (engine == address(0)) revert EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
@@ -96,6 +95,7 @@ contract PrimitiveHouse is
     }
 
     function addLiquidity(
+        address engine,
         address risky,
         address stable,
         bytes32 poolId,
@@ -103,8 +103,6 @@ contract PrimitiveHouse is
         bool fromMargin
     ) external override lock {
         if (delLiquidity == 0) revert ZeroLiquidityError();
-
-        address engine = factory.getEngine(risky, stable);
 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
             poolId,
@@ -131,14 +129,13 @@ contract PrimitiveHouse is
     }
 
     function removeLiquidity(
+        address engine,
         address risky,
         address stable,
         bytes32 poolId,
         uint256 delLiquidity
     ) external override lock {
         if (delLiquidity == 0) revert ZeroLiquidityError();
-
-        address engine = factory.getEngine(risky, stable);
 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
         _remove(msg.sender, engine, poolId, delLiquidity);

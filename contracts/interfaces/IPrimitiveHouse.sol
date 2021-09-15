@@ -31,6 +31,7 @@ interface IPrimitiveHouse is
     /// @param delta The initial delta of the curve
     /// @param delLiquidity The amount of initial liquidity to provide
     function create(
+        address engine,
         address risky,
         address stable,
         uint256 strike,
@@ -49,6 +50,7 @@ interface IPrimitiveHouse is
     /// @param delStable The amount of stable to deposit
     function deposit(
         address recipient,
+        address engine,
         address risky,
         address stable,
         uint256 delRisky,
@@ -57,6 +59,7 @@ interface IPrimitiveHouse is
 
     function withdraw(
         address recipient,
+        address engine,
         address risky,
         address stable,
         uint256 delRisky,
@@ -64,6 +67,7 @@ interface IPrimitiveHouse is
     ) external;
 
     function addLiquidity(
+        address engine,
         address risky,
         address stable,
         bytes32 poolId,
@@ -72,6 +76,7 @@ interface IPrimitiveHouse is
     ) external;
 
     function removeLiquidity(
+        address engine,
         address risky,
         address stable,
         bytes32 poolId,
@@ -79,6 +84,7 @@ interface IPrimitiveHouse is
     ) external;
 
     function swap(
+        address engine,
         address risky,
         address stable,
         bytes32 poolId,
