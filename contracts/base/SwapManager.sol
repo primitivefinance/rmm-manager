@@ -39,7 +39,7 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
         uint256 deltaOutMin,
         bool fromMargin,
         bool toMargin
-    ) public virtual override lock {
+    ) external virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
         SwapCallbackData memory callbackData = SwapCallbackData({
