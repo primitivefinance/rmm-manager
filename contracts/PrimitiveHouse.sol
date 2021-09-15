@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 
 import "./interfaces/IPrimitiveHouse.sol";
+
+import "./libraries/TransferHelper.sol";
 
 import "./base/HouseBase.sol";
 import "./base/Multicall.sol";
@@ -29,7 +30,7 @@ contract PrimitiveHouse is
     MarginManager,
     SwapManager
 {
-    using SafeERC20 for IERC20;
+    using TransferHelper for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
 
