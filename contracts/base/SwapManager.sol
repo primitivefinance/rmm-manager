@@ -68,7 +68,7 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
         if (toMargin) {
             margins[msg.sender][engine].deposit(riskyForStable ? deltaIn : 0, riskyForStable ? 0 : deltaIn);
         } else {
-            IERC20(riskyForStable ? stable : risky).safeTransfer(msg.sender, deltaOut);
+            TransferHelper.safeTransfer(riskyForStable ? stable : risky, msg.sender, deltaOut);
         }
 
         emit Swap(msg.sender, engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
@@ -83,7 +83,7 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
 
         if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
 
-        if (delRisky > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 }
