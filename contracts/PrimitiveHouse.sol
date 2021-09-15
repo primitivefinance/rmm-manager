@@ -14,6 +14,8 @@ import "./base/PositionWrapper.sol";
 import "./base/MarginManager.sol";
 import "./base/SwapManager.sol";
 
+import "hardhat/console.sol";
+
 /// @title Primitive House
 /// @author Primitive
 /// @dev Interacts with Primitive Engine contracts
@@ -59,12 +61,9 @@ contract PrimitiveHouse is
     ) public virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
-        CreateCallbackData memory callbackData = CreateCallbackData({
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        CreateCallbackData memory callbackData = CreateCallbackData({payer: msg.sender, risky: risky, stable: stable});
 
+        console.log("calling create");
         (bytes32 poolId, , ) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
@@ -73,6 +72,8 @@ contract PrimitiveHouse is
             delLiquidity,
             abi.encode(callbackData)
         );
+
+        console.log("calling allocate");
 
         // Mints {delLiquidity - 1000} of liquidity tokens
         _allocate(msg.sender, engine, poolId, delLiquidity - 1000);
