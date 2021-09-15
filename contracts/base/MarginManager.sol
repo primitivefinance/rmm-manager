@@ -30,7 +30,7 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
         address stable,
         uint256 delRisky,
         uint256 delStable
-    ) external virtual override lock {
+    ) external override lock {
         // TODO: Revert if delRisky || delStable == 0?
         address engine = factory.getEngine(risky, stable);
 
@@ -62,7 +62,7 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
         address stable,
         uint256 delRisky,
         uint256 delStable
-    ) external virtual override lock {
+    ) external override lock {
         if (delRisky == 0 || delStable == 0) {
             // TODO: Revert the call or not?
         }
