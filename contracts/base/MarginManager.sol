@@ -82,7 +82,8 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
     ) external override {
         DepositCallbackData memory decoded = abi.decode(data, (DepositCallbackData));
 
-        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
+        address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
+        if (msg.sender != engine) revert NotEngineError();
 
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);

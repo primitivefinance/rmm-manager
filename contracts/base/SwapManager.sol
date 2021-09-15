@@ -81,7 +81,8 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
     ) external override {
         SwapCallbackData memory decoded = abi.decode(data, (SwapCallbackData));
 
-        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
+        address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
+        if (msg.sender != engine) revert NotEngineError();
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);

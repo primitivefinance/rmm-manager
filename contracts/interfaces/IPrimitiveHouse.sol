@@ -95,8 +95,8 @@ interface IPrimitiveHouse is
 
     /// VIEW FUNCTIONS ///
 
-    /// @notice Returns the factory contract
-    function factory() external view returns (IPrimitiveFactory);
+    /// @notice Returns the address of the factory contract
+    function factory() external view returns (address);
 
     /// @notice Returns the margin of an account for a specific engine
     /// @param engine The address of the engine

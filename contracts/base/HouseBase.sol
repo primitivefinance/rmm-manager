@@ -2,9 +2,12 @@
 pragma solidity 0.8.6;
 
 import "../interfaces/IPrimitiveHouse.sol";
+
 import "./Reentrancy.sol";
+
+import "../libraries/EngineAddress.sol";
 
 abstract contract HouseBase is IPrimitiveHouse, Reentrancy {
     /// @inheritdoc IPrimitiveHouse
-    IPrimitiveFactory public override factory;
+    address public override factory;
 }

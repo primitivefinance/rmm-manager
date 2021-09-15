@@ -41,7 +41,7 @@ contract PrimitiveHouse is
         address _WETH10,
         string memory _URI
     ) PositionWrapper(_URI) CashManager(_WETH10) {
-        factory = IPrimitiveFactory(_factory);
+        factory = _factory;
     }
 
     struct CreateCallbackData {
@@ -155,7 +155,8 @@ contract PrimitiveHouse is
     ) external override {
         CreateCallbackData memory decoded = abi.decode(data, (CreateCallbackData));
 
-        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
+        address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
+        if (msg.sender != engine) revert NotEngineError();
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
@@ -168,7 +169,8 @@ contract PrimitiveHouse is
     ) external override {
         AllocateCallbackData memory decoded = abi.decode(data, (AllocateCallbackData));
 
-        if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
+        address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
+        if (msg.sender != engine) revert NotEngineError();
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
