@@ -2,7 +2,7 @@
 pragma solidity 0.8.6;
 
 library EngineAddress {
-    bytes32 internal constant ENGINE_INIT_CODE_HASH = 0x0;
+    bytes32 internal constant ENGINE_INIT_CODE_HASH = 0x8225a637619e373ee53c6e0a24f8681cdca3558c44010a60631b320229711097;
 
     function computeAddress(
         address factory,
