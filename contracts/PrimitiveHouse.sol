@@ -80,8 +80,9 @@ contract PrimitiveHouse is
 
         console.log("calling allocate");
 
-        // Mints {delLiquidity - 1000} of liquidity tokens
-        _allocate(msg.sender, engine, poolId, delLiquidity - 1000);
+        // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
+        uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
+        _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
