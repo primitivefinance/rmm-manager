@@ -58,7 +58,7 @@ contract PrimitiveHouse is
         uint32 maturity,
         uint256 delta,
         uint256 delLiquidity
-    ) public virtual override lock {
+    ) external virtual override lock {
         address engine = factory.getEngine(risky, stable);
 
         CreateCallbackData memory callbackData = CreateCallbackData({payer: msg.sender, risky: risky, stable: stable});
@@ -95,7 +95,7 @@ contract PrimitiveHouse is
         bytes32 poolId,
         uint256 delLiquidity,
         bool fromMargin
-    ) public virtual override lock {
+    ) external virtual override lock {
         // TODO: Revert if delLiquidity == 0?
 
         address engine = factory.getEngine(risky, stable);
@@ -129,7 +129,7 @@ contract PrimitiveHouse is
         address stable,
         bytes32 poolId,
         uint256 delLiquidity
-    ) public virtual override lock {
+    ) external virtual override lock {
         // TODO: Revert if delLiquidity == 0?
 
         address engine = factory.getEngine(risky, stable);

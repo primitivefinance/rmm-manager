@@ -28,7 +28,7 @@ abstract contract SelfPermit is ISelfPermit {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public payable override {
+    ) external payable override {
         if (IERC20(token).allowance(msg.sender, address(this)) < value) selfPermit(token, value, deadline, v, r, s);
     }
 }
