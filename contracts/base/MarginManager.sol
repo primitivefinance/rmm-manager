@@ -1,17 +1,20 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
 
 import "../interfaces/IPrimitiveHouse.sol";
+
+import "../libraries/TransferHelper.sol";
+
 import "./HouseBase.sol";
 
 abstract contract MarginManager is IPrimitiveHouse, HouseBase {
+    using TransferHelper for IERC20;
+
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
-    using SafeERC20 for IERC20;
 
     mapping(address => mapping(address => Margin.Data)) public override margins;
 

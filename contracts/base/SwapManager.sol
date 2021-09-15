@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
+
+import "../interfaces/IERC20.sol";
 
 import "./MarginManager.sol";
 import "./HouseBase.sol";
@@ -15,9 +16,10 @@ import "hardhat/console.sol";
 /// @author Primitive
 /// @dev Manages the swaps
 abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseBase, MarginManager {
+    using TransferHelper for IERC20;
+
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
-    using SafeERC20 for IERC20;
 
     modifier checkDeadline(uint256 deadline) {
         require(block.timestamp <= deadline, "Transaction too old");
