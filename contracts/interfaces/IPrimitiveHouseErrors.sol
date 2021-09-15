@@ -8,4 +8,6 @@ interface IPrimitiveHouseErrors {
     error DeltaOutMinError(uint256 expected, uint256 actual);
 
     error NotEngineError();
+
+    error EngineNotDeployedError();
 }
