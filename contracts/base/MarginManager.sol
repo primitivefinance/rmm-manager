@@ -86,7 +86,7 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
 
         if (msg.sender != factory.getEngine(decoded.risky, decoded.stable)) revert NotEngineError();
 
-        if (delRisky > 0) IERC20(decoded.risky).safeTransferFrom(decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) IERC20(decoded.stable).safeTransferFrom(decoded.payer, msg.sender, delStable);
+        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
     }
 }
