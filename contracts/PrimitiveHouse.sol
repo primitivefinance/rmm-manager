@@ -62,6 +62,8 @@ contract PrimitiveHouse is
     ) external override lock {
         address engine = factory.getEngine(risky, stable);
 
+        if (engine == address(0)) revert EngineNotDeployedError();
+
         CreateCallbackData memory callbackData = CreateCallbackData({payer: msg.sender, risky: risky, stable: stable});
 
         console.log("calling create");
