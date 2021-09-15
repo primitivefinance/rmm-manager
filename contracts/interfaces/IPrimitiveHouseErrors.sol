@@ -10,4 +10,6 @@ interface IPrimitiveHouseErrors {
     error NotEngineError();
 
     error EngineNotDeployedError();
+
+    error ZeroLiquidityError();
 }

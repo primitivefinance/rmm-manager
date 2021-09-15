@@ -64,6 +64,8 @@ contract PrimitiveHouse is
 
         if (engine == address(0)) revert EngineNotDeployedError();
 
+        if (delLiquidity == 0) revert ZeroLiquidityError();
+
         CreateCallbackData memory callbackData = CreateCallbackData({payer: msg.sender, risky: risky, stable: stable});
 
         console.log("calling create");
@@ -99,7 +101,7 @@ contract PrimitiveHouse is
         uint256 delLiquidity,
         bool fromMargin
     ) external override lock {
-        // TODO: Revert if delLiquidity == 0?
+        if (delLiquidity == 0) revert ZeroLiquidityError();
 
         address engine = factory.getEngine(risky, stable);
 
@@ -133,7 +135,7 @@ contract PrimitiveHouse is
         bytes32 poolId,
         uint256 delLiquidity
     ) external override lock {
-        // TODO: Revert if delLiquidity == 0?
+        if (delLiquidity == 0) revert ZeroLiquidityError();
 
         address engine = factory.getEngine(risky, stable);
 
