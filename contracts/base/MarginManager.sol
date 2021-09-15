@@ -35,7 +35,7 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
         uint256 delRisky,
         uint256 delStable
     ) external override lock {
-        // TODO: Revert if delRisky || delStable == 0?
+        if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         IPrimitiveEngineActions(engine).deposit(
             address(this),
@@ -67,9 +67,7 @@ abstract contract MarginManager is IPrimitiveHouse, HouseBase {
         uint256 delRisky,
         uint256 delStable
     ) external override lock {
-        if (delRisky == 0 || delStable == 0) {
-            // TODO: Revert the call or not?
-        }
+        if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         // Reverts the call early if margins are insufficient
         margins[engine].withdraw(delRisky, delStable);
