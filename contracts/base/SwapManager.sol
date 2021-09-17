@@ -16,7 +16,7 @@ import "hardhat/console.sol";
 /// @title SwapManager
 /// @author Primitive
 /// @dev Manages the swaps
-abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseBase, MarginManager {
+abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     using TransferHelper for IERC20;
 
     using Margin for mapping(address => Margin.Data);

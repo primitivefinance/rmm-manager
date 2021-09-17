@@ -30,14 +30,4 @@ interface IPrimitiveHouseEvents {
         uint256 delRisky,
         uint256 delStable
     );
-
-    event Swap(
-        address indexed recipient,
-        address indexed engine,
-        bytes32 indexed poolId,
-        bool riskyForStable,
-        uint256 deltaIn,
-        uint256 deltaOut,
-        bool fromMargin
-    );
 }
