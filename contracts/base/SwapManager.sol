@@ -42,14 +42,16 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
         uint256 deltaOutMin,
         bool fromMargin,
         bool toMargin
-    ) external override lock {
+    ) external override lock returns (
+        uint256 deltaOut
+    ) {
         SwapCallbackData memory callbackData = SwapCallbackData({
             payer: msg.sender,
             risky: risky,
             stable: stable
         });
 
-        uint256 deltaOut = IPrimitiveEngineActions(engine).swap(
+        deltaOut = IPrimitiveEngineActions(engine).swap(
             poolId,
             riskyForStable,
             deltaIn,

@@ -39,7 +39,11 @@ interface IPrimitiveHouse is
         uint32 maturity,
         uint256 delta,
         uint256 delLiquidity
-    ) external;
+    ) external returns (
+        bytes32 poolId,
+        uint256 delRisky,
+        uint256 delStable
+    );
 
     /// @notice Deposits assets into the margin of a specific engine
     /// @dev The address of the engine is defined by the risky / stable pair
@@ -71,7 +75,10 @@ interface IPrimitiveHouse is
         bytes32 poolId,
         uint256 delLiquidity,
         bool fromMargin
-    ) external;
+    ) external returns (
+        uint256 delRisky,
+        uint256 delStable
+    );
 
     function removeLiquidity(
         address engine,
@@ -79,7 +86,10 @@ interface IPrimitiveHouse is
         address stable,
         bytes32 poolId,
         uint256 delLiquidity
-    ) external;
+    ) external returns (
+        uint256 delRisky,
+        uint256 delStable
+    );
 
     function swap(
         address engine,
@@ -91,12 +101,9 @@ interface IPrimitiveHouse is
         uint256 deltaOutMin,
         bool fromMargin,
         bool toMargin
-    ) external;
+    ) external returns (uint256 deltaOut);
 
     /// VIEW FUNCTIONS ///
-
-    /// @notice Returns the address of the factory contract
-    function factory() external view returns (address);
 
     /// @notice Returns the margin of an account for a specific engine
     /// @param engine The address of the engine
