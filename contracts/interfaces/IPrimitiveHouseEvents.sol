@@ -11,24 +11,6 @@ interface IPrimitiveHouseEvents {
         uint32 maturity
     );
 
-    event Deposit(
-        address indexed payer,
-        address indexed recipient,
-        address indexed engine,
-        address risky,
-        address stable,
-        uint256 delRisky,
-        uint256 delStable
-    );
-
-    event Withdraw(
-        address indexed payer,
-        address indexed recipient,
-        address indexed engine,
-        uint256 delRisky,
-        uint256 delStable
-    );
-
     event Allocate(
         address indexed payer,
         address indexed engine,

@@ -102,16 +102,4 @@ interface IPrimitiveHouse is
         bool fromMargin,
         bool toMargin
     ) external returns (uint256 deltaOut);
-
-    /// VIEW FUNCTIONS ///
-
-    /// @notice Returns the margin of an account for a specific engine
-    /// @param engine The address of the engine
-    /// @param account The address of the account
-    /// @return balanceRisky The balance of risky in the margin of the user
-    /// balanceStable The balance of stable in the margin of the user
-    function margins(address engine, address account)
-        external
-        view
-        returns (uint128 balanceRisky, uint128 balanceStable);
 }

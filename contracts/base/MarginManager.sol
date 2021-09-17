@@ -25,7 +25,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         uint256 delStable;
     }
 
-    /// @inheritdoc IPrimitiveHouse
+    /// @inheritdoc IMarginManager
     function deposit(
         address recipient,
         address engine,
@@ -57,7 +57,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         emit Deposit(msg.sender, recipient, engine, risky, stable, delRisky, delStable);
     }
 
-    /// @inheritdoc IPrimitiveHouse
+    /// @inheritdoc IMarginManager
     function withdraw(
         address recipient,
         address engine,
