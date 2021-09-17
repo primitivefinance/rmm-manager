@@ -4,15 +4,12 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 
 import "./interfaces/IPrimitiveHouse.sol";
-
 import "./libraries/TransferHelper.sol";
 
-import "./base/HouseBase.sol";
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
 import "./base/SelfPermit.sol";
 import "./base/PositionWrapper.sol";
-import "./base/MarginManager.sol";
 import "./base/SwapManager.sol";
 
 import "hardhat/console.sol";
@@ -22,12 +19,10 @@ import "hardhat/console.sol";
 /// @dev Interacts with Primitive Engine contracts
 contract PrimitiveHouse is
     IPrimitiveHouse,
-    HouseBase,
     Multicall,
     CashManager,
     SelfPermit,
     PositionWrapper,
-    MarginManager,
     SwapManager
 {
     using TransferHelper for IERC20;
