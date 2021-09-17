@@ -7,11 +7,7 @@ interface IPrimitiveHouseErrors {
     /// @param actual The actual delta out
     error DeltaOutMinError(uint256 expected, uint256 actual);
 
-    error NotEngineError();
-
     error EngineNotDeployedError();
 
     error ZeroLiquidityError();
-
-    error ZeroDelError();
 }
