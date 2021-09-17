@@ -68,7 +68,7 @@ interface IPrimitiveHouse is
         uint256 delStable
     ) external;
 
-    function addLiquidity(
+    function allocate(
         address engine,
         address risky,
         address stable,
@@ -80,7 +80,7 @@ interface IPrimitiveHouse is
         uint256 delStable
     );
 
-    function removeLiquidity(
+    function remove(
         address engine,
         address risky,
         address stable,

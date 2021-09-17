@@ -88,7 +88,7 @@ contract PrimitiveHouse is
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
 
-    function addLiquidity(
+    function allocate(
         address engine,
         address risky,
         address stable,
@@ -123,7 +123,7 @@ contract PrimitiveHouse is
         emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
 
-    function removeLiquidity(
+    function remove(
         address engine,
         address risky,
         address stable,
