@@ -9,6 +9,8 @@ interface ISwapManager is IPrimitiveSwapCallback {
     /// @param actual The actual delta out
     error DeltaOutMinError(uint256 expected, uint256 actual);
 
+    error DeadlineReachedError();
+
     event Swap(
         address indexed recipient,
         address indexed engine,
@@ -28,7 +30,8 @@ interface ISwapManager is IPrimitiveSwapCallback {
         uint256 deltaIn,
         uint256 deltaOutMin,
         bool fromMargin,
-        bool toMargin
+        bool toMargin,
+        uint256 deadline
     ) external returns (
         uint256 deltaOut
     );
