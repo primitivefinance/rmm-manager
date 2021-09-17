@@ -17,14 +17,6 @@ abstract contract MarginManager is IMarginManager, HouseBase {
 
     mapping(address => mapping(address => Margin.Data)) public override margins;
 
-    struct DepositCallbackData {
-        address payer;
-        address risky;
-        address stable;
-        uint256 delRisky;
-        uint256 delStable;
-    }
-
     /// @inheritdoc IMarginManager
     function deposit(
         address recipient,
@@ -41,12 +33,10 @@ abstract contract MarginManager is IMarginManager, HouseBase {
             delRisky,
             delStable,
             abi.encode(
-                DepositCallbackData({
+                CallbackData({
                     payer: msg.sender,
                     risky: risky,
-                    stable: stable,
-                    delRisky: delRisky,
-                    delStable: delStable
+                    stable: stable
                 })
             )
         );
@@ -79,7 +69,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         uint256 delStable,
         bytes calldata data
     ) external override {
-        DepositCallbackData memory decoded = abi.decode(data, (DepositCallbackData));
+        CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
