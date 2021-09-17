@@ -88,14 +88,6 @@ contract PrimitiveHouse is
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
 
-    struct AllocateCallbackData {
-        address payer;
-        address risky;
-        address stable;
-        uint256 delLiquidity;
-        bool fromMargin;
-    }
-
     function addLiquidity(
         address engine,
         address risky,
@@ -115,12 +107,10 @@ contract PrimitiveHouse is
             delLiquidity,
             fromMargin,
             abi.encode(
-                AllocateCallbackData({
+                CallbackData({
                     payer: msg.sender,
                     risky: risky,
-                    stable: stable,
-                    delLiquidity: delLiquidity,
-                    fromMargin: fromMargin
+                    stable: stable
                 })
             )
         );
@@ -175,7 +165,7 @@ contract PrimitiveHouse is
         uint256 delStable,
         bytes calldata data
     ) external override {
-        AllocateCallbackData memory decoded = abi.decode(data, (AllocateCallbackData));
+        CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
