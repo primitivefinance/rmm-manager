@@ -23,7 +23,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     using Margin for Margin.Data;
 
     modifier checkDeadline(uint256 deadline) {
-        if (block.timestamp > deadline) revert DeadlineReachedError();
+        if (_blockTimestamp() > deadline) revert DeadlineReachedError();
         _;
     }
 
@@ -84,5 +84,10 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
+    }
+
+    /// @return blockTimestamp casted as a uint32
+    function _blockTimestamp() internal view virtual returns (uint32 blockTimestamp) {
+        blockTimestamp = uint32(block.timestamp);
     }
 }
