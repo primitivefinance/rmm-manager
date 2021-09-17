@@ -35,10 +35,4 @@ interface ICashManager {
 
     /// @notice Transfers the ETH balance of the contract to the caller
     function refundETH() external payable;
-
-    /// VIEW FUNCTIONS ///
-
-    /// @notice Returns the address of the WETH10 token
-    /// @return The address of the WETH10 token
-    function WETH10() external view returns (address);
 }
