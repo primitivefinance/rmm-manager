@@ -2,13 +2,13 @@
 pragma solidity 0.8.6;
 
 abstract contract Reentrancy {
-    uint256 private reentrant;
+    uint256 private reentrant = 1;
 
     /// MODIFIERS ///
     modifier lock() {
         require(reentrant != 1, "locked");
-        reentrant = 1;
-        _;
         reentrant = 0;
+        _;
+        reentrant = 1;
     }
 }
