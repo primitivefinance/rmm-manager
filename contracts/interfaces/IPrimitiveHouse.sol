@@ -4,20 +4,42 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
-import "./IPrimitiveHouseErrors.sol";
-import "./IPrimitiveHouseEvents.sol";
-
-import "./IMulticall.sol";
-import "./ICashManager.sol";
-import "./ISelfPermit.sol";
-
 interface IPrimitiveHouse is
     IPrimitiveCreateCallback,
-    IPrimitiveLiquidityCallback,
-    IPrimitiveHouseErrors,
-    IPrimitiveHouseEvents,
-    IMulticall
+    IPrimitiveLiquidityCallback
 {
+    error EngineNotDeployedError();
+    error ZeroLiquidityError();
+
+    event Create(
+        address indexed recipient,
+        address indexed engine,
+        bytes32 indexed poolId,
+        uint256 strike,
+        uint64 sigma,
+        uint32 maturity
+    );
+
+    event Allocate(
+        address indexed payer,
+        address indexed engine,
+        bytes32 indexed poolId,
+        uint256 delLiquidity,
+        uint256 delRisky,
+        uint256 delStable,
+        bool fromMargin
+    );
+
+    event Remove(
+        address indexed payer,
+        address indexed engine,
+        bytes32 indexed poolId,
+        address risky,
+        address stable,
+        uint256 delRisky,
+        uint256 delStable
+    );
+
     /// EFFECT FUNCTIONS ///
 
     /// @notice Creates a new pool using the
