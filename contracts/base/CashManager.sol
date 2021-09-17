@@ -1,22 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+import "../interfaces/ICashManager.sol";
+import "../base/HouseBase.sol";
+
 import "../libraries/TransferHelper.sol";
 import "../interfaces/IWETH10.sol";
-import "../interfaces/ICashManager.sol";
 
 /// @title CashManager
 /// @notice Utils contract to manage ETH and token balances
 /// @author Primitive
-abstract contract CashManager is ICashManager {
-    /// @inheritdoc ICashManager
-    address public override WETH10;
-
-    /// @param _WETH10 The address of the WEHT10 contract
-    constructor(address _WETH10) {
-        WETH10 = _WETH10;
-    }
-
+abstract contract CashManager is ICashManager, HouseBase {
     /// @notice Only WETH10 can send ETH to this contract
     receive() external payable {
         if (msg.sender != WETH10) {
