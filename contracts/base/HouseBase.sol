@@ -9,6 +9,12 @@ import "./Reentrancy.sol";
 import "../libraries/EngineAddress.sol";
 
 abstract contract HouseBase is IHouseBase, Reentrancy {
+    struct CallbackData {
+        address payer;
+        address risky;
+        address stable;
+    }
+
     /// @inheritdoc IHouseBase
     address public immutable override factory;
 
