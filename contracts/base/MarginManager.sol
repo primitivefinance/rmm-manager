@@ -4,13 +4,12 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
 
-import "../interfaces/IPrimitiveHouse.sol";
+import "../interfaces/IMarginManager.sol";
+import "./HouseBase.sol";
 
 import "../libraries/TransferHelper.sol";
 
-import "./HouseBase.sol";
-
-abstract contract MarginManager is IPrimitiveHouse, HouseBase {
+abstract contract MarginManager is IMarginManager, HouseBase {
     using TransferHelper for IERC20;
 
     using Margin for mapping(address => Margin.Data);
