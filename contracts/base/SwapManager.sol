@@ -26,12 +26,6 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
         _;
     }
 
-    struct SwapCallbackData {
-        address payer;
-        address risky;
-        address stable;
-    }
-
     function swap(
         address engine,
         address risky,
@@ -45,7 +39,7 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
     ) external override lock returns (
         uint256 deltaOut
     ) {
-        SwapCallbackData memory callbackData = SwapCallbackData({
+        CallbackData memory callbackData = CallbackData({
             payer: msg.sender,
             risky: risky,
             stable: stable
@@ -81,7 +75,7 @@ abstract contract SwapManager is IPrimitiveHouse, IPrimitiveSwapCallback, HouseB
         uint256 delStable,
         bytes calldata data
     ) external override {
-        SwapCallbackData memory decoded = abi.decode(data, (SwapCallbackData));
+        CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();

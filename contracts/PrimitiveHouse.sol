@@ -44,12 +44,6 @@ contract PrimitiveHouse is
         factory = _factory;
     }
 
-    struct CreateCallbackData {
-        address payer;
-        address risky;
-        address stable;
-    }
-
     /// @inheritdoc IPrimitiveHouse
     function create(
         address engine,
@@ -69,7 +63,11 @@ contract PrimitiveHouse is
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
-        CreateCallbackData memory callbackData = CreateCallbackData({payer: msg.sender, risky: risky, stable: stable});
+        CallbackData memory callbackData = CallbackData({
+            payer: msg.sender,
+            risky: risky,
+            stable: stable
+        });
 
         console.log("calling create");
         (poolId, delRisky, delStable) = IPrimitiveEngineActions(engine).create(
@@ -163,7 +161,7 @@ contract PrimitiveHouse is
         uint256 delStable,
         bytes calldata data
     ) external override {
-        CreateCallbackData memory decoded = abi.decode(data, (CreateCallbackData));
+        CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
