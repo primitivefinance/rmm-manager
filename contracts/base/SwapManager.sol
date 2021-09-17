@@ -23,7 +23,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     using Margin for Margin.Data;
 
     modifier checkDeadline(uint256 deadline) {
-        require(block.timestamp <= deadline, "Transaction too old");
+        if (block.timestamp > deadline) revert DeadlineReachedError();
         _;
     }
 
@@ -36,8 +36,9 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         uint256 deltaIn,
         uint256 deltaOutMin,
         bool fromMargin,
-        bool toMargin
-    ) external override lock returns (
+        bool toMargin,
+        uint256 deadline
+    ) external override lock checkDeadline(deadline) returns (
         uint256 deltaOut
     ) {
         CallbackData memory callbackData = CallbackData({
