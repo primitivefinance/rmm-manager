@@ -5,7 +5,7 @@ interface IPrimitiveHouseEvents {
     event Create(
         address indexed recipient,
         address indexed engine,
-        bytes32 poolId,
+        bytes32 indexed poolId,
         uint256 strike,
         uint64 sigma,
         uint32 maturity
@@ -41,8 +41,8 @@ interface IPrimitiveHouseEvents {
 
     event Remove(
         address indexed payer,
-        address engine,
-        bytes32 poolId,
+        address indexed engine,
+        bytes32 indexed poolId,
         address risky,
         address stable,
         uint256 delRisky,
