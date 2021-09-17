@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-abstract contract Reentrancy {
+contract Reentrancy {
     uint256 private reentrant = 1;
 
     /// MODIFIERS ///
