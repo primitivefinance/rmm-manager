@@ -17,27 +17,24 @@ abstract contract PositionWrapper is ERC1155 {
 
     function _allocate(
         address account,
-        address engine,
         bytes32 poolId,
         uint256 amount
     ) internal {
-        _mint(account, getTokenId(engine, poolId, Token.Liquidity), amount, empty);
+        _mint(account, getTokenId(poolId, Token.Liquidity), amount, empty);
     }
 
     function _remove(
         address account,
-        address engine,
         bytes32 poolId,
         uint256 amount
     ) internal {
-        _burn(account, getTokenId(engine, poolId, Token.Liquidity), amount);
+        _burn(account, getTokenId(poolId, Token.Liquidity), amount);
     }
 
     function getTokenId(
-        address engine,
         bytes32 poolId,
         Token token
     ) internal pure returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(engine, poolId, token)));
+        return uint256(keccak256(abi.encodePacked(poolId, token)));
     }
 }

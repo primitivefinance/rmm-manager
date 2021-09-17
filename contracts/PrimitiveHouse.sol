@@ -81,7 +81,7 @@ contract PrimitiveHouse is
 
         // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
-        _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
+        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY);
 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
@@ -123,7 +123,7 @@ contract PrimitiveHouse is
         if (fromMargin) margins[engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, engine, poolId, delLiquidity);
+        _allocate(msg.sender, poolId, delLiquidity);
 
         emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
@@ -138,7 +138,7 @@ contract PrimitiveHouse is
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
         (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
-        _remove(msg.sender, engine, poolId, delLiquidity);
+        _remove(msg.sender, poolId, delLiquidity);
 
         Margin.Data storage mar = margins[engine][msg.sender];
         mar.deposit(delRisky, delStable);
