@@ -28,48 +28,56 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     }
 
     function swap(
-        address engine,
-        address risky,
-        address stable,
-        bytes32 poolId,
-        bool riskyForStable,
-        uint256 deltaIn,
-        uint256 deltaOutMin,
-        bool fromMargin,
-        bool toMargin,
-        uint256 deadline
-    ) external override lock checkDeadline(deadline) returns (
+        SwapParameters memory params
+    ) external override lock checkDeadline(params.deadline) returns (
         uint256 deltaOut
     ) {
         CallbackData memory callbackData = CallbackData({
             payer: msg.sender,
-            risky: risky,
-            stable: stable
+            risky: params.risky,
+            stable: params.stable
         });
 
-        deltaOut = IPrimitiveEngineActions(engine).swap(
-            poolId,
-            riskyForStable,
-            deltaIn,
-            fromMargin,
-            toMargin,
+        deltaOut = IPrimitiveEngineActions(params.engine).swap(
+            params.poolId,
+            params.riskyForStable,
+            params.deltaIn,
+            params.fromMargin,
+            params.toMargin,
             abi.encode(callbackData)
         );
 
         // Reverts if the delta out is lower than the minimum
-        if (deltaOutMin > deltaOut) revert DeltaOutMinError(deltaOutMin, deltaOut);
+        if (params.deltaOutMin > deltaOut) revert DeltaOutMinError(params.deltaOutMin, deltaOut);
 
-        if (fromMargin) {
-            margins[engine].withdraw(riskyForStable ? deltaIn : 0, riskyForStable ? 0 : deltaIn);
+        if (params.fromMargin) {
+            margins[params.engine].withdraw(
+                params.riskyForStable ? params.deltaIn : 0,
+                params.riskyForStable ? 0 : params.deltaIn
+            );
         }
 
-        if (toMargin) {
-            margins[msg.sender][engine].deposit(riskyForStable ? deltaIn : 0, riskyForStable ? 0 : deltaIn);
+        if (params.toMargin) {
+            margins[msg.sender][params.engine].deposit(
+                params.riskyForStable ? params.deltaIn : 0,
+                params.riskyForStable ? 0 : params.deltaIn
+            );
         } else {
-            TransferHelper.safeTransfer(riskyForStable ? stable : risky, msg.sender, deltaOut);
+            TransferHelper.safeTransfer(
+                params.riskyForStable ? params.stable : params.risky,
+                msg.sender,
+                deltaOut);
         }
 
-        emit Swap(msg.sender, engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
+        emit Swap(
+            msg.sender,
+            params.engine,
+            params.poolId,
+            params.riskyForStable,
+            params.deltaIn,
+            deltaOut,
+            params.fromMargin
+        );
     }
 
     function swapCallback(
