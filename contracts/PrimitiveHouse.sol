@@ -60,7 +60,11 @@ contract PrimitiveHouse is
         uint32 maturity,
         uint256 delta,
         uint256 delLiquidity
-    ) external override lock {
+    ) external override lock returns (
+        bytes32 poolId,
+        uint256 delRisky,
+        uint256 delStable
+    ) {
         if (engine == address(0)) revert EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
@@ -68,7 +72,7 @@ contract PrimitiveHouse is
         CreateCallbackData memory callbackData = CreateCallbackData({payer: msg.sender, risky: risky, stable: stable});
 
         console.log("calling create");
-        (bytes32 poolId, , ) = IPrimitiveEngineActions(engine).create(
+        (poolId, delRisky, delStable) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
             maturity,
@@ -101,10 +105,13 @@ contract PrimitiveHouse is
         bytes32 poolId,
         uint256 delLiquidity,
         bool fromMargin
-    ) external override lock {
+    ) external override lock returns (
+        uint256 delRisky,
+        uint256 delStable
+    ) {
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
-        (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
+        (delRisky, delStable) = IPrimitiveEngineActions(engine).allocate(
             poolId,
             address(this),
             delLiquidity,
@@ -134,10 +141,13 @@ contract PrimitiveHouse is
         address stable,
         bytes32 poolId,
         uint256 delLiquidity
-    ) external override lock {
+    ) external override lock returns (
+        uint256 delRisky,
+        uint256 delStable
+    ) {
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
-        (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
+        (delRisky, delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
         _remove(msg.sender, poolId, delLiquidity);
 
         Margin.Data storage mar = margins[engine][msg.sender];
