@@ -4,6 +4,20 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
 
 interface ISwapManager is IPrimitiveSwapCallback {
+    struct SwapParameters {
+        address engine;
+        address risky;
+        address stable;
+        bytes32 poolId;
+        bool riskyForStable;
+        uint256 deltaIn;
+        uint256 deltaOutMin;
+        bool fromMargin;
+        bool toMargin;
+        uint256 deadline;
+    }
+
+
     /// @notice Thrown when the delta out is lower than the minimum
     /// @param expected The minimum delta out
     /// @param actual The actual delta out
@@ -21,18 +35,5 @@ interface ISwapManager is IPrimitiveSwapCallback {
         bool fromMargin
     );
 
-    function swap(
-        address engine,
-        address risky,
-        address stable,
-        bytes32 poolId,
-        bool riskyForStable,
-        uint256 deltaIn,
-        uint256 deltaOutMin,
-        bool fromMargin,
-        bool toMargin,
-        uint256 deadline
-    ) external returns (
-        uint256 deltaOut
-    );
+    function swap(SwapParameters memory params) external returns (uint256 deltaOut);
 }

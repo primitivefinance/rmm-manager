@@ -40,9 +40,7 @@ contract PrimitiveHouse is
         address _factory,
         address _WETH10,
         string memory _URI
-    ) PositionWrapper(_URI) CashManager(_WETH10) {
-        factory = _factory;
-    }
+    ) HouseBase(_factory, _WETH10) PositionWrapper(_URI) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
