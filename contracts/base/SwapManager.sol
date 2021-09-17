@@ -3,7 +3,8 @@ pragma solidity 0.8.6;
 
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
+
+import "../interfaces/ISwapManager.sol";
 
 import "../interfaces/IERC20.sol";
 
