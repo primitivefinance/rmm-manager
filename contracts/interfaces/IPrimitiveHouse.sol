@@ -57,7 +57,8 @@ interface IPrimitiveHouse is
         uint64 sigma,
         uint32 maturity,
         uint256 delta,
-        uint256 delLiquidity
+        uint256 delLiquidity,
+        bool shouldTokenizeLiquidity
     ) external returns (
         bytes32 poolId,
         uint256 delRisky,
@@ -70,7 +71,8 @@ interface IPrimitiveHouse is
         address stable,
         bytes32 poolId,
         uint256 delLiquidity,
-        bool fromMargin
+        bool fromMargin,
+        bool shouldTokenizeLiquidity
     ) external returns (
         uint256 delRisky,
         uint256 delStable
