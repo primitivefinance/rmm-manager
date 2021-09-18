@@ -46,7 +46,8 @@ contract PrimitiveHouse is
         uint64 sigma,
         uint32 maturity,
         uint256 delta,
-        uint256 delLiquidity
+        uint256 delLiquidity,
+        bool shouldTokenizeLiquidity
     ) external override lock returns (
         bytes32 poolId,
         uint256 delRisky,
@@ -76,7 +77,7 @@ contract PrimitiveHouse is
 
         // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
-        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY);
+        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY, shouldTokenizeLiquidity);
 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
@@ -87,7 +88,8 @@ contract PrimitiveHouse is
         address stable,
         bytes32 poolId,
         uint256 delLiquidity,
-        bool fromMargin
+        bool fromMargin,
+        bool shouldTokenizeLiquidity
     ) external override lock returns (
         uint256 delRisky,
         uint256 delStable
@@ -111,7 +113,7 @@ contract PrimitiveHouse is
         if (fromMargin) margins[engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, poolId, delLiquidity);
+        _allocate(msg.sender, poolId, delLiquidity, shouldTokenizeLiquidity);
 
         emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
