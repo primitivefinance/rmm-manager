@@ -8,8 +8,8 @@ import "../libraries/TransferHelper.sol";
 import "../interfaces/IWETH10.sol";
 
 /// @title CashManager
-/// @notice Utils contract to manage ETH and token balances
 /// @author Primitive
+/// @notice Utils contract to manage ETH and token balances
 abstract contract CashManager is ICashManager, HouseBase {
     /// @notice Only WETH10 can send ETH to this contract
     receive() external payable {

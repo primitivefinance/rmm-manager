@@ -145,6 +145,7 @@ contract PrimitiveHouse is
 
     // ===== Callback Implementations =====
 
+    /// @inheritdoc IPrimitiveCreateCallback
     function createCallback(
         uint256 delRisky,
         uint256 delStable,
@@ -159,6 +160,7 @@ contract PrimitiveHouse is
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 
+    /// @inheritdoc IPrimitiveLiquidityCallback
     function allocateCallback(
         uint256 delRisky,
         uint256 delStable,
