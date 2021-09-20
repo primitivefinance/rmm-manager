@@ -9,12 +9,15 @@ import "./HouseBase.sol";
 
 import "../libraries/TransferHelper.sol";
 
+/// @title MarginManager
+/// @author Primitive
+/// @notice Manages the margins
 abstract contract MarginManager is IMarginManager, HouseBase {
     using TransferHelper for IERC20;
-
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
 
+    /// @inheritdoc IMarginManager
     mapping(address => mapping(address => Margin.Data)) public override margins;
 
     /// @inheritdoc IMarginManager
@@ -68,6 +71,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         emit Withdraw(msg.sender, recipient, engine, delRisky, delStable);
     }
 
+    /// @inheritdoc IPrimitiveDepositCallback
     function depositCallback(
         uint256 delRisky,
         uint256 delStable,
