@@ -59,7 +59,11 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         // Reverts the call early if margins are insufficient
         margins[engine].withdraw(delRisky, delStable);
 
-        IPrimitiveEngineActions(engine).withdraw(recipient, delRisky, delStable);
+        IPrimitiveEngineActions(engine).withdraw(
+            recipient == address(0) ? address(this) : recipient,
+            delRisky,
+            delStable
+        );
 
         emit Withdraw(msg.sender, recipient, engine, delRisky, delStable);
     }
