@@ -26,17 +26,18 @@
   "license": "GNU",
   "homepage": "https://primitive.finance",
   "scripts": {
+    "typechain": "hardhat typechain",
+    "clean": "hardhat clean",
     "compile": "hardhat compile",
-    "test": "hardhat test",
-    "test:logs": "hardhat test --logs",
-    "test:house": "hardhat test ./test/unit/primitiveHouse",
+    "test": "npx mocha --require hardhat/register --recursive --parallel --exit --extension ts --timeout 100000000",
     "prepare": "husky install"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
     "@primitivefinance/v2-core": "^1.6.0",
     "@uniswap/v3-core": "^1.0.0",
-    "@uniswap/v3-periphery": "^1.0.0"
+    "@uniswap/v3-periphery": "^1.0.0",
+    "mocha": "^9.1.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^12.1.4",
