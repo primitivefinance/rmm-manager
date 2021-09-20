@@ -31,6 +31,8 @@ contract PrimitiveHouse is
 
     /// EFFECT FUNCTIONS ///
 
+    /// @param _factory The address of a PrimitiveFactory
+    /// @param _WETH10 The address of WETH10
     constructor(
         address _factory,
         address _WETH10,
@@ -82,6 +84,7 @@ contract PrimitiveHouse is
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function allocate(
         address engine,
         address risky,
@@ -118,6 +121,7 @@ contract PrimitiveHouse is
         emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function remove(
         address engine,
         address risky,
@@ -169,11 +173,11 @@ contract PrimitiveHouse is
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 
+    // TODO: Delete this callback when the interface will be updated
     function removeCallback(
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
     ) external override {
-        // TODO: Delete this callback
     }
 }
