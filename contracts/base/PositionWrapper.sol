@@ -8,15 +8,15 @@ import "../interfaces/IPositionWrapper.sol";
 /// @title PositionWrapper
 /// @author Primitive
 /// @notice Wraps the positions into ERC1155 tokens
-abstract contract PositionWrapper is ERC1155 {
-    error LiquidityError();
-
-    mapping(address => mapping(bytes32 => uint256)) public liquidityOf;
+abstract contract PositionWrapper is IPositionWrapper, ERC1155 {
+    /// @inheritdoc IPositionWrapper
+    mapping(address => mapping(bytes32 => uint256)) public override liquidityOf;
 
     constructor(string memory _URI) ERC1155(_URI) {}
 
     bytes private empty;
 
+    /// @inheritdoc ERC1155
     function safeTransferFrom(
         address from,
         address to,
@@ -31,6 +31,7 @@ abstract contract PositionWrapper is ERC1155 {
         liquidityOf[to][bytes32(id)] += amount;
     }
 
+    /// @inheritdoc ERC1155
     function safeBatchTransferFrom(
         address from,
         address to,
@@ -46,10 +47,11 @@ abstract contract PositionWrapper is ERC1155 {
         }
     }
 
+    /// @inheritdoc IPositionWrapper
     function wrapLiquidity(
         bytes32 poolId,
         uint256 amount
-    ) external {
+    ) external override {
         uint256 balance = balanceOf(msg.sender, uint256(poolId));
         uint256 liquidity = liquidityOf[msg.sender][poolId];
         uint256 unwrapped = liquidity - balance;
@@ -59,10 +61,11 @@ abstract contract PositionWrapper is ERC1155 {
         _mint(msg.sender, uint256(poolId), amount, empty);
     }
 
+    /// @inheritdoc IPositionWrapper
     function unwrapLiquidity(
         bytes32 poolId,
         uint256 amount
-    ) external {
+    ) external override {
         uint256 balance = balanceOf(msg.sender, uint256(poolId));
 
         if (amount > balance) revert LiquidityError();
@@ -70,6 +73,11 @@ abstract contract PositionWrapper is ERC1155 {
         _burn(msg.sender, uint256(poolId), amount);
     }
 
+    /// @notice Allocates liquidity
+    /// @param account The recipient of the liquidity
+    /// @param poolId The id of the pool
+    /// @param amount The amount of liquidity to allocate
+    /// @param shouldTokenizeLiquidity True if liquidity should be tokenized
     function _allocate(
         address account,
         bytes32 poolId,
@@ -83,6 +91,10 @@ abstract contract PositionWrapper is ERC1155 {
         }
     }
 
+    /// @notice Removes liquidity
+    /// @param account The account to remove from
+    /// @param poolId The id of the pool
+    /// @param amount The amount of liquidity to remove
     function _remove(
         address account,
         bytes32 poolId,
