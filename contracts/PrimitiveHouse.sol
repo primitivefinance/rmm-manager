@@ -124,8 +124,6 @@ contract PrimitiveHouse is
     /// @inheritdoc IPrimitiveHouse
     function remove(
         address engine,
-        address risky,
-        address stable,
         bytes32 poolId,
         uint256 delLiquidity
     ) external override lock returns (
@@ -140,7 +138,7 @@ contract PrimitiveHouse is
         Margin.Data storage mar = margins[engine][msg.sender];
         mar.deposit(delRisky, delStable);
 
-        emit Remove(msg.sender, engine, poolId, risky, stable, delRisky, delStable);
+        emit Remove(msg.sender, engine, poolId, delLiquidity, delRisky, delStable);
     }
 
     // ===== Callback Implementations =====
