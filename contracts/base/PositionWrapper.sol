@@ -3,19 +3,17 @@ pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
+import "../interfaces/IPositionWrapper.sol";
+
 /// @title PositionWrapper
-/// @notice Wraps the positions into ERC1155 tokens
 /// @author Primitive
+/// @notice Wraps the positions into ERC1155 tokens
 abstract contract PositionWrapper is ERC1155 {
     error LiquidityError();
 
     mapping(address => mapping(bytes32 => uint256)) public liquidityOf;
 
     constructor(string memory _URI) ERC1155(_URI) {}
-
-    enum Token {
-        Liquidity
-    }
 
     bytes private empty;
 
@@ -58,7 +56,7 @@ abstract contract PositionWrapper is ERC1155 {
 
         if (amount > unwrapped) revert LiquidityError();
 
-        _mint(msg.sender, getTokenId(poolId, Token.Liquidity), amount, empty);
+        _mint(msg.sender, uint256(poolId), amount, empty);
     }
 
     function unwrapLiquidity(
@@ -69,7 +67,7 @@ abstract contract PositionWrapper is ERC1155 {
 
         if (amount > balance) revert LiquidityError();
 
-        _burn(msg.sender, getTokenId(poolId, Token.Liquidity), amount);
+        _burn(msg.sender, uint256(poolId), amount);
     }
 
     function _allocate(
@@ -81,7 +79,7 @@ abstract contract PositionWrapper is ERC1155 {
         liquidityOf[account][poolId] += amount;
 
         if (shouldTokenizeLiquidity) {
-            _mint(account, getTokenId(poolId, Token.Liquidity), amount, empty);
+            _mint(account, uint256(poolId), amount, empty);
         }
     }
 
@@ -92,13 +90,6 @@ abstract contract PositionWrapper is ERC1155 {
     ) internal {
         liquidityOf[account][poolId] -= amount;
 
-        _burn(account, getTokenId(poolId, Token.Liquidity), amount);
-    }
-
-    function getTokenId(
-        bytes32 poolId,
-        Token token
-    ) internal pure returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(poolId, token)));
+        _burn(account, uint256(poolId), amount);
     }
 }
