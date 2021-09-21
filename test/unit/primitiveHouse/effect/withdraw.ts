@@ -1,23 +1,45 @@
-import { waffle } from 'hardhat'
-import { expect } from 'chai'
-import { utils } from 'ethers'
+import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
-import loadContext from '../../context'
+import expect from '../../../shared/expect'
+import { runTest, DEFAULT_CONFIG } from '../../context'
 
-import { withdrawFragment } from '../fragments'
+const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 
-describe('withdraw', function () {
-  before(async function () {
-    loadContext(waffle.provider, withdrawFragment)
+runTest('withdraw', function () {
+  beforeEach(async function () {
+    await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.risky.approve(this.house.address, constants.MaxUint256)
+    await this.stable.approve(this.house.address, constants.MaxUint256)
+
+    await this.house.create(
+      this.engine.address,
+      this.risky.address,
+      this.stable.address,
+      strike.raw,
+      sigma.raw,
+      maturity.raw,
+      parseWei(delta).raw,
+      parseWei('1').raw,
+      false
+    )
+
+    await this.house.deposit(
+      this.deployer.address,
+      this.engine.address,
+      this.risky.address,
+      this.stable.address,
+      parseWei('1000').raw,
+      parseWei('1000').raw
+    )
   })
 
   describe('success cases', function () {
     it('withdraws 1000 risky and 1000 stable from margin', async function () {
       await this.house.withdraw(
         this.deployer.address,
-        this.risky.address,
-        this.stable.address,
+        this.engine.address,
         parseWei('1000').raw,
         parseWei('1000').raw
       )
@@ -26,16 +48,15 @@ describe('withdraw', function () {
     it('reduces the margin of the sender', async function () {
       await this.house.withdraw(
         this.deployer.address,
-        this.risky.address,
-        this.stable.address,
+        this.engine.address,
         parseWei('1000').raw,
         parseWei('1000').raw
       )
 
       const margin = await this.house.margins(this.engine.address, this.deployer.address)
 
-      expect(margin.balanceRisky).to.equal(parseWei('99000').raw)
-      expect(margin.balanceStable).to.equal(parseWei('99000').raw)
+      expect(margin.balanceRisky).to.equal(parseWei('0').raw)
+      expect(margin.balanceStable).to.equal(parseWei('0').raw)
     })
 
     it('reduces the balance of the engine', async function () {
@@ -44,8 +65,7 @@ describe('withdraw', function () {
 
       await this.house.withdraw(
         this.deployer.address,
-        this.risky.address,
-        this.stable.address,
+        this.engine.address,
         parseWei('1000').raw,
         parseWei('1000').raw
       )
@@ -60,23 +80,22 @@ describe('withdraw', function () {
     })
 
     it('increases the balance of the sender', async function () {
-      const stableBalance = await this.stable.balanceOf(this.signers[0].address)
-      const riskyBalance = await this.risky.balanceOf(this.signers[0].address)
+      const stableBalance = await this.stable.balanceOf(this.deployer.address)
+      const riskyBalance = await this.risky.balanceOf(this.deployer.address)
 
       await this.house.withdraw(
         this.deployer.address,
-        this.risky.address,
-        this.stable.address,
+        this.engine.address,
         parseWei('1000').raw,
         parseWei('1000').raw
       )
 
       expect(
-        await this.stable.balanceOf(this.signers[0].address)
+        await this.stable.balanceOf(this.deployer.address)
       ).to.equal(stableBalance.add(parseWei('1000').raw))
 
       expect(
-        await this.risky.balanceOf(this.signers[0].address)
+        await this.risky.balanceOf(this.deployer.address)
       ).to.equal(riskyBalance.add(parseWei('1000').raw))
     })
 
@@ -84,13 +103,12 @@ describe('withdraw', function () {
       await expect(
         this.house.withdraw(
           this.deployer.address,
-          this.risky.address,
-          this.stable.address,
+          this.engine.address,
           parseWei('1000').raw,
           parseWei('1000').raw
         )
       )
-        .to.emit(this.house, 'Withdrawn')
+        .to.emit(this.house, 'Withdraw')
         .withArgs(
           this.deployer.address,
           this.deployer.address,
@@ -106,10 +124,9 @@ describe('withdraw', function () {
       await expect(
         this.house.withdraw(
           this.deployer.address,
-          this.risky.address,
-          this.stable.address,
-          parseWei('10000000').raw,
-          parseWei('10000000').raw
+          this.engine.address,
+          parseWei('1001').raw,
+          parseWei('1001').raw
         )
       ).to.be.reverted
     })
