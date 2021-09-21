@@ -1,348 +1,181 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.0;
+pragma solidity 0.8.6;
 
-/// @title   Primitive House
-/// @author  Primitive
-/// @dev     Interacts with Primitive Engine contracts
-
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-import "@primitivefinance/primitive-v2-core/contracts/interfaces/IPrimitiveFactory.sol";
-import "@primitivefinance/primitive-v2-core/contracts/libraries/Margin.sol";
-import "@primitivefinance/primitive-v2-core/contracts/libraries/Position.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 
 import "./interfaces/IPrimitiveHouse.sol";
-import "./interfaces/IPrimitiveHouseEvents.sol";
+import "./libraries/TransferHelper.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse, IPrimitiveHouseEvents {
-    using SafeERC20 for IERC20;
+import "./base/Multicall.sol";
+import "./base/CashManager.sol";
+import "./base/SelfPermit.sol";
+import "./base/PositionWrapper.sol";
+import "./base/SwapManager.sol";
+
+import "hardhat/console.sol";
+
+/// @title Primitive House
+/// @author Primitive
+/// @dev Interacts with Primitive Engine contracts
+contract PrimitiveHouse is
+    IPrimitiveHouse,
+    Multicall,
+    CashManager,
+    SelfPermit,
+    PositionWrapper,
+    SwapManager
+{
+    using TransferHelper for IERC20;
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
-    using Position for mapping(bytes32 => Position.Data);
-    using Position for Position.Data;
-
-    /// STORAGE PROPERTIES ///
-
-    IPrimitiveFactory public factory;
-
-    // engine => user => Margin.Data
-    mapping(address => mapping(address => Margin.Data)) public margins;
-
-    // engine => posId => Position.Data
-    mapping(address => mapping(bytes32 => Position.Data)) public positions;
-
-    uint256 private reentrant;
-
-    /// MODIFIERS ///
-
-    modifier lock() {
-        require(reentrant != 1, "locked");
-        reentrant = 1;
-        _;
-        reentrant = 0;
-    }
 
     /// EFFECT FUNCTIONS ///
 
-    constructor(address _factory) {
-        factory = IPrimitiveFactory(_factory);
-    }
-
-    struct CallbackData {
-        address engine;
-        address payer;
-        address risky;
-        address stable;
-    }
-
-    CallbackData private callbackData;
-    bytes private empty;
+    /// @param _factory The address of a PrimitiveFactory
+    /// @param _WETH10 The address of WETH10
+    constructor(
+        address _factory,
+        address _WETH10,
+        string memory _URI
+    ) HouseBase(_factory, _WETH10) PositionWrapper(_URI) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
+        address engine,
         address risky,
         address stable,
-        uint256 delLiquidity,
         uint256 strike,
         uint64 sigma,
-        uint32 time,
-        uint256 riskyPrice
-    ) public virtual override lock {
-        address engine = factory.getEngine(risky, stable);
+        uint32 maturity,
+        uint256 delta,
+        uint256 delLiquidity,
+        bool shouldTokenizeLiquidity
+    ) external override lock returns (
+        bytes32 poolId,
+        uint256 delRisky,
+        uint256 delStable
+    ) {
+        if (engine == address(0)) revert EngineNotDeployedError();
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
+        if (delLiquidity == 0) revert ZeroLiquidityError();
 
-        (bytes32 poolId, uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).create(
+        CallbackData memory callbackData = CallbackData({
+            payer: msg.sender,
+            risky: risky,
+            stable: stable
+        });
+
+        (poolId, delRisky, delStable) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
-            time,
-            riskyPrice,
+            maturity,
+            delta,
             delLiquidity,
-            empty
+            abi.encode(callbackData)
         );
 
-        positions[engine][Position.getPositionId(msg.sender, poolId)].allocate(delLiquidity - 1000);
+        // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
+        uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
+        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY, shouldTokenizeLiquidity);
 
-        emit Created(msg.sender, engine, poolId, strike, sigma, time, riskyPrice, delRisky, delStable);
-    }
-
-    /// @inheritdoc IPrimitiveHouse
-    function deposit(
-        address owner,
-        address risky,
-        address stable,
-        uint256 delRisky,
-        uint256 delStable
-    ) public virtual override lock {
-        address engine = factory.getEngine(risky, stable);
-
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
-
-        IPrimitiveEngineActions(engine).deposit(address(this), delRisky, delStable, empty);
-
-        Margin.Data storage mar = margins[engine][owner];
-        mar.deposit(delRisky, delStable);
-
-        emit Deposited(owner, engine, delRisky, delStable);
-    }
-
-    /// @inheritdoc IPrimitiveHouse
-    function withdraw(
-        address risky,
-        address stable,
-        uint256 delRisky,
-        uint256 delStable
-    ) public virtual override lock {
-        address engine = factory.getEngine(risky, stable);
-
-        IPrimitiveEngineActions(engine).withdraw(delRisky, delStable);
-
-        margins[engine].withdraw(delRisky, delStable);
-
-        if (delRisky > 0) IERC20(risky).safeTransfer(msg.sender, delRisky);
-        if (delStable > 0) IERC20(stable).safeTransfer(msg.sender, delStable);
-
-        emit Withdrawn(msg.sender, engine, delRisky, delStable);
+        emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
 
     /// @inheritdoc IPrimitiveHouse
     function allocate(
-        address owner,
+        address engine,
         address risky,
         address stable,
         bytes32 poolId,
         uint256 delLiquidity,
-        bool fromMargin
-    ) public virtual override lock {
-        address engine = factory.getEngine(risky, stable);
+        bool fromMargin,
+        bool shouldTokenizeLiquidity
+    ) external override lock returns (
+        uint256 delRisky,
+        uint256 delStable
+    ) {
+        if (delLiquidity == 0) revert ZeroLiquidityError();
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
-
-        (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).allocate(
+        (delRisky, delStable) = IPrimitiveEngineActions(engine).allocate(
             poolId,
             address(this),
             delLiquidity,
             fromMargin,
-            empty
+            abi.encode(
+                CallbackData({
+                    payer: msg.sender,
+                    risky: risky,
+                    stable: stable
+                })
+            )
         );
 
         if (fromMargin) margins[engine].withdraw(delRisky, delStable);
 
-        Position.Data storage pos = positions[engine].fetch(owner, poolId);
-        pos.allocate(delLiquidity);
+        // Mints {delLiquidity} of liquidity tokens
+        _allocate(msg.sender, poolId, delLiquidity, shouldTokenizeLiquidity);
 
-        IPrimitiveEngineActions(engine).lend(poolId, delLiquidity);
-
-        positions[engine].lend(poolId, delLiquidity);
-
-        emit AllocatedAndLent(owner, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
+        emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
 
+    /// @inheritdoc IPrimitiveHouse
     function remove(
-        address risky,
-        address stable,
+        address engine,
         bytes32 poolId,
-        uint256 delLiquidity,
-        bool toMargin
-    ) public virtual lock {
-        address engine = factory.getEngine(risky, stable);
+        uint256 delLiquidity
+    ) external override lock returns (
+        uint256 delRisky,
+        uint256 delStable
+    ) {
+        if (delLiquidity == 0) revert ZeroLiquidityError();
 
-        IPrimitiveEngineActions(engine).claim(poolId, delLiquidity);
+        (delRisky, delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
+        _remove(msg.sender, poolId, delLiquidity);
 
-        positions[engine].claim(poolId, delLiquidity);
+        Margin.Data storage mar = margins[engine][msg.sender];
+        mar.deposit(delRisky, delStable);
 
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
-
-        (uint256 delRisky, uint256 delStable) = IPrimitiveEngineActions(engine).remove(
-            poolId,
-            delLiquidity,
-            toMargin,
-            empty
-        );
-
-        if (toMargin) {
-            Margin.Data storage mar = margins[engine][msg.sender];
-            mar.deposit(delRisky, delStable);
-        }
-
-        positions[engine].remove(poolId, delLiquidity);
-
-        // TODO: Emit the Removed event
-    }
-
-    /// @inheritdoc IPrimitiveHouse
-    function borrow(
-        address owner,
-        address risky,
-        address stable,
-        bytes32 poolId,
-        uint256 delLiquidity,
-        uint256 maxPremium
-    ) public virtual override lock {
-        address engine = factory.getEngine(risky, stable);
-
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
-
-        uint256 premium = IPrimitiveEngineActions(engine).borrow(poolId, delLiquidity, maxPremium, empty);
-
-        positions[engine].borrow(poolId, delLiquidity);
-
-        emit Borrowed(owner, engine, poolId, delLiquidity, maxPremium, premium);
-    }
-
-    /// @inheritdoc IPrimitiveHouse
-    function repay(
-        address owner,
-        address risky,
-        address stable,
-        bytes32 poolId,
-        uint256 delLiquidity,
-        bool fromMargin
-    ) public virtual override lock {
-        address engine = factory.getEngine(risky, stable);
-
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
-
-        (uint256 delRisky, uint256 delStable, uint256 premium) = IPrimitiveEngineActions(engine).repay(
-            poolId,
-            address(this),
-            delLiquidity,
-            fromMargin,
-            empty
-        );
-
-        if (fromMargin) margins[engine].withdraw(0, delStable);
-
-        // TODO: Update position
-        Position.Data storage pos = positions[engine].fetch(owner, poolId);
-        pos.repay(delLiquidity);
-
-        // TODO: Update position
-        Margin.Data storage mar = margins[engine][owner];
-        mar.deposit(premium, 0);
-
-        emit Repaid(owner, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
-    }
-
-    /// @inheritdoc IPrimitiveHouse
-    function swap(
-        address risky,
-        address stable,
-        bytes32 poolId,
-        bool riskyForStable,
-        uint256 deltaIn,
-        uint256 deltaOutMin,
-        bool fromMargin
-    ) public virtual override lock {
-        address engine = factory.getEngine(risky, stable);
-
-        callbackData = CallbackData({engine: engine, payer: msg.sender, risky: risky, stable: stable});
-
-        uint256 deltaOut = IPrimitiveEngineActions(engine).swap(
-            poolId,
-            riskyForStable,
-            deltaIn,
-            deltaOutMin,
-            fromMargin,
-            abi.encode(callbackData)
-        );
-
-        emit Swapped(msg.sender, engine, poolId, riskyForStable, deltaIn, deltaOut, fromMargin);
+        emit Remove(msg.sender, engine, poolId, delLiquidity, delRisky, delStable);
     }
 
     // ===== Callback Implementations =====
 
+    /// @inheritdoc IPrimitiveCreateCallback
     function createCallback(
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
-        if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
-        if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
+        CallbackData memory decoded = abi.decode(data, (CallbackData));
+
+        address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
+
+        if (msg.sender != engine) revert NotEngineError();
+
+        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 
-    struct DepositCallbackData {
-        address payer;
-        address risky;
-        address stable;
-    }
-
-    function depositCallback(
-        uint256 delRisky,
-        uint256 delStable,
-        bytes calldata data
-    ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
-        if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
-        if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
-    }
-
+    /// @inheritdoc IPrimitiveLiquidityCallback
     function allocateCallback(
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
-        if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
-        if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
+        CallbackData memory decoded = abi.decode(data, (CallbackData));
+
+        address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
+        if (msg.sender != engine) revert NotEngineError();
+
+        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 
-    function borrowCallback(
-        uint256 delLiquidity,
-        uint256 delRisky,
-        uint256 delStable,
-        bytes calldata data
-    ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
-        uint256 riskyNeeded = delLiquidity - delRisky;
-        IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, riskyNeeded);
-        IERC20(callbackData.stable).safeTransfer(callbackData.payer, delStable);
-    }
-
-    function repayFromExternalCallback(uint256 delStable, bytes calldata data) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
-        IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
-    }
-
-    function swapCallback(
-        uint256 delRisky,
-        uint256 delStable,
-        bytes calldata data
-    ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
-        if (delRisky > 0) IERC20(callbackData.risky).safeTransferFrom(callbackData.payer, msg.sender, delRisky);
-        if (delStable > 0) IERC20(callbackData.stable).safeTransferFrom(callbackData.payer, msg.sender, delStable);
-    }
-
+    // TODO: Delete this callback when the interface will be updated
     function removeCallback(
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
     ) external override {
-        require(callbackData.engine == msg.sender, "Not engine");
-        if (delRisky > 0) IERC20(callbackData.risky).safeTransfer(callbackData.payer, delRisky);
-        if (delStable > 0) IERC20(callbackData.stable).safeTransfer(callbackData.payer, delStable);
     }
 }
