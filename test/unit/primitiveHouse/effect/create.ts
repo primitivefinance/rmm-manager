@@ -3,13 +3,11 @@ import { parseWei } from 'web3-units'
 
 import { DEFAULT_CONFIG } from '../../context'
 import { computePoolId } from '../../../shared/utilities'
-
-const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
-
-let poolId: string
-
 import expect from '../../../shared/expect'
 import { runTest } from '../../context'
+
+const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+let poolId: string
 
 runTest('create', function () {
   beforeEach(async function () {
