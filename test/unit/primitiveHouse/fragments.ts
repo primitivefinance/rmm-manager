@@ -3,7 +3,6 @@ import { parseWei } from 'web3-units'
 
 import { Contracts } from '../../../types'
 import { DEFAULT_CONFIG } from '../context'
-import { computePoolId } from '../../shared/utilities'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 
@@ -53,16 +52,6 @@ export async function removeLiquidityFragment(signers: Wallet[], contracts: Cont
     parseWei(delta).raw,
     parseWei('10').raw
   )
-  /*
-  const poolId = computePoolId(contracts.engine.address, strike.raw, sigma.raw, maturity.raw)
-  await contracts.house.addLiquidity(
-    contracts.risky.address,
-    contracts.stable.address,
-    poolId,
-    parseWei('1').raw,
-    true
-  )
-  */
 }
 
 export async function swapFragment(signers: Wallet[], contracts: Contracts): Promise<void> {

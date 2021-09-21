@@ -1,67 +1,70 @@
-import { waffle } from 'hardhat'
-import { expect } from 'chai'
-import { utils, BytesLike, constants } from 'ethers'
+import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
-import loadContext, { DEFAULT_CONFIG } from '../../context'
-import { computePoolId, getTokenId } from '../../../shared/utilities'
-import { createFragment } from '../fragments'
+import { DEFAULT_CONFIG } from '../../context'
+import { computePoolId } from '../../../shared/utilities'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 
-const empty: BytesLike = constants.HashZero
+let poolId: string
 
-let poolId, housePosId : string
+import expect from '../../../shared/expect'
+import { runTest } from '../../context'
 
-describe('create', function () {
-  before(async function () {
-    loadContext(waffle.provider, createFragment)
-  })
-
+runTest('create', function () {
   beforeEach(async function () {
+    await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.risky.approve(this.house.address, constants.MaxUint256)
+    await this.stable.approve(this.house.address, constants.MaxUint256)
+
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
-    housePosId = utils.solidityKeccak256(['address', 'bytes32'], [this.house.address, poolId])
   })
 
   describe('success cases', function () {
     it('creates a curve using the house contract', async function () {
       await this.house.create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
         sigma.raw,
         maturity.raw,
         parseWei(delta).raw,
-        parseWei(1).raw
+        parseWei(1).raw,
+        false,
       )
     })
 
     it('updates the sender position', async function () {
       await this.house.create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
         sigma.raw,
         maturity.raw,
         parseWei(delta).raw,
-        parseWei(1).raw
+        parseWei(1).raw,
+        false,
       )
 
-      const tokenId = getTokenId(this.engine.address, poolId, 0)
-      const liquidity = await this.house.balanceOf(this.deployer.address, tokenId)
+      const liquidity = await this.house.liquidityOf(this.deployer.address, poolId)
       expect(liquidity).to.equal(parseWei('1').raw.sub('1000'))
     })
 
     it('emits the Created event', async function () {
       await expect(this.house.create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
         sigma.raw,
         maturity.raw,
         parseWei(delta).raw,
-        parseWei(1).raw
-      )).to.emit(this.house, 'Created').withArgs(
+        parseWei(1).raw,
+        false,
+      )).to.emit(this.house, 'Create').withArgs(
         this.deployer.address,
         this.engine.address,
         poolId,
@@ -75,34 +78,40 @@ describe('create', function () {
   describe('fail cases', function () {
     it('reverts if the curve is already created', async function () {
       await this.house.create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
         sigma.raw,
         maturity.raw,
         parseWei(delta).raw,
-        parseWei(1).raw
+        parseWei(1).raw,
+        false,
       )
       await expect(this.house.create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
         sigma.raw,
         maturity.raw,
         parseWei(delta).raw,
-        parseWei(1).raw
+        parseWei(1).raw,
+        false,
       )).to.be.reverted
     })
 
     it('reverts if the sender has insufficient funds', async function () {
-      await expect(this.house.connect(this.signers[1]).create(
+      await expect(this.house.connect(this.alice).create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
         sigma.raw,
         maturity.raw,
         parseWei(delta).raw,
-        parseWei(1).raw
+        parseWei(1).raw,
+        false,
       )).to.be.reverted
     })
 

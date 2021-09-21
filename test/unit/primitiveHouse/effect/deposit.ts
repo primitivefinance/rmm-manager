@@ -1,21 +1,36 @@
-import { waffle } from 'hardhat'
-import { expect } from 'chai'
-import { utils } from 'ethers'
+import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
-import loadContext from '../../context'
+import expect from '../../../shared/expect'
+import { runTest, DEFAULT_CONFIG } from '../../context'
 
-import { depositFragment } from '../fragments'
+const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 
-describe('deposit', function () {
-  before(async function () {
-    loadContext(waffle.provider, depositFragment)
+runTest('deposit', function () {
+  beforeEach(async function () {
+    await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.risky.approve(this.house.address, constants.MaxUint256)
+    await this.stable.approve(this.house.address, constants.MaxUint256)
+
+    await this.house.create(
+      this.engine.address,
+      this.risky.address,
+      this.stable.address,
+      strike.raw,
+      sigma.raw,
+      maturity.raw,
+      parseWei(delta).raw,
+      parseWei('1').raw,
+      false
+    )
   })
 
   describe('success cases', function () {
     it('deposits risky and stable to margin', async function () {
       await this.house.deposit(
         this.deployer.address,
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -26,6 +41,7 @@ describe('deposit', function () {
     it('increases the margin', async function () {
       await this.house.deposit(
         this.deployer.address,
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -38,11 +54,12 @@ describe('deposit', function () {
     })
 
     it('reduces the balance of the sender', async function () {
-      const stableBalance = await this.stable.balanceOf(this.signers[0].address)
-      const riskyBalance = await this.risky.balanceOf(this.signers[0].address)
+      const stableBalance = await this.stable.balanceOf(this.deployer.address)
+      const riskyBalance = await this.risky.balanceOf(this.deployer.address)
 
       await this.house.deposit(
         this.deployer.address,
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -50,11 +67,11 @@ describe('deposit', function () {
       )
 
       expect(
-        await this.stable.balanceOf(this.signers[0].address)
+        await this.stable.balanceOf(this.deployer.address)
       ).to.equal(stableBalance.sub(parseWei('1000').raw))
 
       expect(
-        await this.risky.balanceOf(this.signers[0].address)
+        await this.risky.balanceOf(this.deployer.address)
       ).to.equal(riskyBalance.sub(parseWei('1000').raw))
     })
 
@@ -64,6 +81,7 @@ describe('deposit', function () {
 
       await this.house.deposit(
         this.deployer.address,
+        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -83,13 +101,14 @@ describe('deposit', function () {
       await expect(
         this.house.deposit(
           this.deployer.address,
+          this.engine.address,
           this.risky.address,
           this.stable.address,
           parseWei('1000').raw,
           parseWei('1000').raw
         )
       )
-        .to.emit(this.house, 'Deposited')
+        .to.emit(this.house, 'Deposit')
         .withArgs(
           this.deployer.address,
           this.deployer.address,
@@ -110,6 +129,7 @@ describe('deposit', function () {
           .connect(this.bob)
           .deposit(
             this.deployer.address,
+            this.engine.address,
             this.risky.address,
             this.stable.address,
             parseWei('1000').raw,
