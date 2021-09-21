@@ -5,13 +5,16 @@ pragma solidity 0.8.6;
 /// @author Primitive
 /// @notice Prevents reentrancy
 contract Reentrancy {
-    uint256 private reentrant = 1;
+    error LockedError();
+
+    uint256 private unlocked = 1;
 
     /// @notice Locks the contract to prevent reentrancy
     modifier lock() {
-        require(reentrant != 1, "locked");
-        reentrant = 0;
+        if (unlocked != 1) revert LockedError();
+
+        unlocked = 0;
         _;
-        reentrant = 1;
+        unlocked = 1;
     }
 }
