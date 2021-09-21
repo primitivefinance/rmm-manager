@@ -65,7 +65,6 @@ contract PrimitiveHouse is
             stable: stable
         });
 
-        console.log("calling create");
         (poolId, delRisky, delStable) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
@@ -74,8 +73,6 @@ contract PrimitiveHouse is
             delLiquidity,
             abi.encode(callbackData)
         );
-
-        console.log("calling allocate");
 
         // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
@@ -152,6 +149,7 @@ contract PrimitiveHouse is
         CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
+
         if (msg.sender != engine) revert NotEngineError();
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
