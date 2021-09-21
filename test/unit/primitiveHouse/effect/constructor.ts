@@ -1,12 +1,7 @@
-import { waffle } from 'hardhat'
-import { expect } from 'chai'
-import loadContext from '../../context'
+import expect from '../../../shared/expect'
+import { runTest } from '../../context'
 
-describe('constructor', function () {
-  before(async function () {
-    loadContext(waffle.provider)
-  })
-
+runTest('constructor', function () {
   describe('success cases', function () {
     it('sets the address of the factory', async function () {
       expect(await this.house.factory()).to.equal(this.factory.address)

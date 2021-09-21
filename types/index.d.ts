@@ -1,23 +1,20 @@
 import { Wallet } from 'ethers'
-import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
 import * as ContractTypes from '../typechain'
+import { Fixture } from '@ethereum-waffle/provider'
 
 export interface Contracts {
-  engine: PrimitiveEngine
-  factory: PrimitiveFactory
+  factory: ContractTypes.MockFactory
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token
-  testEngineAddress: ContractTypes.TestEngineAddress
-  // testAdmin: ContractTypes.TestAdmin
-  // whitelist: ContractTypes.Whitelist
-  // paleoHouse: ContractTypes.PrimitivePaleoHouse
+  engine: ContractTypes.MockEngine
 }
 
 declare module 'mocha' {
   export interface Context extends Contracts {
     deployer: Wallet
+    alice: Wallet
     bob: Wallet
-    signers: Wallet[]
+    loadFixture: <T>(fixture: Fixture<T>) => Promise<T>
   }
 }

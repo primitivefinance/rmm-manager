@@ -10,15 +10,11 @@ import { computePoolId, getTokenId } from '../../../shared/utilities'
 const { strike, sigma, maturity } = DEFAULT_CONFIG
 let poolId: string
 
-const empty: BytesLike = constants.HashZero
-
-describe('addLiquidity', function () {
-  before(async function () {
-    loadContext(waffle.provider, addLiquidityFragment)
-  })
-
+describe('allocate', function () {
   beforeEach(async function () {
-    poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
+
+
+    // poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
   })
 
   describe('success cases', function () {
