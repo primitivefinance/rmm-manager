@@ -17,6 +17,7 @@ interface ISwapManager is IPrimitiveSwapCallback {
         uint256 deadline;
     }
 
+    /// ERRORS ///
 
     /// @notice Thrown when the delta out is lower than the minimum
     /// @param expected The minimum delta out
@@ -24,6 +25,8 @@ interface ISwapManager is IPrimitiveSwapCallback {
     error DeltaOutMinError(uint256 expected, uint256 actual);
 
     error DeadlineReachedError();
+
+    /// EVENTS ///
 
     event Swap(
         address indexed recipient,
@@ -34,6 +37,8 @@ interface ISwapManager is IPrimitiveSwapCallback {
         uint256 deltaOut,
         bool fromMargin
     );
+
+    /// EFFECTS FUNCTIONS ///
 
     function swap(SwapParameters memory params) external returns (uint256 deltaOut);
 }
