@@ -1,90 +1,113 @@
-import { waffle } from 'hardhat'
-import { expect } from 'chai'
-import { utils, BytesLike, constants } from 'ethers'
+import { utils, constants } from 'ethers'
+import { parseWei } from 'web3-units'
 
-import { parseWei } from '../../../shared/Units'
-import loadContext, { config } from '../../context'
+import { DEFAULT_CONFIG } from '../../context'
+import { computePoolId } from '../../../shared/utilities'
+import expect from '../../../shared/expect'
+import { runTest } from '../../context'
 
-import { removeFragment } from '../fragments'
+const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+let poolId: string
 
-const { strike, sigma, maturity } = config
-let poolId, userPosId: string
-
-const empty: BytesLike = constants.HashZero
-
-describe('remove', function () {
-  before(async function () {
-    await loadContext(waffle.provider, removeFragment)
-  })
-
+runTest('remove', function () {
   beforeEach(async function () {
-    poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
-    userPosId = utils.solidityKeccak256(['address', 'bytes32'], [this.deployer.address, poolId])
+    await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.risky.approve(this.house.address, constants.MaxUint256)
+    await this.stable.approve(this.house.address, constants.MaxUint256)
+
+    await this.house.create(
+      this.engine.address,
+      this.risky.address,
+      this.stable.address,
+      strike.raw,
+      sigma.raw,
+      maturity.raw,
+      parseWei(delta).raw,
+      parseWei('1').raw,
+      false
+    )
+
+    await this.house.deposit(
+      this.deployer.address,
+      this.engine.address,
+      this.risky.address,
+      this.stable.address,
+      parseWei('1000').raw,
+      parseWei('1000').raw
+    )
+
+    poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
+
+    await this.house.allocate(
+      this.engine.address,
+      this.risky.address,
+      this.stable.address,
+      poolId,
+      parseWei('1').raw,
+      true,
+      false,
+    )
   })
 
   describe('success cases', function () {
-    describe('when removing to margin', function () {
-      it('removes 10 LP shares', async function () {
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, true)
-      })
-
-      it('updates the position of the sender', async function () {
-        const initialPos = await this.house.positions(this.engine.address, userPosId)
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, true)
-        const newPos = await this.house.positions(this.engine.address, userPosId)
-
-        expect(newPos.liquidity).equal(initialPos.liquidity.sub(parseWei('10').raw))
-      })
-
-      it('increases the margin of the sender', async function () {
-        const reserve = await this.engine.reserves(poolId)
-        const deltaRisky = parseWei('10').mul(reserve.reserveRisky).div(reserve.liquidity)
-        const deltaStable = parseWei('10').mul(reserve.reserveStable).div(reserve.liquidity)
-        const initialMargin = await this.house.margins(this.engine.address, this.deployer.address)
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, true)
-        const newMargin = await this.house.margins(this.engine.address, this.deployer.address)
-
-        expect(newMargin.balanceRisky).to.equal(initialMargin.balanceRisky.add(deltaRisky.raw))
-        expect(newMargin.balanceStable).to.equal(initialMargin.balanceStable.add(deltaStable.raw))
-      })
+    it('removes 1 LP share', async function () {
+      await this.house.remove(
+        this.engine.address,
+        poolId,
+        parseWei('1').raw,
+      )
     })
 
-    describe('when removing to external', function () {
-      it('removes 10 LP shares', async function () {
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, false)
-      })
+    it.skip('decreases the position of the sender', async function () {
+      const liquidity = await this.house.balanceOf(this.deployer.address, poolId)
 
-      it('updates the position of the sender', async function () {
-        const initialPos = await this.house.positions(this.engine.address, userPosId)
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, false)
-        const newPos = await this.house.positions(this.engine.address, userPosId)
+      await this.house.remove(
+        this.engine.address,
+        poolId,
+        parseWei('1').raw,
+      )
 
-        expect(newPos.liquidity).equal(initialPos.liquidity.sub(parseWei('10').raw))
-      })
+      expect(
+        await this.house.balanceOf(this.deployer.address, poolId)
+      ).to.equal(liquidity.sub(parseWei('1').raw))
+    })
 
-      it('increases the balances of the sender', async function () {
-        const reserve = await this.engine.reserves(poolId)
-        const deltaRisky = parseWei('10').mul(reserve.reserveRisky).div(reserve.liquidity)
-        const deltaStable = parseWei('10').mul(reserve.reserveStable).div(reserve.liquidity)
-        const riskyBalance = await this.risky.balanceOf(this.deployer.address)
-        const stableBalance = await this.stable.balanceOf(this.deployer.address)
-        await this.house.remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, false)
+    it('increases the margin of the sender', async function () {
+      const reserve = await this.engine.reserves(poolId)
+      const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
+      const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
+      const initialMargin = await this.house.margins(this.engine.address, this.deployer.address)
 
-        expect(await this.risky.balanceOf(this.deployer.address)).to.equal(riskyBalance.add(deltaRisky.raw))
-        expect(await this.stable.balanceOf(this.deployer.address)).to.equal(stableBalance.add(deltaStable.raw))
-      })
+      await this.house.remove(
+        this.engine.address,
+        poolId,
+        parseWei('1').raw,
+      )
+
+      const newMargin = await this.house.margins(this.engine.address, this.deployer.address)
+
+      expect(newMargin.balanceRisky).to.equal(initialMargin.balanceRisky.add(deltaRisky.raw))
+      expect(newMargin.balanceStable).to.equal(initialMargin.balanceStable.add(deltaStable.raw))
+    })
+
+    it('emits the LiquidityRemoved event', async function () {
+      // TODO: Check args
+      await expect(this.house.remove(
+        this.engine.address,
+        poolId,
+        parseWei('1').raw,
+      )).to.emit(this.house, 'Remove')
     })
   })
 
   describe('fail cases', function () {
     it('fails to remove more than the position', async function () {
-      await expect(
-        this.house.connect(this.signers[1]).remove(this.risky.address, this.stable.address, poolId, parseWei('10').raw, true)
-      ).to.be.reverted
-    })
-
-    it('reverts if the callback function is called directly', async function () {
-      await expect(this.house.removeCallback(0, 0, empty)).to.be.revertedWith('Not engine')
+      await expect(this.house.remove(
+        this.engine.address,
+        poolId,
+        parseWei('10').raw,
+      )).to.be.reverted
     })
   })
 })
