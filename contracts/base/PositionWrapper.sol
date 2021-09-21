@@ -102,6 +102,8 @@ abstract contract PositionWrapper is IPositionWrapper, ERC1155 {
     ) internal {
         liquidityOf[account][poolId] -= amount;
 
-        _burn(account, uint256(poolId), amount);
+        if (balanceOf(account, uint256(poolId)) >= amount) {
+            _burn(account, uint256(poolId), amount);
+        }
     }
 }
