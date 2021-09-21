@@ -4,7 +4,11 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
 
 interface IMarginManager is IPrimitiveDepositCallback {
+    /// ERRORS ///
+
     error ZeroDelError();
+
+    /// EVENTS ///
 
     event Deposit(
         address indexed payer,
@@ -23,6 +27,8 @@ interface IMarginManager is IPrimitiveDepositCallback {
         uint256 delRisky,
         uint256 delStable
     );
+
+    /// EFFECT FUNCTIONS ///
 
     function deposit(
         address recipient,
