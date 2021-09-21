@@ -6,6 +6,7 @@ import 'hardhat-tracer'
 import 'hardhat-gas-reporter'
 import 'solidity-coverage'
 import { HardhatUserConfig } from 'hardhat/config'
+import 'hardhat-contract-sizer'
 
 const config: HardhatUserConfig = {
   networks: {
@@ -14,7 +15,7 @@ const config: HardhatUserConfig = {
     },
   },
   solidity: {
-    version: '0.8.0',
+    version: '0.8.6',
     settings: {
       optimizer: {
         enabled: true,
@@ -22,9 +23,15 @@ const config: HardhatUserConfig = {
       },
     },
   },
+  contractSizer: {
+    alphaSort: true,
+    runOnCompile: false,
+    disambiguatePaths: false,
+  },
   gasReporter: {
     currency: 'USD',
     gasPrice: 100,
+    enabled: false,
   },
   paths: {
     sources: './contracts',

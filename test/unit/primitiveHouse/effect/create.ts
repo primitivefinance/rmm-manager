@@ -1,106 +1,125 @@
-import { waffle } from 'hardhat'
-import { expect } from 'chai'
-import { utils, BytesLike, constants } from 'ethers'
+import { utils, constants } from 'ethers'
+import { parseWei } from 'web3-units'
 
-import { parseWei } from '../../../shared/Units'
-import loadContext, { config } from '../../context'
-import { createFragment } from '../fragments'
+import { DEFAULT_CONFIG } from '../../context'
+import { computePoolId } from '../../../shared/utilities'
+import expect from '../../../shared/expect'
+import { runTest } from '../../context'
 
-const { strike, sigma, maturity, spot } = config
+const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+let poolId: string
 
-let poolId, housePosId, userPosId: string
-let empty: BytesLike = constants.HashZero
-
-describe('create', function () {
-  before(async function () {
-    await loadContext(waffle.provider, createFragment)
-  })
-
+runTest('create', function () {
   beforeEach(async function () {
-    poolId = await this.engine.getPoolId(strike.raw, sigma.raw, maturity.raw)
-    housePosId = utils.solidityKeccak256(['address', 'bytes32'], [this.house.address, poolId])
-    userPosId = utils.solidityKeccak256(['address', 'bytes32'], [this.deployer.address, poolId])
+    await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
+    await this.risky.approve(this.house.address, constants.MaxUint256)
+    await this.stable.approve(this.house.address, constants.MaxUint256)
+
+    poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
   })
 
   describe('success cases', function () {
     it('creates a curve using the house contract', async function () {
       await this.house.create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
-        parseWei('1').raw,
         strike.raw,
         sigma.raw,
         maturity.raw,
-        spot.raw
+        parseWei(delta).raw,
+        parseWei(1).raw,
+        false,
       )
     })
 
     it('updates the sender position', async function () {
       await this.house.create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
-        parseWei('1').raw,
         strike.raw,
         sigma.raw,
         maturity.raw,
-        spot.raw
+        parseWei(delta).raw,
+        parseWei(1).raw,
+        false,
       )
 
-      const enginePosition = await this.engine.positions(housePosId)
-      const ownerPosition = await this.house.positions(this.engine.address, userPosId)
-      expect(enginePosition.liquidity).to.equal(ownerPosition.liquidity)
+      const liquidity = await this.house.liquidityOf(this.deployer.address, poolId)
+      expect(liquidity).to.equal(parseWei('1').raw.sub('1000'))
     })
 
     it('emits the Created event', async function () {
-      // TODO: Checks the arguments
-      await expect(
-        this.house.create(
-          this.risky.address,
-          this.stable.address,
-          parseWei('1').raw,
-          strike.raw,
-          sigma.raw,
-          maturity.raw,
-          spot.raw
-        )
-      ).to.emit(this.house, 'Created')
+      await expect(this.house.create(
+        this.engine.address,
+        this.risky.address,
+        this.stable.address,
+        strike.raw,
+        sigma.raw,
+        maturity.raw,
+        parseWei(delta).raw,
+        parseWei(1).raw,
+        false,
+      )).to.emit(this.house, 'Create').withArgs(
+        this.deployer.address,
+        this.engine.address,
+        poolId,
+        strike.raw,
+        sigma.raw,
+        maturity.raw
+      )
     })
   })
 
   describe('fail cases', function () {
     it('reverts if the curve is already created', async function () {
       await this.house.create(
+        this.engine.address,
         this.risky.address,
         this.stable.address,
-        parseWei('1').raw,
         strike.raw,
         sigma.raw,
         maturity.raw,
-        spot.raw
+        parseWei(delta).raw,
+        parseWei(1).raw,
+        false,
       )
-      await expect(
-        this.house.create(
-          this.risky.address,
-          this.stable.address,
-          parseWei('1').raw,
-          strike.raw,
-          sigma.raw,
-          maturity.raw,
-          spot.raw
-        )
-      ).to.be.revertedWith('Initialized')
+      await expect(this.house.create(
+        this.engine.address,
+        this.risky.address,
+        this.stable.address,
+        strike.raw,
+        sigma.raw,
+        maturity.raw,
+        parseWei(delta).raw,
+        parseWei(1).raw,
+        false,
+      )).to.be.reverted
     })
 
     it('reverts if the sender has insufficient funds', async function () {
-      await expect(
-        this.house
-          .connect(this.signers[1])
-          .create(this.risky.address, this.stable.address, parseWei('1').raw, strike.raw, sigma.raw, maturity.raw, spot.raw)
-      ).to.be.reverted
+      await expect(this.house.connect(this.alice).create(
+        this.engine.address,
+        this.risky.address,
+        this.stable.address,
+        strike.raw,
+        sigma.raw,
+        maturity.raw,
+        parseWei(delta).raw,
+        parseWei(1).raw,
+        false,
+      )).to.be.reverted
     })
 
     it('reverts if the callback function is called directly', async function () {
-      await expect(this.house.createCallback(0, 0, empty)).to.be.revertedWith('Not engine')
+      const data = utils.defaultAbiCoder.encode(
+        ['address', 'address', 'address', 'uint256', 'uint256'],
+        [this.house.address, this.risky.address, this.stable.address, '0', '0']
+      );
+
+      await expect(this.house.createCallback(0, 0, data)).to.be.revertedWith('NotEngineError()')
     })
   })
 })
