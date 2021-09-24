@@ -6,7 +6,7 @@ import "../interfaces/INFTGatekeeper.sol";
 
 /// @title NFTGatekeeper
 /// @author Primitive
-/// @notice Restricts access to holders of a specific NFT
+/// @notice Limits access to holders of a specific NFT
 contract NFTGatekeeper is INFTGatekeeper {
     /// @inheritdoc INFTGatekeeper
     uint256 public immutable override id;

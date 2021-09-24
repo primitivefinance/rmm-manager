@@ -4,15 +4,12 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 
 import "./interfaces/IPrimitiveHouse.sol";
-import "./libraries/TransferHelper.sol";
-
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
 import "./base/SelfPermit.sol";
-import "./base/PositionWrapper.sol";
+import "./base/PositionManager.sol";
 import "./base/SwapManager.sol";
-
-import "hardhat/console.sol";
+import "./libraries/TransferHelper.sol";
 
 /// @title Primitive House
 /// @author Primitive
@@ -22,7 +19,7 @@ contract PrimitiveHouse is
     Multicall,
     CashManager,
     SelfPermit,
-    PositionWrapper,
+    PositionManager,
     SwapManager
 {
     using TransferHelper for IERC20;
@@ -37,7 +34,7 @@ contract PrimitiveHouse is
         address _factory,
         address _WETH10,
         string memory _URI
-    ) HouseBase(_factory, _WETH10) PositionWrapper(_URI) {}
+    ) HouseBase(_factory, _WETH10) PositionManager(_URI) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
@@ -138,7 +135,7 @@ contract PrimitiveHouse is
         emit Remove(msg.sender, engine, poolId, delLiquidity, delRisky, delStable);
     }
 
-    // ===== Callback Implementations =====
+    /// CALLBACK IMPLEMENTATIONS ///
 
     /// @inheritdoc IPrimitiveCreateCallback
     function createCallback(

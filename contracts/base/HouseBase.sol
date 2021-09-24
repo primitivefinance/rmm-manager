@@ -3,9 +3,7 @@ pragma solidity 0.8.6;
 
 import "../interfaces/IHouseBase.sol";
 import "../interfaces/IPrimitiveHouse.sol";
-
 import "./Reentrancy.sol";
-
 import "../libraries/EngineAddress.sol";
 
 /// @title HouseBase

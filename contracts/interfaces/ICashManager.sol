@@ -6,12 +6,12 @@ pragma solidity 0.8.6;
 interface ICashManager {
     /// EVENTS ///
 
-    /// @notice Emitted when the sender is not WETH
+    /// @notice Thrown when the sender is not WETH
     /// @param expected The expected sender (WETH)
     /// @param actual The actual sender
     error WrongSender(address expected, address actual);
 
-    /// @notice Emmited when the amount required is above balance
+    /// @notice Thrown when the amount required is above balance
     /// @param expected The expected amount
     /// @param actual The actual amount
     error AmountTooLow(uint256 expected, uint256 actual);
