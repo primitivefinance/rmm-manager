@@ -3,15 +3,16 @@ pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
-import "../interfaces/IPositionWrapper.sol";
+import "../interfaces/IPositionManager.sol";
 
-/// @title PositionWrapper
+/// @title PositionManager
 /// @author Primitive
 /// @notice Wraps the positions into ERC1155 tokens
-abstract contract PositionWrapper is IPositionWrapper, ERC1155 {
-    /// @inheritdoc IPositionWrapper
+abstract contract PositionManager is IPositionManager, ERC1155 {
+    /// @inheritdoc IPositionManager
     mapping(address => mapping(bytes32 => uint256)) public override liquidityOf;
 
+    /// @param _URI The address of the base URI
     constructor(string memory _URI) ERC1155(_URI) {}
 
     bytes private empty;
@@ -47,7 +48,7 @@ abstract contract PositionWrapper is IPositionWrapper, ERC1155 {
         }
     }
 
-    /// @inheritdoc IPositionWrapper
+    /// @inheritdoc IPositionManager
     function wrapLiquidity(
         bytes32 poolId,
         uint256 amount
@@ -61,7 +62,7 @@ abstract contract PositionWrapper is IPositionWrapper, ERC1155 {
         _mint(msg.sender, uint256(poolId), amount, empty);
     }
 
-    /// @inheritdoc IPositionWrapper
+    /// @inheritdoc IPositionManager
     function unwrapLiquidity(
         bytes32 poolId,
         uint256 amount

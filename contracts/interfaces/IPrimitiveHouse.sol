@@ -4,9 +4,8 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
-/// @title IPrimitiveHouse
+/// @title PrimitiveHouse Interface
 /// @author Primitive
-/// @notice Interface of PrimitiveHouse
 interface IPrimitiveHouse is
     IPrimitiveCreateCallback,
     IPrimitiveLiquidityCallback

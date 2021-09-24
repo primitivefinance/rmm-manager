@@ -8,10 +8,10 @@ import "../interfaces/IERC20PermitAllowed.sol";
 import "../interfaces/ISelfPermit.sol";
 
 /// @title Self Permit
+/// @author Uniswap (https://github.com/Uniswap/v3-periphery)
 /// @notice Functionality to call permit on any EIP-2612-compliant token for use in the route
 /// @dev These functions are expected to be embedded in multicalls to allow EOAs to approve a contract and call a function
 /// that requires an approval in a single transaction.
-/// Credits goes to Uniswap (https://github.com/Uniswap/v3-periphery)
 abstract contract SelfPermit is ISelfPermit {
     /// @inheritdoc ISelfPermit
     function selfPermit(
