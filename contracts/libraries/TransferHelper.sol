@@ -3,7 +3,11 @@ pragma solidity 0.8.6;
 
 import "../interfaces/IERC20.sol";
 
+/// @notice Utils functions to transfer tokens and ETH
+/// @dev Based on https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/TransferHelper.sol
+/// @author Primitive
 library TransferHelper {
+    /// @notice Thrown when a transfer reverts
     error TransferError();
 
     /// @notice Transfers tokens from the targeted address to the given destination
