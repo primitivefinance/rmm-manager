@@ -44,7 +44,7 @@ contract PrimitiveHouse is
         uint256 strike,
         uint64 sigma,
         uint32 maturity,
-        uint256 delta,
+        uint256 riskyPerLp,
         uint256 delLiquidity,
         bool shouldTokenizeLiquidity
     ) external override lock returns (
@@ -66,7 +66,7 @@ contract PrimitiveHouse is
             strike,
             sigma,
             maturity,
-            delta,
+            riskyPerLp,
             delLiquidity,
             abi.encode(callbackData)
         );
@@ -81,22 +81,21 @@ contract PrimitiveHouse is
     /// @inheritdoc IPrimitiveHouse
     function allocate(
         address engine,
+        bytes32 poolId,
         address risky,
         address stable,
-        bytes32 poolId,
-        uint256 delLiquidity,
+        uint256 delRisky,
+        uint256 delStable,
         bool fromMargin,
         bool shouldTokenizeLiquidity
-    ) external override lock returns (
-        uint256 delRisky,
-        uint256 delStable
-    ) {
-        if (delLiquidity == 0) revert ZeroLiquidityError();
+    ) external override lock returns (uint256 delLiquidity) {
+        if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
 
-        (delRisky, delStable) = IPrimitiveEngineActions(engine).allocate(
+        (delLiquidity) = IPrimitiveEngineActions(engine).allocate(
             poolId,
             address(this),
-            delLiquidity,
+            delRisky,
+            delStable,
             fromMargin,
             abi.encode(
                 CallbackData({
@@ -166,13 +165,5 @@ contract PrimitiveHouse is
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
-    }
-
-    // TODO: Delete this callback when the interface will be updated
-    function removeCallback(
-        uint256 delRisky,
-        uint256 delStable,
-        bytes calldata data
-    ) external override {
     }
 }

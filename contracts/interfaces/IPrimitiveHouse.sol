@@ -105,16 +105,14 @@ interface IPrimitiveHouse is
     /// @param shouldTokenizeLiquidity True if liquidity should be tokenized
     function allocate(
         address engine,
+        bytes32 poolId,
         address risky,
         address stable,
-        bytes32 poolId,
-        uint256 delLiquidity,
+        uint256 delRisky,
+        uint256 delStable,
         bool fromMargin,
         bool shouldTokenizeLiquidity
-    ) external returns (
-        uint256 delRisky,
-        uint256 delStable
-    );
+    ) external returns (uint256 delLiquidity);
 
     /// @notice Removes liquidity from a pool
     /// @param engine The address of the engine
