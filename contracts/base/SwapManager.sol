@@ -36,6 +36,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         });
 
         deltaOut = IPrimitiveEngineActions(params.engine).swap(
+            params.toMargin ? address(this) : params.recipient,
             params.poolId,
             params.riskyForStable,
             params.deltaIn,
@@ -59,11 +60,6 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
                 params.riskyForStable ? params.deltaIn : 0,
                 params.riskyForStable ? 0 : params.deltaIn
             );
-        } else {
-            TransferHelper.safeTransfer(
-                params.riskyForStable ? params.stable : params.risky,
-                params.recipient,
-                deltaOut);
         }
 
         emit Swap(
