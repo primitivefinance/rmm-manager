@@ -1,5 +1,5 @@
-import { utils, constants } from 'ethers'
-import { parseWei } from 'web3-units'
+import { constants } from 'ethers'
+import { parseWei, Wei } from 'web3-units'
 
 import { DEFAULT_CONFIG } from '../../context'
 import { computePoolId } from '../../../shared/utilities'
@@ -8,6 +8,7 @@ import { runTest } from '../../context'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
+let delLiquidity: Wei, delRisky: Wei, delStable: Wei
 
 runTest('swap', function () {
   beforeEach(async function () {
@@ -30,12 +31,19 @@ runTest('swap', function () {
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
+    const amount = parseWei('1000')
+    const res = await this.engine.reserves(poolId)
+    delLiquidity = amount
+    delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
+    delStable = amount.mul(res.reserveStable).div(res.liquidity)
+
     await this.house.allocate(
       this.engine.address,
+      poolId,
       this.risky.address,
       this.stable.address,
-      poolId,
-      parseWei('10').raw,
+      delRisky.raw,
+      delStable.raw,
       false,
       false,
     )
@@ -49,13 +57,14 @@ runTest('swap', function () {
           this.engine.address,
           this.risky.address,
           this.stable.address,
-          parseWei('1000').raw,
-          parseWei('1000').raw
+          parseWei('100').raw,
+          parseWei('100').raw
         )
       })
 
       it('swaps risky for stable', async function () {
         await this.house.swap({
+          recipient: this.deployer.address,
           engine: this.engine.address,
           risky: this.risky.address,
           stable: this.stable.address,
@@ -71,12 +80,13 @@ runTest('swap', function () {
 
       it('swaps stable for risky', async function () {
         await this.house.swap({
+          recipient: this.deployer.address,
           engine: this.engine.address,
           risky: this.risky.address,
           stable: this.stable.address,
           poolId: poolId,
           riskyForStable: false,
-          deltaIn: parseWei('1').raw,
+          deltaIn: parseWei('20').raw,
           deltaOutMin: 0,
           fromMargin: true,
           toMargin: true,
@@ -87,6 +97,7 @@ runTest('swap', function () {
       it('emits the Swapped event', async function () {
         await expect(
           this.house.swap({
+            recipient: this.deployer.address,
             engine: this.engine.address,
             risky: this.risky.address,
             stable: this.stable.address,
