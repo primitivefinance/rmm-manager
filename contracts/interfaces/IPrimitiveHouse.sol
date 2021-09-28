@@ -4,9 +4,8 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
-/// @title IPrimitiveHouse
+/// @title PrimitiveHouse Interface
 /// @author Primitive
-/// @notice Interface of PrimitiveHouse
 interface IPrimitiveHouse is
     IPrimitiveCreateCallback,
     IPrimitiveLiquidityCallback
@@ -106,16 +105,14 @@ interface IPrimitiveHouse is
     /// @param shouldTokenizeLiquidity True if liquidity should be tokenized
     function allocate(
         address engine,
+        bytes32 poolId,
         address risky,
         address stable,
-        bytes32 poolId,
-        uint256 delLiquidity,
+        uint256 delRisky,
+        uint256 delStable,
         bool fromMargin,
         bool shouldTokenizeLiquidity
-    ) external returns (
-        uint256 delRisky,
-        uint256 delStable
-    );
+    ) external returns (uint256 delLiquidity);
 
     /// @notice Removes liquidity from a pool
     /// @param engine The address of the engine

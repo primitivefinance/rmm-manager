@@ -6,7 +6,6 @@ import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
 
 import "../interfaces/IMarginManager.sol";
 import "./HouseBase.sol";
-
 import "../libraries/TransferHelper.sol";
 
 /// @title MarginManager

@@ -712,10 +712,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.2.tgz#ff80affd6d352dbe1bbc5b4e1833c41afd6283b6"
   integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
 
-"@primitivefinance/v2-core@^1.6.0":
-  version "1.6.0"
-  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-core/1.6.0/944a85d202bb1a8c17f46bae5ebfd54be2953cefa5d836c5b938b8bee0b46985#719e23c687d01594f8d34712a28ae20c8baaf14c"
-  integrity sha512-Zk5uz123c4soiDmk5Pt3iV183tKTkp3EmPulezcqfCT5Re9Usg590NX0VPTMcRRRfaZD/QsVoOsyZDLy2QqZNA==
+"@primitivefinance/v2-core@^1.9.0":
+  version "1.9.0"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-core/1.9.0/6209203728097a646cc97bda3a7c6cd6815808a667726a7070cbea21ddbfefdf#856de92bca8a575bfd12d06d529abc1b53caba54"
+  integrity sha512-ngx5FBPIgzQk6SzWxLKt1xcaPLJbMTyzyFapFVW+HrqvGaDZj6wCa9aOGjriPmI6DzRKXpVTcv51yoIzYBmjTA==
   dependencies:
     mocha "^9.0.3"
 
