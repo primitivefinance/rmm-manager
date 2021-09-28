@@ -1,5 +1,5 @@
-import { utils, constants } from 'ethers'
-import { parseWei } from 'web3-units'
+import { constants } from 'ethers'
+import { parseWei, Wei } from 'web3-units'
 
 import { DEFAULT_CONFIG } from '../../context'
 import { computePoolId } from '../../../shared/utilities'
@@ -8,6 +8,7 @@ import { runTest } from '../../context'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
+let delLiquidity: Wei, delRisky: Wei, delStable: Wei
 
 runTest('remove', function () {
   beforeEach(async function () {
@@ -39,12 +40,19 @@ runTest('remove', function () {
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
+    const amount = parseWei('1000')
+    const res = await this.engine.reserves(poolId)
+    delLiquidity = amount
+    delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
+    delStable = amount.mul(res.reserveStable).div(res.liquidity)
+
     await this.house.allocate(
       this.engine.address,
+      poolId,
       this.risky.address,
       this.stable.address,
-      poolId,
-      parseWei('1').raw,
+      delRisky.raw,
+      delStable.raw,
       true,
       false,
     )
@@ -106,7 +114,7 @@ runTest('remove', function () {
       await expect(this.house.remove(
         this.engine.address,
         poolId,
-        parseWei('10').raw,
+        parseWei('10000').raw,
       )).to.be.reverted
     })
   })
