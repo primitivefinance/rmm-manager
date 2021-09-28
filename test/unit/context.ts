@@ -1,5 +1,5 @@
 import { Wallet, Contract, Signer } from 'ethers'
-import { parsePercentage } from 'web3-units'
+import { Time, parsePercentage, Percentage, toBN } from 'web3-units'
 import hre, { ethers, waffle } from 'hardhat'
 import { deployContract, createFixtureLoader } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
@@ -15,7 +15,7 @@ export async function deploy(contractName: string, deployer: Wallet, args: any[]
   return contract
 }
 
-export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, 1633113818, 1, 10, parsePercentage(0.0015))
+export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, Time.YearInSeconds + 1, 1, 10, parsePercentage(0.0015))
 
 export function runTest(
   description: string,
