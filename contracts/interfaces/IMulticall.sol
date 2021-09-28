@@ -2,6 +2,7 @@
 pragma solidity 0.8.6;
 
 /// @title Multicall interface
+/// @author Uniswap (https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/IMulticall.sol)
 /// @notice Enables calling multiple methods in a single call to the contract
 interface IMulticall {
     /// @notice Call multiple functions in the current contract and return the data from all of them if they all succeed

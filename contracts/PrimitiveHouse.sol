@@ -4,15 +4,12 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 
 import "./interfaces/IPrimitiveHouse.sol";
-import "./libraries/TransferHelper.sol";
-
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
 import "./base/SelfPermit.sol";
-import "./base/PositionWrapper.sol";
+import "./base/PositionManager.sol";
 import "./base/SwapManager.sol";
-
-import "hardhat/console.sol";
+import "./libraries/TransferHelper.sol";
 
 /// @title Primitive House
 /// @author Primitive
@@ -22,7 +19,7 @@ contract PrimitiveHouse is
     Multicall,
     CashManager,
     SelfPermit,
-    PositionWrapper,
+    PositionManager,
     SwapManager
 {
     using TransferHelper for IERC20;
@@ -37,7 +34,7 @@ contract PrimitiveHouse is
         address _factory,
         address _WETH10,
         string memory _URI
-    ) HouseBase(_factory, _WETH10) PositionWrapper(_URI) {}
+    ) HouseBase(_factory, _WETH10) PositionManager(_URI) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
@@ -47,7 +44,7 @@ contract PrimitiveHouse is
         uint256 strike,
         uint64 sigma,
         uint32 maturity,
-        uint256 delta,
+        uint256 riskyPerLp,
         uint256 delLiquidity,
         bool shouldTokenizeLiquidity
     ) external override lock returns (
@@ -69,7 +66,7 @@ contract PrimitiveHouse is
             strike,
             sigma,
             maturity,
-            delta,
+            riskyPerLp,
             delLiquidity,
             abi.encode(callbackData)
         );
@@ -84,22 +81,21 @@ contract PrimitiveHouse is
     /// @inheritdoc IPrimitiveHouse
     function allocate(
         address engine,
+        bytes32 poolId,
         address risky,
         address stable,
-        bytes32 poolId,
-        uint256 delLiquidity,
+        uint256 delRisky,
+        uint256 delStable,
         bool fromMargin,
         bool shouldTokenizeLiquidity
-    ) external override lock returns (
-        uint256 delRisky,
-        uint256 delStable
-    ) {
-        if (delLiquidity == 0) revert ZeroLiquidityError();
+    ) external override lock returns (uint256 delLiquidity) {
+        if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
 
-        (delRisky, delStable) = IPrimitiveEngineActions(engine).allocate(
+        (delLiquidity) = IPrimitiveEngineActions(engine).allocate(
             poolId,
             address(this),
-            delLiquidity,
+            delRisky,
+            delStable,
             fromMargin,
             abi.encode(
                 CallbackData({
@@ -138,7 +134,7 @@ contract PrimitiveHouse is
         emit Remove(msg.sender, engine, poolId, delLiquidity, delRisky, delStable);
     }
 
-    // ===== Callback Implementations =====
+    /// CALLBACK IMPLEMENTATIONS ///
 
     /// @inheritdoc IPrimitiveCreateCallback
     function createCallback(
@@ -169,13 +165,5 @@ contract PrimitiveHouse is
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
-    }
-
-    // TODO: Delete this callback when the interface will be updated
-    function removeCallback(
-        uint256 delRisky,
-        uint256 delStable,
-        bytes calldata data
-    ) external override {
     }
 }

@@ -5,13 +5,9 @@ import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineAc
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 
 import "../interfaces/ISwapManager.sol";
-
 import "../interfaces/IERC20.sol";
-
 import "./MarginManager.sol";
 import "./HouseBase.sol";
-
-import "hardhat/console.sol";
 
 /// @title SwapManager
 /// @author Primitive
@@ -21,11 +17,13 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
 
+    /// @notice Reverts the tx above the deadline
     modifier checkDeadline(uint256 deadline) {
         if (_blockTimestamp() > deadline) revert DeadlineReachedError();
         _;
     }
 
+    /// @inheritdoc ISwapManager
     function swap(
         SwapParameters memory params
     ) external override lock checkDeadline(params.deadline) returns (
@@ -38,6 +36,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         });
 
         deltaOut = IPrimitiveEngineActions(params.engine).swap(
+            params.toMargin ? address(this) : params.recipient,
             params.poolId,
             params.riskyForStable,
             params.deltaIn,
@@ -57,28 +56,26 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         }
 
         if (params.toMargin) {
-            margins[msg.sender][params.engine].deposit(
+            margins[params.recipient][params.engine].deposit(
                 params.riskyForStable ? params.deltaIn : 0,
                 params.riskyForStable ? 0 : params.deltaIn
             );
-        } else {
-            TransferHelper.safeTransfer(
-                params.riskyForStable ? params.stable : params.risky,
-                msg.sender,
-                deltaOut);
         }
 
         emit Swap(
             msg.sender,
+            params.recipient,
             params.engine,
             params.poolId,
             params.riskyForStable,
             params.deltaIn,
             deltaOut,
-            params.fromMargin
+            params.fromMargin,
+            params.toMargin
         );
     }
 
+    /// @inheritdoc IPrimitiveSwapCallback
     function swapCallback(
         uint256 delRisky,
         uint256 delStable,

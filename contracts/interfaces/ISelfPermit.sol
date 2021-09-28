@@ -2,8 +2,8 @@
 pragma solidity 0.8.6;
 
 /// @title Self Permit
+/// @author Uniswap (https://github.com/Uniswap/v3-periphery)
 /// @notice Functionality to call permit on any EIP-2612-compliant token for use in the route
-/// @dev Credits goes to Uniswap (https://github.com/Uniswap/v3-periphery)
 interface ISelfPermit {
     /// @notice Permits this contract to spend a given token from `msg.sender`
     /// @dev The `owner` is always msg.sender and the `spender` is always address(this).

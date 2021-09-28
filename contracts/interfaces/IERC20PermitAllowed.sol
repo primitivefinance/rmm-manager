@@ -2,8 +2,8 @@
 pragma solidity 0.8.6;
 
 /// @title Interface for permit
+/// @author Uniswap (https://github.com/Uniswap/v3-periphery)
 /// @notice Interface used by DAI/CHAI for permit
-/// @dev Credits goes to Uniswap (https://github.com/Uniswap/v3-periphery)
 interface IERC20PermitAllowed {
     /// @notice Approve the spender to spend some tokens via the holder signature
     /// @dev This is the permit interface used by DAI and CHAI
