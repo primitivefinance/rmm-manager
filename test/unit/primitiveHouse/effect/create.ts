@@ -7,6 +7,7 @@ import expect from '../../../shared/expect'
 import { runTest } from '../../context'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+const delLiquidity = parseWei('1')
 let poolId: string
 
 runTest('create', function () {
@@ -20,7 +21,7 @@ runTest('create', function () {
   })
 
   describe('success cases', function () {
-    it('creates a curve using the house contract', async function () {
+    it('creates a new pool using the house contract', async function () {
       await this.house.create(
         this.engine.address,
         this.risky.address,
@@ -28,8 +29,8 @@ runTest('create', function () {
         strike.raw,
         sigma.raw,
         maturity.raw,
-        parseWei(delta).raw,
-        parseWei(1).raw,
+        parseWei(1).sub(parseWei(delta)).raw,
+        delLiquidity.raw,
         false,
       )
     })
@@ -42,8 +43,8 @@ runTest('create', function () {
         strike.raw,
         sigma.raw,
         maturity.raw,
-        parseWei(delta).raw,
-        parseWei(1).raw,
+        parseWei(1).sub(parseWei(delta)).raw,
+        delLiquidity.raw,
         false,
       )
 
@@ -59,8 +60,8 @@ runTest('create', function () {
         strike.raw,
         sigma.raw,
         maturity.raw,
-        parseWei(delta).raw,
-        parseWei(1).raw,
+        parseWei(1).sub(parseWei(delta)).raw,
+        delLiquidity.raw,
         false,
       )).to.emit(this.house, 'Create').withArgs(
         this.deployer.address,
@@ -82,8 +83,8 @@ runTest('create', function () {
         strike.raw,
         sigma.raw,
         maturity.raw,
-        parseWei(delta).raw,
-        parseWei(1).raw,
+        parseWei(1).sub(parseWei(delta)).raw,
+        delLiquidity.raw,
         false,
       )
       await expect(this.house.create(
@@ -93,8 +94,8 @@ runTest('create', function () {
         strike.raw,
         sigma.raw,
         maturity.raw,
-        parseWei(delta).raw,
-        parseWei(1).raw,
+        parseWei(1).sub(parseWei(delta)).raw,
+        delLiquidity.raw,
         false,
       )).to.be.reverted
     })
@@ -107,8 +108,8 @@ runTest('create', function () {
         strike.raw,
         sigma.raw,
         maturity.raw,
-        parseWei(delta).raw,
-        parseWei(1).raw,
+        parseWei(1).sub(parseWei(delta)).raw,
+        delLiquidity.raw,
         false,
       )).to.be.reverted
     })
