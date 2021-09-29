@@ -12,8 +12,8 @@ abstract contract PositionManager is IPositionManager, ERC1155 {
     /// @inheritdoc IPositionManager
     mapping(address => mapping(bytes32 => uint256)) public override liquidityOf;
 
-    /// @param _URI Address of the base URI
-    constructor(string memory _URI) ERC1155(_URI) {}
+    /// @param URI_ Address of the base URI
+    constructor(string memory URI_) ERC1155(URI_) {}
 
     bytes private empty;
 

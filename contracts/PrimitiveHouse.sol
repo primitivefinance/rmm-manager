@@ -28,13 +28,13 @@ contract PrimitiveHouse is
 
     /// EFFECT FUNCTIONS ///
 
-    /// @param _factory  Address of a PrimitiveFactory
-    /// @param _WETH10   Address of WETH10
+    /// @param factory_  Address of a PrimitiveFactory
+    /// @param WETH10_   Address of WETH10
     constructor(
-        address _factory,
-        address _WETH10,
-        string memory _URI
-    ) HouseBase(_factory, _WETH10) PositionManager(_URI) {}
+        address factory_,
+        address WETH10_,
+        string memory URI_
+    ) HouseBase(factory_, WETH10_) PositionManager(URI_) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(

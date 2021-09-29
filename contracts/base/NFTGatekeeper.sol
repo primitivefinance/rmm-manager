@@ -23,10 +23,10 @@ contract NFTGatekeeper is INFTGatekeeper {
         _;
     }
 
-    /// @param _token  Address of the token contract
-    /// @param _id     Id of the token to look for
-    constructor(address _token, uint256 _id) {
-        token = _token;
-        id = _id;
+    /// @param token_  Address of the token contract
+    /// @param id_     Id of the token to look for
+    constructor(address token_, uint256 id_) {
+        token = token_;
+        id = id_;
     }
 }
