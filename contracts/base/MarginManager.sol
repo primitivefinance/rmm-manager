@@ -2,6 +2,7 @@
 pragma solidity 0.8.6;
 
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
 
 import "../interfaces/IMarginManager.sol";
@@ -70,7 +71,15 @@ abstract contract MarginManager is IMarginManager, HouseBase {
             delStable
         );
 
-        emit Withdraw(msg.sender, recipient, engine, delRisky, delStable);
+        emit Withdraw(
+            msg.sender,
+            recipient,
+            engine,
+            IPrimitiveEngineView(engine).risky(), // FIXME: A bit expensive for just an event no?
+            IPrimitiveEngineView(engine).stable(), // FIXME: A bit expensive for just an event no?
+            delRisky,
+            delStable
+        );
     }
 
     /// @inheritdoc IPrimitiveDepositCallback
