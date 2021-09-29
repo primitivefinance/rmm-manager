@@ -8,9 +8,9 @@ import "../interfaces/IMarginManager.sol";
 import "./HouseBase.sol";
 import "../libraries/TransferHelper.sol";
 
-/// @title MarginManager
-/// @author Primitive
-/// @notice Manages the margins
+/// @title   MarginManager
+/// @author  Primitive
+/// @notice  Manages the margins
 abstract contract MarginManager is IMarginManager, HouseBase {
     using TransferHelper for IERC20;
     using Margin for mapping(address => Margin.Data);

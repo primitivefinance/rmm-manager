@@ -6,9 +6,9 @@ import "../interfaces/IPrimitiveHouse.sol";
 import "./Reentrancy.sol";
 import "../libraries/EngineAddress.sol";
 
-/// @title HouseBase
-/// @author Primitive
-/// @notice Base contract of the House
+/// @title   HouseBase
+/// @author  Primitive
+/// @notice  Base contract of the House
 abstract contract HouseBase is IHouseBase, Reentrancy {
     /// @notice Data struct reused by callbacks
     struct CallbackData {
