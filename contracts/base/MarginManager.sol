@@ -22,13 +22,14 @@ abstract contract MarginManager is IMarginManager, HouseBase {
     /// @inheritdoc IMarginManager
     function deposit(
         address recipient,
-        address engine,
         address risky,
         address stable,
         uint256 delRisky,
         uint256 delStable
     ) external override lock {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
+
+        address engine = EngineAddress.computeAddress(factory, risky, stable);
 
         IPrimitiveEngineActions(engine).deposit(
             address(this),

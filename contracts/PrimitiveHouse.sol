@@ -38,7 +38,6 @@ contract PrimitiveHouse is
 
     /// @inheritdoc IPrimitiveHouse
     function create(
-        address engine,
         address risky,
         address stable,
         uint256 strike,
@@ -52,14 +51,16 @@ contract PrimitiveHouse is
         uint256 delRisky,
         uint256 delStable
     ) {
+        address engine = EngineAddress.computeAddress(factory, risky, stable);
+
         if (engine == address(0)) revert EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
         CallbackData memory callbackData = CallbackData({
-            payer: msg.sender,
             risky: risky,
-            stable: stable
+            stable: stable,
+            payer: msg.sender
         });
 
         (poolId, delRisky, delStable) = IPrimitiveEngineActions(engine).create(
@@ -80,7 +81,6 @@ contract PrimitiveHouse is
 
     /// @inheritdoc IPrimitiveHouse
     function allocate(
-        address engine,
         bytes32 poolId,
         address risky,
         address stable,
@@ -89,6 +89,8 @@ contract PrimitiveHouse is
         bool fromMargin,
         bool shouldTokenizeLiquidity
     ) external override lock returns (uint256 delLiquidity) {
+        address engine = EngineAddress.computeAddress(factory, risky, stable);
+
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
 
         (delLiquidity) = IPrimitiveEngineActions(engine).allocate(
@@ -99,9 +101,9 @@ contract PrimitiveHouse is
             fromMargin,
             abi.encode(
                 CallbackData({
-                    payer: msg.sender,
                     risky: risky,
-                    stable: stable
+                    stable: stable,
+                    payer: msg.sender
                 })
             )
         );
@@ -145,7 +147,6 @@ contract PrimitiveHouse is
         CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
-
         if (msg.sender != engine) revert NotEngineError();
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);

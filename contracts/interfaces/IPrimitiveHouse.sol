@@ -80,7 +80,6 @@ interface IPrimitiveHouse is
     /// @param delta         Initial delta of the curve
     /// @param delLiquidity  Amount of initial liquidity to provide
     function create(
-        address engine,
         address risky,
         address stable,
         uint256 strike,
@@ -96,7 +95,6 @@ interface IPrimitiveHouse is
     );
 
     /// @notice                         Allocates liquidity into a pool
-    /// @param engine                   Address of the engine
     /// @param risky                    Address of the risky asset
     /// @param stable                   Address of the stable asset
     /// @param poolId                   Id of the pool
@@ -104,7 +102,6 @@ interface IPrimitiveHouse is
     /// @param fromMargin               True if margins should be used
     /// @param shouldTokenizeLiquidity  True if liquidity should be tokenized
     function allocate(
-        address engine,
         bytes32 poolId,
         address risky,
         address stable,
