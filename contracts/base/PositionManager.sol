@@ -15,7 +15,7 @@ abstract contract PositionManager is IPositionManager, ERC1155 {
     /// @param URI_ Address of the base URI
     constructor(string memory URI_) ERC1155(URI_) {}
 
-    bytes private empty;
+    bytes private _empty;
 
     /// @inheritdoc ERC1155
     function safeTransferFrom(
@@ -59,7 +59,7 @@ abstract contract PositionManager is IPositionManager, ERC1155 {
 
         if (amount > unwrapped) revert LiquidityError();
 
-        _mint(msg.sender, uint256(poolId), amount, empty);
+        _mint(msg.sender, uint256(poolId), amount, _empty);
     }
 
     /// @inheritdoc IPositionManager
@@ -88,7 +88,7 @@ abstract contract PositionManager is IPositionManager, ERC1155 {
         liquidityOf[account][poolId] += amount;
 
         if (shouldTokenizeLiquidity) {
-            _mint(account, uint256(poolId), amount, empty);
+            _mint(account, uint256(poolId), amount, _empty);
         }
     }
 
