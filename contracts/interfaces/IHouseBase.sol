@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title HouseBase Interface
-/// @author Primitive
+/// @title   HouseBase Interface
+/// @author  Primitive
 interface IHouseBase {
     /// @notice Thrown when the sender is not an engine
     error NotEngineError();

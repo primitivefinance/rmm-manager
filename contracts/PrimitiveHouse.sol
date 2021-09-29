@@ -11,9 +11,9 @@ import "./base/PositionManager.sol";
 import "./base/SwapManager.sol";
 import "./libraries/TransferHelper.sol";
 
-/// @title Primitive House
-/// @author Primitive
-/// @dev Interacts with Primitive Engine contracts
+/// @title   Primitive House
+/// @author  Primitive
+/// @dev     Interacts with Primitive Engine contracts
 contract PrimitiveHouse is
     IPrimitiveHouse,
     Multicall,
@@ -28,8 +28,8 @@ contract PrimitiveHouse is
 
     /// EFFECT FUNCTIONS ///
 
-    /// @param _factory The address of a PrimitiveFactory
-    /// @param _WETH10 The address of WETH10
+    /// @param _factory  Address of a PrimitiveFactory
+    /// @param _WETH10   Address of WETH10
     constructor(
         address _factory,
         address _WETH10,

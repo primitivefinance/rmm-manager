@@ -9,9 +9,9 @@ import "../interfaces/IERC20.sol";
 import "./MarginManager.sol";
 import "./HouseBase.sol";
 
-/// @title SwapManager
-/// @author Primitive
-/// @dev Manages the swaps
+/// @title   SwapManager
+/// @author  Primitive
+/// @dev     Manages the swaps
 abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     using TransferHelper for IERC20;
     using Margin for mapping(address => Margin.Data);

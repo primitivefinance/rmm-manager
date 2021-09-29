@@ -3,9 +3,9 @@ pragma solidity 0.8.6;
 
 import "../interfaces/IMulticall.sol";
 
-/// @title Multicall
-/// @author Uniswap (https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/Multicall.sol)
-/// @notice Enables calling multiple methods in a single call to the contract
+/// @title   Multicall
+/// @author  Uniswap (https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/Multicall.sol)
+/// @notice  Enables calling multiple methods in a single call to the contract
 abstract contract Multicall is IMulticall {
     /// @inheritdoc IMulticall
     function multicall(bytes[] calldata data) external payable override returns (bytes[] memory results) {

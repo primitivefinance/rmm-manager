@@ -4,8 +4,8 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
-/// @title PrimitiveHouse Interface
-/// @author Primitive
+/// @title   PrimitiveHouse Interface
+/// @author  Primitive
 interface IPrimitiveHouse is
     IPrimitiveCreateCallback,
     IPrimitiveLiquidityCallback
@@ -20,13 +20,13 @@ interface IPrimitiveHouse is
 
     /// EVENTS ///
 
-    /// @notice Emitted when a new pool is created
-    /// @param recipient The recipient of the liquidity
-    /// @param engine The address of the engine
-    /// @param poolId The id of the new pool
-    /// @param strike The strike of the new pool
-    /// @param sigma The sigma of the new pool
-    /// @param maturity The maturity of the new pool
+    /// @notice           Emitted when a new pool is created
+    /// @param recipient  Recipient of the liquidity
+    /// @param engine     Address of the engine
+    /// @param poolId     Id of the new pool
+    /// @param strike     Strike of the new pool
+    /// @param sigma      Sigma of the new pool
+    /// @param maturity   Maturity of the new pool
     event Create(
         address indexed recipient,
         address indexed engine,
@@ -36,14 +36,14 @@ interface IPrimitiveHouse is
         uint32 maturity
     );
 
-    /// @notice Emitted when liquidity is allocated
-    /// @param payer The payer sending liquidity
-    /// @param engine The engine receiving liquidity
-    /// @param poolId The id of the pool receiving liquidity
-    /// @param delLiquidity The amount of liquidity allocated
-    /// @param delRisky The amount of risky tokens allocated
-    /// @param delStable The amount of stable tokens allocated
-    /// @param fromMargin True if liquidity was paid from margin
+    /// @notice              Emitted when liquidity is allocated
+    /// @param payer         Payer sending liquidity
+    /// @param engine        Engine receiving liquidity
+    /// @param poolId        Id of the pool receiving liquidity
+    /// @param delLiquidity  Amount of liquidity allocated
+    /// @param delRisky      Amount of risky tokens allocated
+    /// @param delStable     Amount of stable tokens allocated
+    /// @param fromMargin    True if liquidity was paid from margin
     event Allocate(
         address indexed payer,
         address indexed engine,
@@ -54,13 +54,13 @@ interface IPrimitiveHouse is
         bool fromMargin
     );
 
-    /// @notice Emitted when liquidity is removed
-    /// @param payer The payer receiving liquidity
-    /// @param engine The engine where liquidity is removed from
-    /// @param poolId The id of the pool where liquidity is removed from
-    /// @param delLiquidity The amount of liquidity removed
-    /// @param delRisky The amount of risky tokens allocated
-    /// @param delStable The amount of stable tokens allocated
+    /// @notice              Emitted when liquidity is removed
+    /// @param payer         Payer receiving liquidity
+    /// @param engine        Engine where liquidity is removed from
+    /// @param poolId        Id of the pool where liquidity is removed from
+    /// @param delLiquidity  Amount of liquidity removed
+    /// @param delRisky      Amount of risky tokens allocated
+    /// @param delStable     Amount of stable tokens allocated
     event Remove(
         address indexed payer,
         address indexed engine,
@@ -72,13 +72,13 @@ interface IPrimitiveHouse is
 
     /// EFFECT FUNCTIONS ///
 
-    /// @notice Creates a new pool using the
-    /// @param risky The address of the risky asset
-    /// @param stable The address of the stable asset
-    /// @param sigma The sigma of the curve
-    /// @param maturity The maturity of the curve (as a timestamp)
-    /// @param delta The initial delta of the curve
-    /// @param delLiquidity The amount of initial liquidity to provide
+    /// @notice              Creates a new pool using the
+    /// @param risky         Address of the risky asset
+    /// @param stable        Address of the stable asset
+    /// @param sigma         Sigma of the curve
+    /// @param maturity      Maturity of the curve (as a timestamp)
+    /// @param delta         Initial delta of the curve
+    /// @param delLiquidity  Amount of initial liquidity to provide
     function create(
         address engine,
         address risky,
@@ -95,14 +95,14 @@ interface IPrimitiveHouse is
         uint256 delStable
     );
 
-    /// @notice Allocates liquidity into a pool
-    /// @param engine The address of the engine
-    /// @param risky The address of the risky asset
-    /// @param stable The address of the stable asset
-    /// @param poolId The id of the pool
-    /// @param delLiquidity The amount of liquidity to allocate
-    /// @param fromMargin True if margins should be used
-    /// @param shouldTokenizeLiquidity True if liquidity should be tokenized
+    /// @notice                         Allocates liquidity into a pool
+    /// @param engine                   Address of the engine
+    /// @param risky                    Address of the risky asset
+    /// @param stable                   Address of the stable asset
+    /// @param poolId                   Id of the pool
+    /// @param delLiquidity             Amount of liquidity to allocate
+    /// @param fromMargin               True if margins should be used
+    /// @param shouldTokenizeLiquidity  True if liquidity should be tokenized
     function allocate(
         address engine,
         bytes32 poolId,
@@ -114,10 +114,10 @@ interface IPrimitiveHouse is
         bool shouldTokenizeLiquidity
     ) external returns (uint256 delLiquidity);
 
-    /// @notice Removes liquidity from a pool
-    /// @param engine The address of the engine
-    /// @param poolId The id of the pool
-    /// @param delLiquidity The amount of liquidity to remove
+    /// @notice              Removes liquidity from a pool
+    /// @param engine        Address of the engine
+    /// @param poolId        Id of the pool
+    /// @param delLiquidity  Amount of liquidity to remove
     function remove(
         address engine,
         bytes32 poolId,

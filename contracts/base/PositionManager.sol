@@ -5,14 +5,14 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 import "../interfaces/IPositionManager.sol";
 
-/// @title PositionManager
-/// @author Primitive
-/// @notice Wraps the positions into ERC1155 tokens
+/// @title   PositionManager
+/// @author  Primitive
+/// @notice  Wraps the positions into ERC1155 tokens
 abstract contract PositionManager is IPositionManager, ERC1155 {
     /// @inheritdoc IPositionManager
     mapping(address => mapping(bytes32 => uint256)) public override liquidityOf;
 
-    /// @param _URI The address of the base URI
+    /// @param _URI Address of the base URI
     constructor(string memory _URI) ERC1155(_URI) {}
 
     bytes private empty;
@@ -74,11 +74,11 @@ abstract contract PositionManager is IPositionManager, ERC1155 {
         _burn(msg.sender, uint256(poolId), amount);
     }
 
-    /// @notice Allocates liquidity
-    /// @param account The recipient of the liquidity
-    /// @param poolId The id of the pool
-    /// @param amount The amount of liquidity to allocate
-    /// @param shouldTokenizeLiquidity True if liquidity should be tokenized
+    /// @notice                         Allocates liquidity
+    /// @param account                  Recipient of the liquidity
+    /// @param poolId                   Id of the pool
+    /// @param amount                   Amount of liquidity to allocate
+    /// @param shouldTokenizeLiquidity  True if liquidity should be tokenized
     function _allocate(
         address account,
         bytes32 poolId,
@@ -92,10 +92,10 @@ abstract contract PositionManager is IPositionManager, ERC1155 {
         }
     }
 
-    /// @notice Removes liquidity
-    /// @param account The account to remove from
-    /// @param poolId The id of the pool
-    /// @param amount The amount of liquidity to remove
+    /// @notice         Removes liquidity
+    /// @param account  Account to remove from
+    /// @param poolId   Id of the pool
+    /// @param amount   Amount of liquidity to remove
     function _remove(
         address account,
         bytes32 poolId,
