@@ -49,14 +49,12 @@ interface IMarginManager is IPrimitiveDepositCallback {
 
     /// @notice           Deposits funds into the margin of an engine
     /// @param recipient  Address receiving the funds in their margin
-    /// @param engine     Engine to deposit into
     /// @param risky      Address of the risky token
     /// @param stable     Address of the stable token
     /// @param delRisky   Amount of risky token to deposit
     /// @param delStable  Amount of stable token to deposit
     function deposit(
         address recipient,
-        address engine,
         address risky,
         address stable,
         uint256 delRisky,

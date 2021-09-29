@@ -8,7 +8,6 @@ import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCa
 interface ISwapManager is IPrimitiveSwapCallback {
     /// @notice                Parameters for the swap function
     /// @param recipient       Address of the recipient
-    /// @param engine          Address of the engine
     /// @param risky           Address of the risky token
     /// @param stable          Address of the stable token
     /// @param poolId          Id of the pool
@@ -20,7 +19,6 @@ interface ISwapManager is IPrimitiveSwapCallback {
     /// @param deadline        Transaction will revert above this deadline
     struct SwapParameters {
         address recipient;
-        address engine;
         address risky;
         address stable;
         bytes32 poolId;

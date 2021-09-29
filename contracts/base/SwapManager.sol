@@ -35,7 +35,9 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
             stable: params.stable
         });
 
-        deltaOut = IPrimitiveEngineActions(params.engine).swap(
+        address engine = EngineAddress.computeAddress(factory, params.risky, params.stable);
+
+        deltaOut = IPrimitiveEngineActions(engine).swap(
             params.toMargin ? address(this) : params.recipient,
             params.poolId,
             params.riskyForStable,
@@ -49,14 +51,14 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         if (params.deltaOutMin > deltaOut) revert DeltaOutMinError(params.deltaOutMin, deltaOut);
 
         if (params.fromMargin) {
-            margins[params.engine].withdraw(
+            margins[engine].withdraw(
                 params.riskyForStable ? params.deltaIn : 0,
                 params.riskyForStable ? 0 : params.deltaIn
             );
         }
 
         if (params.toMargin) {
-            margins[params.recipient][params.engine].deposit(
+            margins[params.recipient][engine].deposit(
                 params.riskyForStable ? params.deltaIn : 0,
                 params.riskyForStable ? 0 : params.deltaIn
             );
@@ -65,7 +67,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         emit Swap(
             msg.sender,
             params.recipient,
-            params.engine,
+            engine,
             params.poolId,
             params.riskyForStable,
             params.deltaIn,
