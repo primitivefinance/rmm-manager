@@ -62,6 +62,8 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         // Reverts the call early if margins are insufficient
         margins[engine].withdraw(delRisky, delStable);
 
+        // Setting address(0) as the recipient will result in the tokens
+        // being sent into the House, useful to unwrap WETH for example
         IPrimitiveEngineActions(engine).withdraw(
             recipient == address(0) ? address(this) : recipient,
             delRisky,
