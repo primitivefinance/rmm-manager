@@ -86,8 +86,7 @@ interface IPrimitiveHouse is
         uint64 sigma,
         uint32 maturity,
         uint256 delta,
-        uint256 delLiquidity,
-        bool shouldTokenizeLiquidity
+        uint256 delLiquidity
     ) external returns (
         bytes32 poolId,
         uint256 delRisky,
@@ -100,15 +99,13 @@ interface IPrimitiveHouse is
     /// @param poolId                   Id of the pool
     /// @param delLiquidity             Amount of liquidity to allocate
     /// @param fromMargin               True if margins should be used
-    /// @param shouldTokenizeLiquidity  True if liquidity should be tokenized
     function allocate(
         bytes32 poolId,
         address risky,
         address stable,
         uint256 delRisky,
         uint256 delStable,
-        bool fromMargin,
-        bool shouldTokenizeLiquidity
+        bool fromMargin
     ) external returns (uint256 delLiquidity);
 
     /// @notice              Removes liquidity from a pool
