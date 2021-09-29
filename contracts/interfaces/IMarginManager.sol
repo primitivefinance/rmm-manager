@@ -35,12 +35,16 @@ interface IMarginManager is IPrimitiveDepositCallback {
     /// @param payer      Address withdrawing the funds
     /// @param recipient  Address receiving the funds (in their wallet)
     /// @param engine     Engine where the funds are withdrawn from
+    /// @param risky      Address of the risky token
+    /// @param stable     Address of the stable token
     /// @param delRisky   Amount of withdrawn risky
     /// @param delStable  Amount of withdrawn stable
     event Withdraw(
         address indexed payer,
         address indexed recipient,
         address indexed engine,
+        address risky,
+        address stable,
         uint256 delRisky,
         uint256 delStable
     );
