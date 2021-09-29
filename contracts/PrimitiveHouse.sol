@@ -73,7 +73,7 @@ contract PrimitiveHouse is
 
         // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
-        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY, false);
+        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY);
 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
@@ -109,7 +109,7 @@ contract PrimitiveHouse is
         if (fromMargin) margins[engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, poolId, delLiquidity, false);
+        _allocate(msg.sender, poolId, delLiquidity);
 
         emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
