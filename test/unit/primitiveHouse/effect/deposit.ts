@@ -12,16 +12,6 @@ runTest('deposit', function () {
     await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
     await this.risky.approve(this.house.address, constants.MaxUint256)
     await this.stable.approve(this.house.address, constants.MaxUint256)
-
-    await this.house.create(
-      this.risky.address,
-      this.stable.address,
-      strike.raw,
-      sigma.raw,
-      maturity.raw,
-      parseWei(delta).raw,
-      parseWei('1').raw,
-    )
   })
 
   describe('success cases', function () {
