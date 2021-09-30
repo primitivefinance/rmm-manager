@@ -14,7 +14,6 @@ import "./HouseBase.sol";
 /// @dev     Manages the swaps
 abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     using TransferHelper for IERC20;
-    using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
 
     /// @notice Reverts the tx above the deadline
@@ -51,7 +50,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         if (params.deltaOutMin > deltaOut) revert DeltaOutMinError(params.deltaOutMin, deltaOut);
 
         if (params.fromMargin) {
-            margins[engine].withdraw(
+            margins[msg.sender][engine].withdraw(
                 params.riskyForStable ? params.deltaIn : 0,
                 params.riskyForStable ? 0 : params.deltaIn
             );
@@ -59,8 +58,8 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
 
         if (params.toMargin) {
             margins[params.recipient][engine].deposit(
-                params.riskyForStable ? params.deltaIn : 0,
-                params.riskyForStable ? 0 : params.deltaIn
+                params.riskyForStable ? deltaOut : 0,
+                params.riskyForStable ? 0 : deltaOut
             );
         }
 

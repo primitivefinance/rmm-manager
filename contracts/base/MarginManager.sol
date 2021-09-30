@@ -3,18 +3,17 @@ pragma solidity 0.8.6;
 
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
 
 import "../interfaces/IMarginManager.sol";
 import "./HouseBase.sol";
 import "../libraries/TransferHelper.sol";
+import "../libraries/Margin.sol";
 
 /// @title   MarginManager
 /// @author  Primitive
 /// @notice  Manages the margins
 abstract contract MarginManager is IMarginManager, HouseBase {
     using TransferHelper for IERC20;
-    using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
 
     /// @inheritdoc IMarginManager
@@ -45,8 +44,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
             )
         );
 
-        Margin.Data storage mar = margins[engine][recipient];
-        mar.deposit(delRisky, delStable);
+        margins[recipient][engine].deposit(delRisky, delStable);
 
         emit Deposit(msg.sender, recipient, engine, risky, stable, delRisky, delStable);
     }
@@ -61,7 +59,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         // Reverts the call early if margins are insufficient
-        margins[engine].withdraw(delRisky, delStable);
+        margins[msg.sender][engine].withdraw(delRisky, delStable);
 
         // Setting address(0) as the recipient will result in the tokens
         // being sent into the House, useful to unwrap WETH for example
