@@ -2,7 +2,7 @@ import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import expect from '../../../shared/expect'
-import { runTest, DEFAULT_CONFIG } from '../../context'
+import { runTest } from '../../context'
 
 runTest('deposit', function () {
   beforeEach(async function () {
