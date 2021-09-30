@@ -18,7 +18,6 @@ runTest('swap', function () {
     await this.stable.approve(this.house.address, constants.MaxUint256)
 
     await this.house.create(
-      this.engine.address,
       this.risky.address,
       this.stable.address,
       strike.raw,
@@ -26,7 +25,6 @@ runTest('swap', function () {
       maturity.raw,
       parseWei(delta).raw,
       parseWei('1').raw,
-      false
     )
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
@@ -38,13 +36,11 @@ runTest('swap', function () {
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
 
     await this.house.allocate(
-      this.engine.address,
       poolId,
       this.risky.address,
       this.stable.address,
       delRisky.raw,
       delStable.raw,
-      false,
       false,
     )
   })
@@ -54,7 +50,6 @@ runTest('swap', function () {
       beforeEach(async function () {
         await this.house.deposit(
           this.deployer.address,
-          this.engine.address,
           this.risky.address,
           this.stable.address,
           parseWei('100').raw,
@@ -65,7 +60,6 @@ runTest('swap', function () {
       it('swaps risky for stable', async function () {
         await this.house.swap({
           recipient: this.deployer.address,
-          engine: this.engine.address,
           risky: this.risky.address,
           stable: this.stable.address,
           poolId: poolId,
@@ -81,7 +75,6 @@ runTest('swap', function () {
       it('swaps stable for risky', async function () {
         await this.house.swap({
           recipient: this.deployer.address,
-          engine: this.engine.address,
           risky: this.risky.address,
           stable: this.stable.address,
           poolId: poolId,
@@ -98,7 +91,6 @@ runTest('swap', function () {
         await expect(
           this.house.swap({
             recipient: this.deployer.address,
-            engine: this.engine.address,
             risky: this.risky.address,
             stable: this.stable.address,
             poolId: poolId,
