@@ -13,21 +13,8 @@ runTest('withdraw', function () {
     await this.risky.approve(this.house.address, constants.MaxUint256)
     await this.stable.approve(this.house.address, constants.MaxUint256)
 
-    await this.house.create(
-      this.engine.address,
-      this.risky.address,
-      this.stable.address,
-      strike.raw,
-      sigma.raw,
-      maturity.raw,
-      parseWei(delta).raw,
-      parseWei('1').raw,
-      false
-    )
-
     await this.house.deposit(
       this.deployer.address,
-      this.engine.address,
       this.risky.address,
       this.stable.address,
       parseWei('1000').raw,
@@ -113,6 +100,8 @@ runTest('withdraw', function () {
           this.deployer.address,
           this.deployer.address,
           this.engine.address,
+          this.risky.address,
+          this.stable.address,
           parseWei('1000').raw,
           parseWei('1000').raw
         )
