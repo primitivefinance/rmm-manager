@@ -82,7 +82,7 @@ runTest('remove', function () {
       const reserve = await this.engine.reserves(poolId)
       const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
-      const initialMargin = await this.house.margins(this.engine.address, this.deployer.address)
+      const initialMargin = await this.house.margins(this.deployer.address, this.engine.address)
 
       await this.house.remove(
         this.engine.address,
@@ -90,7 +90,7 @@ runTest('remove', function () {
         parseWei('1').raw,
       )
 
-      const newMargin = await this.house.margins(this.engine.address, this.deployer.address)
+      const newMargin = await this.house.margins(this.deployer.address, this.engine.address)
 
       expect(newMargin.balanceRisky).to.equal(initialMargin.balanceRisky.add(deltaRisky.raw))
       expect(newMargin.balanceStable).to.equal(initialMargin.balanceStable.add(deltaStable.raw))

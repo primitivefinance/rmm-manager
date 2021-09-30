@@ -75,7 +75,7 @@ runTest('allocate', function () {
       })
 
       it('reduces the margin of the sender', async function () {
-        const initialMargin = await this.house.margins(this.engine.address, this.deployer.address)
+        const initialMargin = await this.house.margins(this.deployer.address, this.engine.address)
         await this.house.allocate(
           poolId,
           this.risky.address,
@@ -84,7 +84,7 @@ runTest('allocate', function () {
           delStable.raw,
           true,
         )
-        const newMargin = await this.house.margins(this.engine.address, this.deployer.address)
+        const newMargin = await this.house.margins(this.deployer.address, this.engine.address, )
 
         expect(newMargin.balanceRisky).to.equal(initialMargin.balanceRisky.sub(delRisky.raw))
         expect(newMargin.balanceStable).to.equal(initialMargin.balanceStable.sub(delStable.raw))
@@ -167,7 +167,7 @@ runTest('allocate', function () {
       })
 
       it('does not reduces the margin', async function () {
-        const initialMargin = await this.house.margins(this.engine.address, this.deployer.address)
+        const initialMargin = await this.house.margins(this.deployer.address, this.engine.address)
         await this.house.allocate(
           poolId,
           this.risky.address,
@@ -176,7 +176,7 @@ runTest('allocate', function () {
           delStable.raw,
           false,
         )
-        const newMargin = await this.house.margins(this.engine.address, this.deployer.address)
+        const newMargin = await this.house.margins(this.deployer.address, this.engine.address)
 
         expect(initialMargin.balanceRisky).to.equal(newMargin.balanceRisky)
         expect(initialMargin.balanceStable).to.equal(newMargin.balanceStable)

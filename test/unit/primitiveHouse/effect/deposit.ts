@@ -32,7 +32,7 @@ runTest('deposit', function () {
         parseWei('1000').raw
       )
 
-      const margin = await this.house.margins(this.engine.address, this.deployer.address)
+      const margin = await this.house.margins(this.deployer.address, this.engine.address)
       expect(margin.balanceRisky).to.equal(parseWei('1000').raw)
       expect(margin.balanceStable).to.equal(parseWei('1000').raw)
     })
