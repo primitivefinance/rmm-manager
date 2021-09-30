@@ -4,8 +4,6 @@ import { parseWei } from 'web3-units'
 import expect from '../../../shared/expect'
 import { runTest, DEFAULT_CONFIG } from '../../context'
 
-const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
-
 runTest('deposit', function () {
   beforeEach(async function () {
     await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
