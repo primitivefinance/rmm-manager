@@ -23,7 +23,6 @@ runTest('create', function () {
   describe('success cases', function () {
     it('creates a new pool using the house contract', async function () {
       await this.house.create(
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
@@ -31,13 +30,11 @@ runTest('create', function () {
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
         delLiquidity.raw,
-        false,
       )
     })
 
     it('updates the sender position', async function () {
       await this.house.create(
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
@@ -45,16 +42,14 @@ runTest('create', function () {
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
         delLiquidity.raw,
-        false,
       )
 
-      const liquidity = await this.house.liquidityOf(this.deployer.address, poolId)
+      const liquidity = await this.house.balanceOf(this.deployer.address, poolId)
       expect(liquidity).to.equal(parseWei('1').raw.sub('1000'))
     })
 
     it('emits the Created event', async function () {
       await expect(this.house.create(
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
@@ -62,7 +57,6 @@ runTest('create', function () {
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
         delLiquidity.raw,
-        false,
       )).to.emit(this.house, 'Create').withArgs(
         this.deployer.address,
         this.engine.address,
@@ -77,7 +71,6 @@ runTest('create', function () {
   describe('fail cases', function () {
     it('reverts if the curve is already created', async function () {
       await this.house.create(
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
@@ -85,10 +78,8 @@ runTest('create', function () {
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
         delLiquidity.raw,
-        false,
       )
       await expect(this.house.create(
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
@@ -96,13 +87,11 @@ runTest('create', function () {
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
         delLiquidity.raw,
-        false,
       )).to.be.reverted
     })
 
     it('reverts if the sender has insufficient funds', async function () {
       await expect(this.house.connect(this.alice).create(
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         strike.raw,
@@ -110,7 +99,6 @@ runTest('create', function () {
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
         delLiquidity.raw,
-        false,
       )).to.be.reverted
     })
 
