@@ -8,7 +8,9 @@ import { runTest } from '../../context'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
-let delLiquidity: Wei, delRisky: Wei, delStable: Wei
+let delRisky: Wei, delStable: Wei
+
+let delLiquidity = parseWei('1')
 
 runTest('remove', function () {
   beforeEach(async function () {
@@ -18,20 +20,17 @@ runTest('remove', function () {
     await this.stable.approve(this.house.address, constants.MaxUint256)
 
     await this.house.create(
-      this.engine.address,
       this.risky.address,
       this.stable.address,
       strike.raw,
       sigma.raw,
       maturity.raw,
-      parseWei(delta).raw,
-      parseWei('1').raw,
-      false
+      parseWei(1).sub(parseWei(delta)).raw,
+      delLiquidity.raw,
     )
 
     await this.house.deposit(
       this.deployer.address,
-      this.engine.address,
       this.risky.address,
       this.stable.address,
       parseWei('1000').raw,
@@ -40,21 +39,19 @@ runTest('remove', function () {
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
-    const amount = parseWei('1000')
+    const amount = parseWei('100')
     const res = await this.engine.reserves(poolId)
     delLiquidity = amount
     delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
 
     await this.house.allocate(
-      this.engine.address,
       poolId,
       this.risky.address,
       this.stable.address,
       delRisky.raw,
       delStable.raw,
       true,
-      false,
     )
   })
 
@@ -67,7 +64,7 @@ runTest('remove', function () {
       )
     })
 
-    it.skip('decreases the position of the sender', async function () {
+    it('decreases the position of the sender', async function () {
       const liquidity = await this.house.balanceOf(this.deployer.address, poolId)
 
       await this.house.remove(
