@@ -2,9 +2,7 @@ import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import expect from '../../../shared/expect'
-import { runTest, DEFAULT_CONFIG } from '../../context'
-
-const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+import { runTest } from '../../context'
 
 runTest('withdraw', function () {
   beforeEach(async function () {
