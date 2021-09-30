@@ -23,7 +23,6 @@ contract PrimitiveHouse is
     SwapManager
 {
     using TransferHelper for IERC20;
-    using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
 
     /// EFFECT FUNCTIONS ///
@@ -106,7 +105,7 @@ contract PrimitiveHouse is
             )
         );
 
-        if (fromMargin) margins[engine].withdraw(delRisky, delStable);
+        if (fromMargin) margins[msg.sender][engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
         _allocate(msg.sender, poolId, delLiquidity);
@@ -128,7 +127,7 @@ contract PrimitiveHouse is
         (delRisky, delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
         _remove(msg.sender, poolId, delLiquidity);
 
-        Margin.Data storage mar = margins[engine][msg.sender];
+        Margin.Data storage mar = margins[msg.sender][engine];
         mar.deposit(delRisky, delStable);
 
         emit Remove(msg.sender, engine, poolId, delLiquidity, delRisky, delStable);
