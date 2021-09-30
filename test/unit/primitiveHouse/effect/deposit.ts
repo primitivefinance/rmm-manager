@@ -14,7 +14,6 @@ runTest('deposit', function () {
     await this.stable.approve(this.house.address, constants.MaxUint256)
 
     await this.house.create(
-      this.engine.address,
       this.risky.address,
       this.stable.address,
       strike.raw,
@@ -22,7 +21,6 @@ runTest('deposit', function () {
       maturity.raw,
       parseWei(delta).raw,
       parseWei('1').raw,
-      false
     )
   })
 
@@ -30,7 +28,6 @@ runTest('deposit', function () {
     it('deposits risky and stable to margin', async function () {
       await this.house.deposit(
         this.deployer.address,
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -41,7 +38,6 @@ runTest('deposit', function () {
     it('increases the margin', async function () {
       await this.house.deposit(
         this.deployer.address,
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -59,7 +55,6 @@ runTest('deposit', function () {
 
       await this.house.deposit(
         this.deployer.address,
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -81,7 +76,6 @@ runTest('deposit', function () {
 
       await this.house.deposit(
         this.deployer.address,
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -101,7 +95,6 @@ runTest('deposit', function () {
       await expect(
         this.house.deposit(
           this.deployer.address,
-          this.engine.address,
           this.risky.address,
           this.stable.address,
           parseWei('1000').raw,
@@ -129,7 +122,6 @@ runTest('deposit', function () {
           .connect(this.bob)
           .deposit(
             this.deployer.address,
-            this.engine.address,
             this.risky.address,
             this.stable.address,
             parseWei('1000').raw,
