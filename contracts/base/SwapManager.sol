@@ -87,10 +87,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
                 );
 
                 deltaIn = (res0 * liquidity) / 10**18 - uint256(reserveRisky);
-                deltaIn += deltaIn * (10000 - 9985) / 10000;
-
-                // 11074336834952110300
-                // 11058508521773508900
+                deltaIn = deltaIn * 10000 / 9985;
             } else {
                 console.log("riskyForStable: false");
                 uint256 res0 = (uint256(reserveRisky - params.deltaOut) * 10**18) / liquidity;
@@ -105,7 +102,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
                 );
 
                 deltaIn = (res1 * liquidity) / 10**18 - uint256(reserveStable);
-                deltaIn += deltaIn * (10000 - 9985) / 10000;
+                deltaIn = deltaIn * 10000 / 9985;
             }
         }
 
