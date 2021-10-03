@@ -62,26 +62,13 @@ runTest('swapExactOut', function () {
       })
 
       it('swaps risky for stable', async function () {
-        /*
-        10000000000000000000
-        11074336834952110300
-
-        20000000000000000000
-        20867109361639727800
-
-        30000000000000000000
-        30676735352078302900
-
-
-        */
-
         await this.house.swapExactOut({
           recipient: this.deployer.address,
           risky: this.risky.address,
           stable: this.stable.address,
           poolId: poolId,
           riskyForStable: true,
-          deltaOut: parseWei('100').raw,
+          deltaOut: parseWei('20').raw,
           deltaInMax: parseWei('1000000').raw,
           fromMargin: false,
           toMargin: true,
