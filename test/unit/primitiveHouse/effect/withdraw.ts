@@ -2,9 +2,7 @@ import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import expect from '../../../shared/expect'
-import { runTest, DEFAULT_CONFIG } from '../../context'
-
-const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+import { runTest } from '../../context'
 
 runTest('withdraw', function () {
   beforeEach(async function () {
@@ -13,21 +11,8 @@ runTest('withdraw', function () {
     await this.risky.approve(this.house.address, constants.MaxUint256)
     await this.stable.approve(this.house.address, constants.MaxUint256)
 
-    await this.house.create(
-      this.engine.address,
-      this.risky.address,
-      this.stable.address,
-      strike.raw,
-      sigma.raw,
-      maturity.raw,
-      parseWei(delta).raw,
-      parseWei('1').raw,
-      false
-    )
-
     await this.house.deposit(
       this.deployer.address,
-      this.engine.address,
       this.risky.address,
       this.stable.address,
       parseWei('1000').raw,
@@ -53,7 +38,7 @@ runTest('withdraw', function () {
         parseWei('1000').raw
       )
 
-      const margin = await this.house.margins(this.engine.address, this.deployer.address)
+      const margin = await this.house.margins(this.deployer.address, this.engine.address)
 
       expect(margin.balanceRisky).to.equal(parseWei('0').raw)
       expect(margin.balanceStable).to.equal(parseWei('0').raw)
@@ -113,6 +98,8 @@ runTest('withdraw', function () {
           this.deployer.address,
           this.deployer.address,
           this.engine.address,
+          this.risky.address,
+          this.stable.address,
           parseWei('1000').raw,
           parseWei('1000').raw
         )
