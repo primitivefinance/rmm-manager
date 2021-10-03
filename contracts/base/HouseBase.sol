@@ -23,8 +23,8 @@ abstract contract HouseBase is IHouseBase, Reentrancy {
     /// @inheritdoc IHouseBase
     address public immutable override WETH10;
 
-    /// @param factory_ The address of a PrimitiveFactory
-    /// @param WETH10_ The address of WETH10
+    /// @param factory_  Address of a PrimitiveFactory
+    /// @param WETH10_   Address of WETH10
     constructor(
         address factory_,
         address WETH10_
