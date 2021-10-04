@@ -14,14 +14,7 @@ import "./libraries/TransferHelper.sol";
 /// @title   Primitive House
 /// @author  Primitive
 /// @dev     Interacts with Primitive Engine contracts
-contract PrimitiveHouse is
-    IPrimitiveHouse,
-    Multicall,
-    CashManager,
-    SelfPermit,
-    PositionManager,
-    SwapManager
-{
+contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, PositionManager, SwapManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
 
@@ -44,22 +37,23 @@ contract PrimitiveHouse is
         uint32 maturity,
         uint256 riskyPerLp,
         uint256 delLiquidity
-    ) external override lock returns (
-        bytes32 poolId,
-        uint256 delRisky,
-        uint256 delStable
-    ) {
+    )
+        external
+        override
+        lock
+        returns (
+            bytes32 poolId,
+            uint256 delRisky,
+            uint256 delStable
+        )
+    {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
 
         if (engine == address(0)) revert EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
-        CallbackData memory callbackData = CallbackData({
-            risky: risky,
-            stable: stable,
-            payer: msg.sender
-        });
+        CallbackData memory callbackData = CallbackData({risky: risky, stable: stable, payer: msg.sender});
 
         (poolId, delRisky, delStable) = IPrimitiveEngineActions(engine).create(
             strike,
@@ -72,7 +66,7 @@ contract PrimitiveHouse is
 
         // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
-        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY);
+        _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
@@ -96,19 +90,13 @@ contract PrimitiveHouse is
             delRisky,
             delStable,
             fromMargin,
-            abi.encode(
-                CallbackData({
-                    risky: risky,
-                    stable: stable,
-                    payer: msg.sender
-                })
-            )
+            abi.encode(CallbackData({risky: risky, stable: stable, payer: msg.sender}))
         );
 
         if (fromMargin) margins[msg.sender][engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, poolId, delLiquidity);
+        _allocate(msg.sender, engine, poolId, delLiquidity);
 
         emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
@@ -118,10 +106,7 @@ contract PrimitiveHouse is
         address engine,
         bytes32 poolId,
         uint256 delLiquidity
-    ) external override lock returns (
-        uint256 delRisky,
-        uint256 delStable
-    ) {
+    ) external override lock returns (uint256 delRisky, uint256 delStable) {
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
         (delRisky, delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);

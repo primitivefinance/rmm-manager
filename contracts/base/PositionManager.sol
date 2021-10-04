@@ -9,7 +9,7 @@ import "../interfaces/IPositionManager.sol";
 /// @author  Primitive
 /// @notice  Wraps the positions into ERC1155 tokens
 abstract contract PositionManager is IPositionManager, ERC1155 {
-    mapping(bytes32 => address) private cache;
+    mapping(uint256 => address) private cache;
 
     /// @param URI_ Address of the base URI
     constructor(string memory URI_) ERC1155(URI_) {}
@@ -22,12 +22,12 @@ abstract contract PositionManager is IPositionManager, ERC1155 {
     /// @param amount   Amount of liquidity to allocate
     function _allocate(
         address account,
-        // address engine,
+        address engine,
         bytes32 poolId,
         uint256 amount
     ) internal {
         _mint(account, uint256(poolId), amount, _empty);
-        // cache[poolId] = engine;
+        cache[uint256(poolId)] = engine;
     }
 
     /// @notice                         Removes liquidity
