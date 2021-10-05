@@ -2,13 +2,15 @@
 pragma solidity 0.8.6;
 
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+
+import "./interfaces/IPositionRenderer.sol";
 import "./interfaces/IERC20WithOptions.sol";
 
-contract PositionRenderer {
-    function returnURI(
+contract PositionRenderer is IPositionRenderer {
+    function uri(
         address engineAddress,
         uint256 tokenId
-    ) external view returns (string memory) {
+    ) external view override returns (string memory) {
         address risky = IPrimitiveEngineView(engineAddress).risky();
         string memory riskyName = IERC20WithOptions(risky).name();
         string memory riskySymbol = IERC20WithOptions(risky).symbol();
@@ -21,7 +23,7 @@ contract PositionRenderer {
             'data:application/json;utf8,{"name":"',
             "Put a name here",
             '","image":"data:image/svg+xml;utf8,',
-            returnSVG(tokenId),
+            renderSVG(tokenId),
             '",',
             '"license":"Put license here","creator":"@PrimitiveFi",',
             '"description":"Put a description here"',
@@ -29,7 +31,7 @@ contract PositionRenderer {
         ));
     }
 
-    function returnSVG(uint256 tokenId) public view returns (string memory) {
+    function renderSVG(uint256 tokenId) public view returns (string memory) {
         return "";
     }
 
