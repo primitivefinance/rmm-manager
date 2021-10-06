@@ -32,8 +32,8 @@ contract PrimitiveHouse is
     constructor(
         address factory_,
         address WETH10_,
-        string memory URI_
-    ) HouseBase(factory_, WETH10_) PositionManager(URI_) {}
+        address positionRenderer_
+    ) HouseBase(factory_, WETH10_, positionRenderer_) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
@@ -72,7 +72,7 @@ contract PrimitiveHouse is
 
         // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
-        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY);
+        _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
@@ -108,7 +108,7 @@ contract PrimitiveHouse is
         if (fromMargin) margins[msg.sender][engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, poolId, delLiquidity);
+        _allocate(msg.sender, engine, poolId, delLiquidity);
 
         emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
