@@ -9,6 +9,34 @@ import "./interfaces/IERC20WithOptions.sol";
 import "./libraries/HexStrings.sol";
 
 contract PositionRenderer is IPositionRenderer {
+    /// @notice Credits https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary/
+    function _daysToDate(uint256 _days)
+        internal
+        pure
+        returns (
+            uint256 year,
+            uint256 month,
+            uint256 day
+        )
+    {
+        int256 __days = int256(_days);
+
+        int256 L = __days + 68569 + 2440588;
+        int256 N = (4 * L) / 146097;
+        L = L - (146097 * N + 3) / 4;
+        int256 _year = (4000 * (L + 1)) / 1461001;
+        L = L - (1461 * _year) / 4 + 31;
+        int256 _month = (80 * L) / 2447;
+        int256 _day = L - (2447 * _month) / 80;
+        L = _month / 11;
+        _month = _month + 2 - 12 * L;
+        _year = 100 * (N - 49) + _year + L;
+
+        year = uint256(_year);
+        month = uint256(_month);
+        day = uint256(_day);
+    }
+
     function uri(address engineAddress, uint256 tokenId) external view override returns (string memory) {
         address risky = IPrimitiveEngineView(engineAddress).risky();
         string memory riskySymbol = IERC20WithOptions(risky).symbol();
