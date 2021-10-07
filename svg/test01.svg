@@ -1,38 +1,61 @@
-<svg width="260" height="260" xmlns="http://www.w3.org/2000/svg">
+<svg width="390px" height="390" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="grad1" x1="100%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" style="stop-color:#1E242C;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#46D7AB;stop-opacity:1" />
+    <linearGradient id="g" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff1b6b" />
+      <stop offset="100%" stop-color="#45caff" />
     </linearGradient>
+
+    <linearGradient id="g" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff1b6b" />
+      <stop offset="100%" stop-color="#45caff" />
+    </linearGradient>
+
+    <mask id="b">
+      <rect x="30" y="325" width="330" height="42" rx="10" ry="10" fill="#fff" />
+    </mask>
   </defs>
 
-  <rect x="0" y="0" width="260" height="260" rx="15" ry="15"  fill="url(#grad1)" />
+  <rect x="0" y="0" width="390" height="390" rx="15" ry="15"  fill="url(#g)" />
 
-  <text x="20" y="60" font-family="Verdana" font-size="28" fill="#fff" font-weight="bold">
+  <text x="20" y="60" font-family="Verdana" font-size="34" fill="#000" font-weight="900">
     ETH / USDC
   </text>
 
-  <rect x="20" y="80" width="220" height="40" rx="15" ry="15" fill="#000" />
-  <text x="30" y="105" font-family="Verdana" font-size="16" fill="#ccc">
+  <rect x="20" y="90" width="350" height="50" rx="15" ry="15" fill="#000" />
+  <text x="35" y="120" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold">
     Expiry
   </text>
-  <text x="230" y="105" font-family="Verdana" font-size="14" fill="#fff" font-weight="bold" text-anchor="end">
+  <text x="355" y="120" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold" text-anchor="end">
     2021/12/31
   </text>
 
-  <rect x="20" y="130" width="220" height="40" rx="15" ry="15" fill="#000" />
-  <text x="30" y="155" font-family="Verdana" font-size="16" fill="#ccc">
+  <rect x="20" y="155" width="350" height="50" rx="15" ry="15" fill="#000" />
+  <text x="35" y="185" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold">
     Strike
   </text>
-  <text x="230" y="155" font-family="Verdana" font-size="14" fill="#fff" font-weight="bold" text-anchor="end">
+  <text x="355" y="185" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold" text-anchor="end">
     3000 USDC
   </text>
 
-  <rect x="20" y="180" width="220" height="40" rx="15" ry="15" fill="#000" />
-  <text x="30" y="205" font-family="Verdana" font-size="16" fill="#ccc">
+  <rect x="20" y="220" width="350" height="50" rx="15" ry="15" fill="#000" />
+  <text x="35" y="250" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold">
     IV
   </text>
-  <text x="230" y="205" font-family="Verdana" font-size="14" fill="#fff" font-weight="bold" text-anchor="end">
+  <text x="355" y="250" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold" text-anchor="end">
     100%
   </text>
+
+  <rect x="20" y="285" width="350" height="95" rx="15" ry="15" fill="#000" />
+  <text x="35" y="315" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold">
+    Premium Collected
+  </text>
+  <text x="355" y="315" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold" text-anchor="end">
+    50%
+  </text>
+
+
+  <g mask="url(#b)">
+    <rect x="30" y="325" width="330" height="42" fill="#fff" />
+    <rect x="30" y="325" width="170" height="42" fill="purple" />
+  </g>
 </svg>
