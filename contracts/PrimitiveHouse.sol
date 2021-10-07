@@ -25,8 +25,8 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     constructor(
         address factory_,
         address WETH10_,
-        string memory URI_
-    ) HouseBase(factory_, WETH10_) PositionManager(URI_) {}
+        address positionRenderer_
+    ) HouseBase(factory_, WETH10_, positionRenderer_) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
