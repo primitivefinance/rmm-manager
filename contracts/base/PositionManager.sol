@@ -4,17 +4,20 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 import "../interfaces/IPositionManager.sol";
+import "../interfaces/IPositionRenderer.sol";
+import "../base/HouseBase.sol";
 
 /// @title   PositionManager
 /// @author  Primitive
 /// @notice  Wraps the positions into ERC1155 tokens
-abstract contract PositionManager is IPositionManager, ERC1155 {
+abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
     mapping(uint256 => address) private cache;
 
-    /// @param URI_ Address of the base URI
-    constructor(string memory URI_) ERC1155(URI_) {}
-
     bytes private _empty;
+
+    function uri(uint256 tokenId) public view override returns (string memory) {
+        return IPositionRenderer(positionRenderer).uri(cache[tokenId], tokenId);
+    }
 
     /// @notice         Allocates liquidity
     /// @param account  Recipient of the liquidity
