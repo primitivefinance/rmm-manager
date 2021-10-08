@@ -17,11 +17,8 @@ export async function deploy(contractName: string, deployer: Wallet, args: any[]
 
 export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, Time.YearInSeconds + 1, 1, 10, parsePercentage(0.0015))
 
-export function runTest(
-  description: string,
-  runTests: Function,
-): void {
-  const loadFixture = createFixtureLoader();
+export function runTest(description: string, runTests: Function): void {
+  const loadFixture = createFixtureLoader()
 
   describe(description, function () {
     beforeEach(async function () {
@@ -44,7 +41,7 @@ export function runTest(
         const house = (await deploy('PrimitiveHouse', deployer, [
           factory.address,
           '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F',
-          '',
+          '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F',
         ])) as ContractTypes.PrimitiveHouse
 
         return {
@@ -56,11 +53,11 @@ export function runTest(
         }
       })
 
-      this.risky = loadedFixture.risky;
-      this.stable = loadedFixture.stable;
-      this.factory = loadedFixture.factory;
-      this.engine = loadedFixture.engine;
-      this.house = loadedFixture.house;
+      this.risky = loadedFixture.risky
+      this.stable = loadedFixture.stable
+      this.factory = loadedFixture.factory
+      this.engine = loadedFixture.engine
+      this.house = loadedFixture.house
 
       this.deployer = deployer
       this.alice = signers[1]

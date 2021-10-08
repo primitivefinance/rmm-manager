@@ -23,8 +23,8 @@ runTest('swap', function () {
       strike.raw,
       sigma.raw,
       maturity.raw,
-      parseWei(delta).raw,
-      parseWei('1').raw,
+      parseWei(1).sub(parseWei(delta)).raw,
+      delLiquidity.raw
     )
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
@@ -35,14 +35,7 @@ runTest('swap', function () {
     delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
 
-    await this.house.allocate(
-      poolId,
-      this.risky.address,
-      this.stable.address,
-      delRisky.raw,
-      delStable.raw,
-      false,
-    )
+    await this.house.allocate(poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false)
   })
 
   describe('success cases', function () {
@@ -104,7 +97,7 @@ runTest('swap', function () {
         ).to.emit(this.house, 'Swap')
       })
     })
-/*
+    /*
     describe('from margin / to external', function () {
       beforeEach(async function () {
         await this.house.deposit(
