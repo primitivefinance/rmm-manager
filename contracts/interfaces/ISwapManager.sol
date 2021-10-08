@@ -12,8 +12,8 @@ interface ISwapManager is IPrimitiveSwapCallback {
     /// @param stable          Address of the stable token
     /// @param poolId          Id of the pool
     /// @param riskyForStable  True if swapping risky for stable
-    /// @param deltaIn         Exact amount to swap
-    /// @param deltaOutMin     Minimum expected amount to receive
+    /// @param deltaIn         Exact amount to send
+    /// @param deltaOut        Exact amount to receive
     /// @param fromMargin      True if the sent amount should be taken from the margin
     /// @param toMargin        True if the received amount should be sent to the margin
     /// @param deadline        Transaction will revert above this deadline
@@ -24,7 +24,7 @@ interface ISwapManager is IPrimitiveSwapCallback {
         bytes32 poolId;
         bool riskyForStable;
         uint256 deltaIn;
-        uint256 deltaOutMin;
+        uint256 deltaOut;
         bool fromMargin;
         bool toMargin;
         uint256 deadline;
