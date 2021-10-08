@@ -29,13 +29,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     error DeltaOutError();
 
     /// @inheritdoc ISwapManager
-    function swap(SwapParameters memory params)
-        external
-        override
-        lock
-        checkDeadline(params.deadline)
-        returns (uint256 deltaOut)
-    {
+    function swap(SwapParameters memory params) external override lock checkDeadline(params.deadline) {
         CallbackData memory callbackData = CallbackData({
             payer: msg.sender,
             risky: params.risky,
@@ -64,8 +58,8 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
 
         if (params.toMargin) {
             margins[params.recipient][engine].deposit(
-                params.riskyForStable ? deltaOut : 0,
-                params.riskyForStable ? 0 : deltaOut
+                params.riskyForStable ? params.deltaOut : 0,
+                params.riskyForStable ? 0 : params.deltaOut
             );
         }
 
