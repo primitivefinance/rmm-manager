@@ -69,6 +69,5 @@ interface ISwapManager is IPrimitiveSwapCallback {
     /// @notice           Swaps an exact amount of risky OR stable tokens for some risky OR stable tokens
     /// @dev              Funds are swapped from a specific pool located into a specific engine
     /// @param params     A struct of type SwapParameters
-    /// @return deltaOut  The amount of received tokens
-    function swap(SwapParameters memory params) external returns (uint256 deltaOut);
+    function swap(SwapParameters memory params) external;
 }
