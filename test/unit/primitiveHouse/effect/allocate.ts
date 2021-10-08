@@ -9,7 +9,7 @@ import { runTest } from '../../context'
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
 let delRisky: Wei, delStable: Wei
-const delLiquidity = parseWei('1000')
+const delLiquidity = parseWei('10')
 
 runTest('allocate', function () {
   beforeEach(async function () {
@@ -38,7 +38,7 @@ runTest('allocate', function () {
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
-    const amount = parseWei('1000')
+    const amount = parseWei('10')
     const res = await this.engine.reserves(poolId)
     delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
@@ -67,8 +67,7 @@ runTest('allocate', function () {
         expect(newMargin.balanceStable).to.equal(initialMargin.balanceStable.sub(delStable.raw))
       })
 
-      it('emits the LiquidityAdded event', async function () {
-        // TODO: Checks the args
+      it('emits the Allocate event', async function () {
         await expect(
           this.house.allocate(poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, true)
         ).to.emit(this.house, 'Allocate')
@@ -115,8 +114,7 @@ runTest('allocate', function () {
         expect(initialMargin.balanceStable).to.equal(newMargin.balanceStable)
       })
 
-      it('emits the LiquidityAdded event', async function () {
-        // TODO: Checks the args
+      it('emits the Allocate event', async function () {
         await expect(
           this.house.allocate(poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false)
         ).to.emit(this.house, 'Allocate')
