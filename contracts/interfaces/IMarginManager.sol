@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
-
 /// @title   MarginManager Interface
 /// @author  Primitive
+
+import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
+
 interface IMarginManager is IPrimitiveDepositCallback {
     /// ERRORS ///
 
@@ -84,11 +85,8 @@ interface IMarginManager is IPrimitiveDepositCallback {
     /// @param engine         Address of the engine
     /// @return balanceRisky  The balance of risky in the margin of the user
     /// balanceStable         The balance of stable in the margin of the user
-    function margins(
-        address account,
-        address engine
-    ) external view returns (
-        uint128 balanceRisky,
-        uint128 balanceStable
-    );
+    function margins(address account, address engine)
+        external
+        view
+        returns (uint128 balanceRisky, uint128 balanceStable);
 }

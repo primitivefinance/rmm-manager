@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
-
 /// @title  SwapManager Interface
 /// @author  Primitive
+
+import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
+
 interface ISwapManager is IPrimitiveSwapCallback {
     /// @notice                Parameters for the swap function
     /// @param recipient       Address of the recipient
@@ -17,7 +18,7 @@ interface ISwapManager is IPrimitiveSwapCallback {
     /// @param fromMargin      True if the sent amount should be taken from the margin
     /// @param toMargin        True if the received amount should be sent to the margin
     /// @param deadline        Transaction will revert above this deadline
-    struct SwapParameters {
+    struct SwapParms {
         address recipient;
         address risky;
         address stable;
@@ -66,8 +67,8 @@ interface ISwapManager is IPrimitiveSwapCallback {
 
     /// EFFECTS FUNCTIONS ///
 
-    /// @notice           Swaps an exact amount of risky OR stable tokens for some risky OR stable tokens
-    /// @dev              Funds are swapped from a specific pool located into a specific engine
-    /// @param params     A struct of type SwapParameters
-    function swap(SwapParameters memory params) external;
+    /// @notice        Swaps an exact amount of risky OR stable tokens for some risky OR stable tokens
+    /// @dev           Funds are swapped from a specific pool located into a specific engine
+    /// @param params  A struct of type SwapParameters
+    function swap(SwapParms memory params) external;
 }

@@ -3,8 +3,9 @@ pragma solidity 0.8.6;
 
 /// @title   CashManager Interface
 /// @author  Primitive
+
 interface ICashManager {
-    /// EVENTS ///
+    /// ERRORS ///
 
     /// @notice          Thrown when the sender is not WETH
     /// @param expected  Expected sender (WETH)

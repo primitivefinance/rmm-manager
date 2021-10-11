@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.6;
 
-import "../interfaces/IERC20.sol";
-
+/// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/TransferHelper.sol
 /// @notice  Utils functions to transfer tokens and ETH
-/// @dev     Based on https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/TransferHelper.sol
-/// @author  Primitive
+
+import "../interfaces/external/IERC20.sol";
+
 library TransferHelper {
     /// @notice Thrown when a transfer reverts
     error TransferError();

@@ -3,6 +3,7 @@ pragma solidity 0.8.6;
 
 /// @title   ERC20 Interface
 /// @author  Primitive
+
 interface IERC20 {
     function totalSupply() external view returns (uint256);
 

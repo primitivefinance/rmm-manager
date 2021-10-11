@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+/// @author  Primitive
+/// @notice  Utils functions to manage margins
+/// @dev     Uses a data struct with two uint128s to optimize for one storage slot
+
 import "@primitivefinance/v2-core/contracts/libraries/SafeCast.sol";
 
-/// @notice  House Margin Library
-/// @author  Primitive
-/// @dev     Uses a data struct with two uint128s to optimize for one storage slot
 library Margin {
     using SafeCast for uint256;
 

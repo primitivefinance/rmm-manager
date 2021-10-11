@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+/// @title   PrimitiveHouse Interface
+/// @author  Primitive
+
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
-/// @title   PrimitiveHouse Interface
-/// @author  Primitive
-interface IPrimitiveHouse is
-    IPrimitiveCreateCallback,
-    IPrimitiveLiquidityCallback
-{
+interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallback {
     /// ERRORS ///
 
     /// @notice Emitted when the engine is not deployed
@@ -87,18 +85,20 @@ interface IPrimitiveHouse is
         uint32 maturity,
         uint256 delta,
         uint256 delLiquidity
-    ) external returns (
-        bytes32 poolId,
-        uint256 delRisky,
-        uint256 delStable
-    );
+    )
+        external
+        returns (
+            bytes32 poolId,
+            uint256 delRisky,
+            uint256 delStable
+        );
 
-    /// @notice                         Allocates liquidity into a pool
-    /// @param risky                    Address of the risky asset
-    /// @param stable                   Address of the stable asset
-    /// @param poolId                   Id of the pool
-    /// @param delLiquidity             Amount of liquidity to allocate
-    /// @param fromMargin               True if margins should be used
+    /// @notice              Allocates liquidity into a pool
+    /// @param risky         Address of the risky asset
+    /// @param stable        Address of the stable asset
+    /// @param poolId        Id of the pool
+    /// @param delLiquidity  Amount of liquidity to allocate
+    /// @param fromMargin    True if margins should be used
     function allocate(
         bytes32 poolId,
         address risky,
@@ -116,8 +116,5 @@ interface IPrimitiveHouse is
         address engine,
         bytes32 poolId,
         uint256 delLiquidity
-    ) external returns (
-        uint256 delRisky,
-        uint256 delStable
-    );
+    ) external returns (uint256 delRisky, uint256 delStable);
 }

@@ -1,8 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+/// @title   Primitive House
+/// @author  Primitive
+/// @notice  Interacts with Primitive Engine contracts
 
+import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "./interfaces/IPrimitiveHouse.sol";
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
@@ -11,9 +14,6 @@ import "./base/PositionManager.sol";
 import "./base/SwapManager.sol";
 import "./libraries/TransferHelper.sol";
 
-/// @title   Primitive House
-/// @author  Primitive
-/// @dev     Interacts with Primitive Engine contracts
 contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, PositionManager, SwapManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
