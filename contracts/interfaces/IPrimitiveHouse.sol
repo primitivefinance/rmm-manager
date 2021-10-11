@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+/// @title   PrimitiveHouse Interface
+/// @author  Primitive
+
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
-/// @title   PrimitiveHouse Interface
-/// @author  Primitive
-interface IPrimitiveHouse is
-    IPrimitiveCreateCallback,
-    IPrimitiveLiquidityCallback
-{
+interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallback {
     /// ERRORS ///
 
     /// @notice Emitted when the engine is not deployed
@@ -72,33 +70,36 @@ interface IPrimitiveHouse is
 
     /// EFFECT FUNCTIONS ///
 
-    /// @notice              Creates a new pool using the
+    /// @notice              Creates a new pool using the specified parameters
+    /// @param strike        Strike price of the pool to calibrate to, with the same decimals as the stable token
     /// @param risky         Address of the risky asset
     /// @param stable        Address of the stable asset
-    /// @param sigma         Sigma of the curve
-    /// @param maturity      Maturity of the curve (as a timestamp)
-    /// @param delta         Initial delta of the curve
-    /// @param delLiquidity  Amount of initial liquidity to provide
+    /// @param sigma         Volatility to calibrate to as an unsigned 256-bit integer w/ precision of 1e4, 10000 = 100%
+    /// @param maturity      Maturity timestamp of the pool, in seconds
+    /// @param riskyPerLp    Risky reserve per liq. with risky decimals, = 1 - N(d1), d1 = (ln(S/K)+(r*sigma^2/2))/sigma*sqrt(tau)
+    /// @param delLiquidity  Amount of liquidity to allocate to the curve, wei value with 18 decimals of precision
     function create(
         address risky,
         address stable,
         uint256 strike,
         uint64 sigma,
         uint32 maturity,
-        uint256 delta,
+        uint256 riskyPerLp,
         uint256 delLiquidity
-    ) external returns (
-        bytes32 poolId,
-        uint256 delRisky,
-        uint256 delStable
-    );
+    )
+        external
+        returns (
+            bytes32 poolId,
+            uint256 delRisky,
+            uint256 delStable
+        );
 
-    /// @notice                         Allocates liquidity into a pool
-    /// @param risky                    Address of the risky asset
-    /// @param stable                   Address of the stable asset
-    /// @param poolId                   Id of the pool
-    /// @param delLiquidity             Amount of liquidity to allocate
-    /// @param fromMargin               True if margins should be used
+    /// @notice              Allocates liquidity into a pool
+    /// @param risky         Address of the risky asset
+    /// @param stable        Address of the stable asset
+    /// @param poolId        Id of the pool
+    /// @param delLiquidity  Amount of liquidity to allocate
+    /// @param fromMargin    True if margins should be used
     function allocate(
         bytes32 poolId,
         address risky,
@@ -116,8 +117,5 @@ interface IPrimitiveHouse is
         address engine,
         bytes32 poolId,
         uint256 delLiquidity
-    ) external returns (
-        uint256 delRisky,
-        uint256 delStable
-    );
+    ) external returns (uint256 delRisky, uint256 delStable);
 }

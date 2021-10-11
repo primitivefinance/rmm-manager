@@ -3,6 +3,7 @@ pragma solidity 0.8.6;
 
 /// @notice  PositionManager Interface
 /// @author  Primitive
+
 interface IPositionManager {
 
 }
