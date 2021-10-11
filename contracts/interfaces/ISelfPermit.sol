@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.6;
 
-/// @title   Self Permit
-/// @author  Uniswap (https://github.com/Uniswap/v3-periphery)
+/// @title   SelfPermit Interface
+/// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/ISelfPermit.sol
 /// @notice  Functionality to call permit on any EIP-2612-compliant token for use in the route
+
 interface ISelfPermit {
     /// @notice          Permits this contract to spend a given token from `msg.sender`
     /// @dev             `owner` is always msg.sender and the `spender` is always address(this).

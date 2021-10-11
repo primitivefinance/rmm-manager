@@ -9,8 +9,7 @@ import { runTest } from '../../context'
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
 let delRisky: Wei, delStable: Wei
-
-let delLiquidity = parseWei('1')
+const delLiquidity = parseWei('10')
 
 runTest('remove', function () {
   beforeEach(async function () {
@@ -39,9 +38,8 @@ runTest('remove', function () {
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
-    const amount = parseWei('100')
+    const amount = parseWei('10')
     const res = await this.engine.reserves(poolId)
-    delLiquidity = amount
     delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
 

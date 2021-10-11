@@ -4,6 +4,7 @@ pragma solidity 0.8.6;
 /// @title   Reentrancy
 /// @author  Primitive
 /// @notice  Prevents reentrancy
+
 contract Reentrancy {
     /// @notice Thrown when a call to the contract is made during a locked state
     error LockedError();

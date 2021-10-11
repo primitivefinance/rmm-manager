@@ -1,6 +1,6 @@
 # Primitive V2 Periphery
 
-This repository is for the core contracts of the Primitive V2 protocol. These are low-level contracts which are designed to be interacted primarily through other smart contracts.
+This repository is for the periphery contracts of the Primitive V2 protocol. These are high-level contracts which are designed to interact with Primitive V2 core contracts.
 
 # Bug Bounty
 
@@ -12,11 +12,43 @@ The contract documentation is hosted here: [Primitive Docs](https://docs.primiti
 
 ## Overview
 
-This repository has the high level contracts to interface with the Primitive V2 core
+This repository has the high level contracts to interact with the Primitive V2 core. The "House" contract is split into several small pieces, that are all inherited by the `PrimitiveHouse` contract.
 
-### House
+### HouseBase
 
-The House contract is a higher-level contract that is designed to interact with the Engine on behalf of users.
+Stores "general" variables that are meant to be reused by the child contracts. This contract is inherited by several child contracts.
+
+### CashManager
+
+Contains several functions to unwrap WETH or sweep tokens / ETH from the house.
+
+### MarginManager
+
+Manages the margins and provides functions to `deposit` and `withdraw`.
+
+### Multicall
+
+Utils contract allowing the batching of transactions into one call.
+
+### PositionManager
+
+Wraps the positions into ERC1155 tokens (and inherits the ERC1155 contract).
+
+### Reentrancy
+
+Small contract to prevent reentrancy.
+
+### SelfPermit
+
+Provides an ensemble of functions to call permit on the compliant tokens.
+
+### SwapManager
+
+Provides an ensemble of functions to swap tokens from different engines.
+
+### PositionRenderer
+
+Manages the visual rendering of the position tokens. This contract is external (not inherited by the House), and will be deployed as a standalone upgradeable contract.
 
 # Testing
 
@@ -42,4 +74,4 @@ The deployed contract addresses for all of Primitive are located here: [Contract
 
 # Access Control
 
-There is no access control for any of the peripheral contracts.
+There is no access control for any of the peripheral contracts. However, the PositionRenderer contract will be deployed as an upgradeable contract.

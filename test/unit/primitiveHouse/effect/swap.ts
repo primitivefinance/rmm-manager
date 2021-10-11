@@ -8,7 +8,8 @@ import { runTest } from '../../context'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
-let delLiquidity: Wei, delRisky: Wei, delStable: Wei
+let delRisky: Wei, delStable: Wei
+const delLiquidity = parseWei('100')
 
 runTest('swap', function () {
   beforeEach(async function () {
@@ -23,26 +24,18 @@ runTest('swap', function () {
       strike.raw,
       sigma.raw,
       maturity.raw,
-      parseWei(delta).raw,
-      parseWei('1').raw,
+      parseWei(1).sub(parseWei(delta)).raw,
+      delLiquidity.raw
     )
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
-    const amount = parseWei('1000')
+    const amount = parseWei('100')
     const res = await this.engine.reserves(poolId)
-    delLiquidity = amount
     delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
 
-    await this.house.allocate(
-      poolId,
-      this.risky.address,
-      this.stable.address,
-      delRisky.raw,
-      delStable.raw,
-      false,
-    )
+    await this.house.allocate(poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false)
   })
 
   describe('success cases', function () {
@@ -64,14 +57,18 @@ runTest('swap', function () {
           stable: this.stable.address,
           poolId: poolId,
           riskyForStable: true,
-          deltaIn: parseWei('1').raw,
-          deltaOutMin: 0,
+          deltaIn: parseWei('10').raw,
+          deltaOut: parseWei('5').raw,
           fromMargin: true,
           toMargin: true,
           deadline: 1000000000000,
         })
       })
+    })
+  })
+})
 
+/*
       it('swaps stable for risky', async function () {
         await this.house.swap({
           recipient: this.deployer.address,
@@ -104,7 +101,7 @@ runTest('swap', function () {
         ).to.emit(this.house, 'Swap')
       })
     })
-/*
+    /*
     describe('from margin / to external', function () {
       beforeEach(async function () {
         await this.house.deposit(
@@ -194,6 +191,6 @@ runTest('swap', function () {
         ).to.emit(this.house, 'Swapped')
       })
     })
-    */
   })
 })
+*/

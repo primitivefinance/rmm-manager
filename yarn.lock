@@ -713,17 +713,17 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.2.tgz#ff80affd6d352dbe1bbc5b4e1833c41afd6283b6"
   integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
 
-"@primitivefinance/v2-core@^1.9.0":
-  version "1.9.0"
-  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-core/1.9.0/6209203728097a646cc97bda3a7c6cd6815808a667726a7070cbea21ddbfefdf#856de92bca8a575bfd12d06d529abc1b53caba54"
-  integrity sha512-ngx5FBPIgzQk6SzWxLKt1xcaPLJbMTyzyFapFVW+HrqvGaDZj6wCa9aOGjriPmI6DzRKXpVTcv51yoIzYBmjTA==
+"@primitivefinance/v2-core@^1.10.0":
+  version "1.10.0"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-core/1.10.0/3e5e96629e1ffffefae87057a0823f0957a36dfe94d9b035c21dcf53544b9b7d#27496a50329f2e3ca46fd99bb92864da1878ce46"
+  integrity sha512-uIKLxmZ7OvfKM2A3uAYZZPR0N8HhdT+Vpk7XcSOe8mHuOzQxH329+6otJaq3ajGe799kgcxFaUz0hnnkY/mgNQ==
   dependencies:
     mocha "^9.0.3"
 
-"@primitivefinance/v2-math@^1.3.0":
-  version "1.3.0"
-  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-math/1.3.0/d17086c777d688a097021f1bf6d9466cc50923b4f47a1b7ea507698cc5d467c9#b9885deedc7923a5ae7a948f063d8974023490c6"
-  integrity sha512-A48cuGax4drUhiqfgZtrtE9Ec8ArZC6JfElasl+OBBm+zX9pVypW+MZ3y5vf2atPTe9NwvixWKMOxLAD4vEEpw==
+"@primitivefinance/v2-math@^1.4.1":
+  version "1.4.1"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-math/1.4.1/90f425aefcbe4bfee9195c70b0ace643d249a332be77cc55a8799aa9187ac931#386e6620a29578d7d40aaacedacecd2a33d0ac2e"
+  integrity sha512-z9XfDL88BgsJYbc1wSy5z1SP2ixb/ahrnFeuBvKcpkiaAnmH1H04Hg0OSeeW1RvRUtiLhBweqnn4JNUG2YWeWw==
   dependencies:
     gaussian "^1.2.0"
     numeric "^1.2.6"
