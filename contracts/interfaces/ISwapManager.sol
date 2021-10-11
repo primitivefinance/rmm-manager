@@ -18,7 +18,7 @@ interface ISwapManager is IPrimitiveSwapCallback {
     /// @param fromMargin      True if the sent amount should be taken from the margin
     /// @param toMargin        True if the received amount should be sent to the margin
     /// @param deadline        Transaction will revert above this deadline
-    struct SwapParms {
+    struct SwapParams {
         address recipient;
         address risky;
         address stable;
@@ -32,11 +32,6 @@ interface ISwapManager is IPrimitiveSwapCallback {
     }
 
     /// ERRORS ///
-
-    /// @notice          Thrown when the delta out is lower than the minimum expected
-    /// @param expected  Minimum expected delta out
-    /// @param actual    Actual delta out
-    error DeltaOutMinError(uint256 expected, uint256 actual);
 
     /// @notice Thrown when the deadline is reached
     error DeadlineReachedError();
@@ -70,5 +65,5 @@ interface ISwapManager is IPrimitiveSwapCallback {
     /// @notice        Swaps an exact amount of risky OR stable tokens for some risky OR stable tokens
     /// @dev           Funds are swapped from a specific pool located into a specific engine
     /// @param params  A struct of type SwapParameters
-    function swap(SwapParms memory params) external;
+    function swap(SwapParams memory params) external;
 }
