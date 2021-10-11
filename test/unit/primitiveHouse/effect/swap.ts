@@ -8,7 +8,8 @@ import { runTest } from '../../context'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
-let delLiquidity: Wei, delRisky: Wei, delStable: Wei
+let delRisky: Wei, delStable: Wei
+const delLiquidity = parseWei('100')
 
 runTest('swap', function () {
   beforeEach(async function () {
@@ -29,9 +30,8 @@ runTest('swap', function () {
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
-    const amount = parseWei('1000')
+    const amount = parseWei('100')
     const res = await this.engine.reserves(poolId)
-    delLiquidity = amount
     delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
 
@@ -56,15 +56,19 @@ runTest('swap', function () {
           risky: this.risky.address,
           stable: this.stable.address,
           poolId: poolId,
-          riskyForStable: true,
+          riskyForStable: false,
           deltaIn: parseWei('1').raw,
-          deltaOutMin: 0,
+          deltaOut: parseWei('1').raw,
           fromMargin: true,
           toMargin: true,
           deadline: 1000000000000,
         })
       })
+    })
+  })
+})
 
+/*
       it('swaps stable for risky', async function () {
         await this.house.swap({
           recipient: this.deployer.address,
@@ -187,6 +191,6 @@ runTest('swap', function () {
         ).to.emit(this.house, 'Swapped')
       })
     })
-    */
   })
 })
+*/
