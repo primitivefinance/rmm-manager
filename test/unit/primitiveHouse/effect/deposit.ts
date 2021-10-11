@@ -2,9 +2,7 @@ import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
 import expect from '../../../shared/expect'
-import { runTest, DEFAULT_CONFIG } from '../../context'
-
-const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+import { runTest } from '../../context'
 
 runTest('deposit', function () {
   beforeEach(async function () {
@@ -12,25 +10,12 @@ runTest('deposit', function () {
     await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
     await this.risky.approve(this.house.address, constants.MaxUint256)
     await this.stable.approve(this.house.address, constants.MaxUint256)
-
-    await this.house.create(
-      this.engine.address,
-      this.risky.address,
-      this.stable.address,
-      strike.raw,
-      sigma.raw,
-      maturity.raw,
-      parseWei(delta).raw,
-      parseWei('1').raw,
-      false
-    )
   })
 
   describe('success cases', function () {
     it('deposits risky and stable to margin', async function () {
       await this.house.deposit(
         this.deployer.address,
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -41,14 +26,13 @@ runTest('deposit', function () {
     it('increases the margin', async function () {
       await this.house.deposit(
         this.deployer.address,
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
         parseWei('1000').raw
       )
 
-      const margin = await this.house.margins(this.engine.address, this.deployer.address)
+      const margin = await this.house.margins(this.deployer.address, this.engine.address)
       expect(margin.balanceRisky).to.equal(parseWei('1000').raw)
       expect(margin.balanceStable).to.equal(parseWei('1000').raw)
     })
@@ -59,7 +43,6 @@ runTest('deposit', function () {
 
       await this.house.deposit(
         this.deployer.address,
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -81,7 +64,6 @@ runTest('deposit', function () {
 
       await this.house.deposit(
         this.deployer.address,
-        this.engine.address,
         this.risky.address,
         this.stable.address,
         parseWei('1000').raw,
@@ -101,7 +83,6 @@ runTest('deposit', function () {
       await expect(
         this.house.deposit(
           this.deployer.address,
-          this.engine.address,
           this.risky.address,
           this.stable.address,
           parseWei('1000').raw,
@@ -129,7 +110,6 @@ runTest('deposit', function () {
           .connect(this.bob)
           .deposit(
             this.deployer.address,
-            this.engine.address,
             this.risky.address,
             this.stable.address,
             parseWei('1000').raw,

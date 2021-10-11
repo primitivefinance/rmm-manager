@@ -1,12 +1,9 @@
-import { Wallet, Contract, Signer } from 'ethers'
-import { parsePercentage } from 'web3-units'
+import { Wallet, Contract } from 'ethers'
+import { Time, parsePercentage } from 'web3-units'
 import hre, { ethers, waffle } from 'hardhat'
-import { deployContract } from 'ethereum-waffle'
+import { deployContract, createFixtureLoader } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
-
 import { MockEngine__factory } from '../../typechain'
-
-import { Contracts } from '../../types'
 import { Calibration } from '../shared/calibration'
 
 export async function deploy(contractName: string, deployer: Wallet, args: any[] = []): Promise<Contract> {
@@ -15,44 +12,49 @@ export async function deploy(contractName: string, deployer: Wallet, args: any[]
   return contract
 }
 
-export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, 1633113818, 1, 10, parsePercentage(0.0015))
+export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, Time.YearInSeconds + 1, 1, 10, parsePercentage(0.0015))
 
-export function runTest(
-  desc: string,
-  runTests: Function,
-): void {
-  describe(desc, function () {
+export function runTest(description: string, runTests: Function): void {
+  const loadFixture = createFixtureLoader()
+
+  describe(description, function () {
     beforeEach(async function () {
-      const signers = waffle.provider.getWallets();
-      const [deployer] = signers;
+      const signers = waffle.provider.getWallets()
+      const [deployer] = signers
 
-      this.loadFixture = waffle.createFixtureLoader(signers)
+      const loadedFixture = await loadFixture(async function () {
+        // Core
+        const risky = (await deploy('Token', deployer)) as ContractTypes.Token
+        const stable = (await deploy('Token', deployer)) as ContractTypes.Token
 
-      // TODO: Put that into a fixture
+        const factory = (await deploy('MockFactory', deployer)) as ContractTypes.MockFactory
 
-      // Core
-      const risky = (await deploy('Token', deployer)) as ContractTypes.Token
-      const stable = (await deploy('Token', deployer)) as ContractTypes.Token
+        // const factory = (await deployContract(deployer, PrimitiveFactoryArtifact)) as PrimitiveFactory
+        await factory.deploy(risky.address, stable.address)
+        const addr = await factory.getEngine(risky.address, stable.address)
+        const engine = (await ethers.getContractAt(MockEngine__factory.abi, addr)) as ContractTypes.MockEngine
 
-      const factory = (await deploy('MockFactory', deployer)) as ContractTypes.MockFactory
+        // Periphery
+        const house = (await deploy('PrimitiveHouse', deployer, [
+          factory.address,
+          '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F',
+          '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F', // Random address for testing purposes
+        ])) as ContractTypes.PrimitiveHouse
 
-      // const factory = (await deployContract(deployer, PrimitiveFactoryArtifact)) as PrimitiveFactory
-      await factory.deploy(risky.address, stable.address)
-      const addr = await factory.getEngine(risky.address, stable.address)
-      const engine = (await ethers.getContractAt(MockEngine__factory.abi, addr)) as ContractTypes.MockEngine
+        return {
+          risky,
+          stable,
+          factory,
+          engine,
+          house,
+        }
+      })
 
-      // Periphery
-      const house = (await deploy('PrimitiveHouse', deployer, [
-        factory.address,
-        '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F',
-        '',
-      ])) as ContractTypes.PrimitiveHouse
-
-      this.risky = risky;
-      this.stable = stable;
-      this.factory = factory;
-      this.engine = engine;
-      this.house = house;
+      this.risky = loadedFixture.risky
+      this.stable = loadedFixture.stable
+      this.factory = loadedFixture.factory
+      this.engine = loadedFixture.engine
+      this.house = loadedFixture.house
 
       this.deployer = deployer
       this.alice = signers[1]

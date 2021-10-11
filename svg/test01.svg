@@ -1,68 +1,61 @@
-<svg width="260" height="500" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="260" height="500" rx="15" ry="15"  fill="#1E242C" />
+<svg width="390px" height="390" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff1b6b" />
+      <stop offset="100%" stop-color="#45caff" />
+    </linearGradient>
 
-  <text x="130" y="40" font-family="Verdana" font-size="18" fill="#fff" font-weight="bold" text-anchor="middle">
-    ETH/USDC
+    <linearGradient id="g" x1="100%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff1b6b" />
+      <stop offset="100%" stop-color="#45caff" />
+    </linearGradient>
+
+    <mask id="b">
+      <rect x="30" y="325" width="330" height="42" rx="10" ry="10" fill="#fff" />
+    </mask>
+  </defs>
+
+  <rect x="0" y="0" width="390" height="390" rx="15" ry="15"  fill="url(#g)" />
+
+  <text x="20" y="60" font-family="Verdana" font-size="34" fill="#000" font-weight="900">
+    ETH / USDC
   </text>
 
-  <text x="130" y="60" font-family="Verdana" font-size="14" fill="#46D7AB" font-weight="bold" text-anchor="middle">
-    $3,293.78
+  <rect x="20" y="90" width="350" height="50" rx="15" ry="15" fill="#000" />
+  <text x="35" y="120" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold">
+    Expiry
+  </text>
+  <text x="355" y="120" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold" text-anchor="end">
+    2021/12/31
   </text>
 
-  <g transform="translate(0, 30)">
-    <text x="20" y="80" font-family="Verdana" font-size="16" fill="#7B7F84">
-    Pool
+  <rect x="20" y="155" width="350" height="50" rx="15" ry="15" fill="#000" />
+  <text x="35" y="185" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold">
+    Strike
+  </text>
+  <text x="355" y="185" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold" text-anchor="end">
+    3000 USDC
   </text>
 
-    <rect x="20" y="90" width="220" height="100" rx="15" ry="15" fill="#29313A" />
+  <rect x="20" y="220" width="350" height="50" rx="15" ry="15" fill="#000" />
+  <text x="35" y="250" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold">
+    IV
+  </text>
+  <text x="355" y="250" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold" text-anchor="end">
+    100%
+  </text>
 
-    <text x="40" y="120" font-family="Verdana" font-size="12" fill="#7B7F84" font-weight="500">
-      Expiry
-    </text>
-    <text x="220" y="120" font-family="Verdana" font-size="14" fill="#fff" font-weight="bold" text-anchor="end">
-      2021/12/31
-    </text>
+  <rect x="20" y="285" width="350" height="95" rx="15" ry="15" fill="#000" />
+  <text x="35" y="315" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold">
+    Premium Collected
+  </text>
+  <text x="355" y="315" font-family="Verdana" font-size="16" fill="#fff" font-weight="bold" text-anchor="end">
+    50%
+  </text>
 
-    <text x="40" y="145" font-family="Verdana" font-size="12" fill="#7B7F84" font-weight="500">
-      Strike
-    </text>
-    <text x="220" y="145" font-family="Verdana" font-size="14" fill="#fff" font-weight="bold" text-anchor="end">
-      $3000
-    </text>
 
-    <text x="40" y="170" font-family="Verdana" font-size="12" fill="#7B7F84" font-weight="500">
-      IV
-    </text>
-    <text x="220" y="170" font-family="Verdana" font-size="14" fill="#fff" font-weight="bold" text-anchor="end">
-      100%
-    </text>
-
-    <text x="20" y="230" font-family="Verdana" font-size="16" fill="#7B7F84">
-      Your Liquidity
-    </text>
-
-    <rect x="20" y="250" width="220" height="105" rx="15" ry="15" fill="#29313A" />
-
-    <text x="40" y="280" font-family="Verdana" font-size="12" fill="#7B7F84" font-weight="500">
-      ETH
-    </text>
-    <text x="220" y="280" font-family="Verdana" font-size="14" fill="#fff" text-anchor="end">
-      2.434
-    </text>
-
-    <text x="40" y="305" font-family="Verdana" font-size="12" fill="#7B7F84" font-weight="500">
-      USDC
-    </text>
-    <text x="220" y="305" font-family="Verdana" font-size="14" fill="#fff" text-anchor="end">
-      3,854.78
-    </text>
-
-    <text x="40" y="340" font-family="Verdana" font-size="16" fill="#fff">
-      Total
-    </text>
-    <text x="220" y="340" font-family="Verdana" font-size="14" fill="#fff" font-weight="bold" text-anchor="end">
-      $10,054.43
-    </text>
-
+  <g mask="url(#b)">
+    <rect x="30" y="325" width="330" height="42" fill="#fff" />
+    <rect x="30" y="325" width="170" height="42" fill="purple" />
   </g>
 </svg>
