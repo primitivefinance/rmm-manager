@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
+/// @title   SelfPermit
+/// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/SelfPermit.sol
+/// @notice  Functionality to call permit on any EIP-2612-compliant token for use in the route
+/// @dev     These functions are expected to be embedded in multicalls to allow EOAs to approve a contract and call a function
+///          that requires an approval in a single transaction.
 
-import "../interfaces/IERC20.sol";
-import "../interfaces/IERC20PermitAllowed.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
+import "../interfaces/external/IERC20.sol";
+import "../interfaces/external/IERC20PermitAllowed.sol";
 import "../interfaces/ISelfPermit.sol";
 
-/// @title Self Permit
-/// @notice Functionality to call permit on any EIP-2612-compliant token for use in the route
-/// @dev These functions are expected to be embedded in multicalls to allow EOAs to approve a contract and call a function
-/// that requires an approval in a single transaction.
-/// Credits goes to Uniswap (https://github.com/Uniswap/v3-periphery)
 abstract contract SelfPermit is ISelfPermit {
     /// @inheritdoc ISelfPermit
     function selfPermit(

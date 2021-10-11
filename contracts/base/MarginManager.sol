@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
-import "@primitivefinance/v2-core/contracts/libraries/Margin.sol";
+/// @title   MarginManager
+/// @author  Primitive
+/// @notice  Manages the margins
 
+import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
+import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "../interfaces/IMarginManager.sol";
 import "./HouseBase.sol";
-
 import "../libraries/TransferHelper.sol";
+import "../libraries/Margin.sol";
 
-/// @title MarginManager
-/// @author Primitive
-/// @notice Manages the margins
 abstract contract MarginManager is IMarginManager, HouseBase {
     using TransferHelper for IERC20;
-    using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
 
     /// @inheritdoc IMarginManager
@@ -23,7 +22,6 @@ abstract contract MarginManager is IMarginManager, HouseBase {
     /// @inheritdoc IMarginManager
     function deposit(
         address recipient,
-        address engine,
         address risky,
         address stable,
         uint256 delRisky,
@@ -31,21 +29,16 @@ abstract contract MarginManager is IMarginManager, HouseBase {
     ) external override lock {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
+        address engine = EngineAddress.computeAddress(factory, risky, stable);
+
         IPrimitiveEngineActions(engine).deposit(
             address(this),
             delRisky,
             delStable,
-            abi.encode(
-                CallbackData({
-                    payer: msg.sender,
-                    risky: risky,
-                    stable: stable
-                })
-            )
+            abi.encode(CallbackData({payer: msg.sender, risky: risky, stable: stable}))
         );
 
-        Margin.Data storage mar = margins[engine][recipient];
-        mar.deposit(delRisky, delStable);
+        margins[recipient][engine].deposit(delRisky, delStable);
 
         emit Deposit(msg.sender, recipient, engine, risky, stable, delRisky, delStable);
     }
@@ -60,15 +53,25 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         // Reverts the call early if margins are insufficient
-        margins[engine].withdraw(delRisky, delStable);
+        margins[msg.sender][engine].withdraw(delRisky, delStable);
 
+        // Setting address(0) as the recipient will result in the tokens
+        // being sent into the House, useful to unwrap WETH for example
         IPrimitiveEngineActions(engine).withdraw(
             recipient == address(0) ? address(this) : recipient,
             delRisky,
             delStable
         );
 
-        emit Withdraw(msg.sender, recipient, engine, delRisky, delStable);
+        emit Withdraw(
+            msg.sender,
+            recipient,
+            engine,
+            IPrimitiveEngineView(engine).risky(), // FIXME: A bit expensive for just an event no?
+            IPrimitiveEngineView(engine).stable(), // FIXME: A bit expensive for just an event no?
+            delRisky,
+            delStable
+        );
     }
 
     /// @inheritdoc IPrimitiveDepositCallback

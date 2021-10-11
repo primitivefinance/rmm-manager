@@ -1,5 +1,5 @@
-import { utils, constants } from 'ethers'
-import { parseWei } from 'web3-units'
+import { constants } from 'ethers'
+import { parseWei, Wei } from 'web3-units'
 
 import { DEFAULT_CONFIG } from '../../context'
 import { computePoolId } from '../../../shared/utilities'
@@ -8,6 +8,8 @@ import { runTest } from '../../context'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
+let delRisky: Wei, delStable: Wei
+const delLiquidity = parseWei('10')
 
 runTest('remove', function () {
   beforeEach(async function () {
@@ -17,20 +19,17 @@ runTest('remove', function () {
     await this.stable.approve(this.house.address, constants.MaxUint256)
 
     await this.house.create(
-      this.engine.address,
       this.risky.address,
       this.stable.address,
       strike.raw,
       sigma.raw,
       maturity.raw,
-      parseWei(delta).raw,
-      parseWei('1').raw,
-      false
+      parseWei(1).sub(parseWei(delta)).raw,
+      delLiquidity.raw,
     )
 
     await this.house.deposit(
       this.deployer.address,
-      this.engine.address,
       this.risky.address,
       this.stable.address,
       parseWei('1000').raw,
@@ -39,14 +38,18 @@ runTest('remove', function () {
 
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
+    const amount = parseWei('10')
+    const res = await this.engine.reserves(poolId)
+    delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
+    delStable = amount.mul(res.reserveStable).div(res.liquidity)
+
     await this.house.allocate(
-      this.engine.address,
+      poolId,
       this.risky.address,
       this.stable.address,
-      poolId,
-      parseWei('1').raw,
+      delRisky.raw,
+      delStable.raw,
       true,
-      false,
     )
   })
 
@@ -59,7 +62,7 @@ runTest('remove', function () {
       )
     })
 
-    it.skip('decreases the position of the sender', async function () {
+    it('decreases the position of the sender', async function () {
       const liquidity = await this.house.balanceOf(this.deployer.address, poolId)
 
       await this.house.remove(
@@ -77,7 +80,7 @@ runTest('remove', function () {
       const reserve = await this.engine.reserves(poolId)
       const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
-      const initialMargin = await this.house.margins(this.engine.address, this.deployer.address)
+      const initialMargin = await this.house.margins(this.deployer.address, this.engine.address)
 
       await this.house.remove(
         this.engine.address,
@@ -85,7 +88,7 @@ runTest('remove', function () {
         parseWei('1').raw,
       )
 
-      const newMargin = await this.house.margins(this.engine.address, this.deployer.address)
+      const newMargin = await this.house.margins(this.deployer.address, this.engine.address)
 
       expect(newMargin.balanceRisky).to.equal(initialMargin.balanceRisky.add(deltaRisky.raw))
       expect(newMargin.balanceStable).to.equal(initialMargin.balanceStable.add(deltaStable.raw))
@@ -106,7 +109,7 @@ runTest('remove', function () {
       await expect(this.house.remove(
         this.engine.address,
         poolId,
-        parseWei('10').raw,
+        parseWei('10000').raw,
       )).to.be.reverted
     })
   })

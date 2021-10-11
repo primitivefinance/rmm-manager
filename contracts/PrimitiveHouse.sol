@@ -1,119 +1,102 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+/// @title   Primitive House
+/// @author  Primitive
+/// @notice  Interacts with Primitive Engine contracts
+
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-
 import "./interfaces/IPrimitiveHouse.sol";
-import "./libraries/TransferHelper.sol";
-
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
 import "./base/SelfPermit.sol";
-import "./base/PositionWrapper.sol";
+import "./base/PositionManager.sol";
 import "./base/SwapManager.sol";
+import "./libraries/TransferHelper.sol";
 
-import "hardhat/console.sol";
-
-/// @title Primitive House
-/// @author Primitive
-/// @dev Interacts with Primitive Engine contracts
-contract PrimitiveHouse is
-    IPrimitiveHouse,
-    Multicall,
-    CashManager,
-    SelfPermit,
-    PositionWrapper,
-    SwapManager
-{
+contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, PositionManager, SwapManager {
     using TransferHelper for IERC20;
-    using Margin for mapping(address => Margin.Data);
     using Margin for Margin.Data;
 
     /// EFFECT FUNCTIONS ///
 
-    /// @param _factory The address of a PrimitiveFactory
-    /// @param _WETH10 The address of WETH10
+    /// @param factory_  Address of a PrimitiveFactory
+    /// @param WETH10_   Address of WETH10
     constructor(
-        address _factory,
-        address _WETH10,
-        string memory _URI
-    ) HouseBase(_factory, _WETH10) PositionWrapper(_URI) {}
+        address factory_,
+        address WETH10_,
+        address positionRenderer_
+    ) HouseBase(factory_, WETH10_, positionRenderer_) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
-        address engine,
         address risky,
         address stable,
         uint256 strike,
         uint64 sigma,
         uint32 maturity,
-        uint256 delta,
-        uint256 delLiquidity,
-        bool shouldTokenizeLiquidity
-    ) external override lock returns (
-        bytes32 poolId,
-        uint256 delRisky,
-        uint256 delStable
-    ) {
+        uint256 riskyPerLp,
+        uint256 delLiquidity
+    )
+        external
+        override
+        lock
+        returns (
+            bytes32 poolId,
+            uint256 delRisky,
+            uint256 delStable
+        )
+    {
+        address engine = EngineAddress.computeAddress(factory, risky, stable);
+
         if (engine == address(0)) revert EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
-        CallbackData memory callbackData = CallbackData({
-            payer: msg.sender,
-            risky: risky,
-            stable: stable
-        });
+        CallbackData memory callbackData = CallbackData({risky: risky, stable: stable, payer: msg.sender});
 
         (poolId, delRisky, delStable) = IPrimitiveEngineActions(engine).create(
             strike,
             sigma,
             maturity,
-            delta,
+            riskyPerLp,
             delLiquidity,
             abi.encode(callbackData)
         );
 
         // Mints {delLiquidity - MIN_LIQUIDITY} of liquidity tokens
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
-        _allocate(msg.sender, poolId, delLiquidity - MIN_LIQUIDITY, shouldTokenizeLiquidity);
+        _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
     }
 
     /// @inheritdoc IPrimitiveHouse
     function allocate(
-        address engine,
+        bytes32 poolId,
         address risky,
         address stable,
-        bytes32 poolId,
-        uint256 delLiquidity,
-        bool fromMargin,
-        bool shouldTokenizeLiquidity
-    ) external override lock returns (
         uint256 delRisky,
-        uint256 delStable
-    ) {
-        if (delLiquidity == 0) revert ZeroLiquidityError();
+        uint256 delStable,
+        bool fromMargin
+    ) external override lock returns (uint256 delLiquidity) {
+        address engine = EngineAddress.computeAddress(factory, risky, stable);
 
-        (delRisky, delStable) = IPrimitiveEngineActions(engine).allocate(
+        if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
+
+        (delLiquidity) = IPrimitiveEngineActions(engine).allocate(
             poolId,
             address(this),
-            delLiquidity,
+            delRisky,
+            delStable,
             fromMargin,
-            abi.encode(
-                CallbackData({
-                    payer: msg.sender,
-                    risky: risky,
-                    stable: stable
-                })
-            )
+            abi.encode(CallbackData({risky: risky, stable: stable, payer: msg.sender}))
         );
 
-        if (fromMargin) margins[engine].withdraw(delRisky, delStable);
+        if (fromMargin) margins[msg.sender][engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, poolId, delLiquidity, shouldTokenizeLiquidity);
+        _allocate(msg.sender, engine, poolId, delLiquidity);
 
         emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
     }
@@ -123,22 +106,19 @@ contract PrimitiveHouse is
         address engine,
         bytes32 poolId,
         uint256 delLiquidity
-    ) external override lock returns (
-        uint256 delRisky,
-        uint256 delStable
-    ) {
+    ) external override lock returns (uint256 delRisky, uint256 delStable) {
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
         (delRisky, delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
         _remove(msg.sender, poolId, delLiquidity);
 
-        Margin.Data storage mar = margins[engine][msg.sender];
+        Margin.Data storage mar = margins[msg.sender][engine];
         mar.deposit(delRisky, delStable);
 
         emit Remove(msg.sender, engine, poolId, delLiquidity, delRisky, delStable);
     }
 
-    // ===== Callback Implementations =====
+    /// CALLBACK IMPLEMENTATIONS ///
 
     /// @inheritdoc IPrimitiveCreateCallback
     function createCallback(
@@ -149,7 +129,6 @@ contract PrimitiveHouse is
         CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
-
         if (msg.sender != engine) revert NotEngineError();
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
@@ -169,13 +148,5 @@ contract PrimitiveHouse is
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
-    }
-
-    // TODO: Delete this callback when the interface will be updated
-    function removeCallback(
-        uint256 delRisky,
-        uint256 delStable,
-        bytes calldata data
-    ) external override {
     }
 }

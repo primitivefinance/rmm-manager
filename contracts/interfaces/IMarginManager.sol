@@ -1,15 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+/// @title   MarginManager Interface
+/// @author  Primitive
+
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
 
 interface IMarginManager is IPrimitiveDepositCallback {
     /// ERRORS ///
 
+    /// @notice Thrown when the risky and stable amounts are 0
     error ZeroDelError();
 
     /// EVENTS ///
 
+    /// @notice           Emitted when funds are deposited
+    /// @param payer      Address depositing the funds
+    /// @param recipient  Address receiving the funds (in their margin)
+    /// @param engine     Engine receiving the funds
+    /// @param risky      Address of the risky token
+    /// @param stable     Address of the stable token
+    /// @param delRisky   Amount of deposited risky
+    /// @param delStable  Amount of deposited stable
     event Deposit(
         address indexed payer,
         address indexed recipient,
@@ -20,25 +32,45 @@ interface IMarginManager is IPrimitiveDepositCallback {
         uint256 delStable
     );
 
+    /// @notice           Emitted when funds are withdrawn
+    /// @param payer      Address withdrawing the funds
+    /// @param recipient  Address receiving the funds (in their wallet)
+    /// @param engine     Engine where the funds are withdrawn from
+    /// @param risky      Address of the risky token
+    /// @param stable     Address of the stable token
+    /// @param delRisky   Amount of withdrawn risky
+    /// @param delStable  Amount of withdrawn stable
     event Withdraw(
         address indexed payer,
         address indexed recipient,
         address indexed engine,
+        address risky,
+        address stable,
         uint256 delRisky,
         uint256 delStable
     );
 
     /// EFFECT FUNCTIONS ///
 
+    /// @notice           Deposits funds into the margin of an engine
+    /// @param recipient  Address receiving the funds in their margin
+    /// @param risky      Address of the risky token
+    /// @param stable     Address of the stable token
+    /// @param delRisky   Amount of risky token to deposit
+    /// @param delStable  Amount of stable token to deposit
     function deposit(
         address recipient,
-        address engine,
         address risky,
         address stable,
         uint256 delRisky,
         uint256 delStable
     ) external;
 
+    /// @notice           Withdraw funds from the margin of an engine
+    /// @param recipient  Address receiving the funds in their wallet
+    /// @param engine     Engine to withdraw from
+    /// @param delRisky   Amount of risky token to withdraw
+    /// @param delStable  Amount of stable token to withdraw
     function withdraw(
         address recipient,
         address engine,
@@ -48,12 +80,12 @@ interface IMarginManager is IPrimitiveDepositCallback {
 
     /// VIEW FUNCTIONS ///
 
-    /// @notice Returns the margin of an account for a specific engine
-    /// @param engine The address of the engine
-    /// @param account The address of the account
-    /// @return balanceRisky The balance of risky in the margin of the user
-    /// balanceStable The balance of stable in the margin of the user
-    function margins(address engine, address account)
+    /// @notice               Returns the margin of an account for a specific engine
+    /// @param account        Address of the account
+    /// @param engine         Address of the engine
+    /// @return balanceRisky  The balance of risky in the margin of the user
+    /// balanceStable         The balance of stable in the margin of the user
+    function margins(address account, address engine)
         external
         view
         returns (uint128 balanceRisky, uint128 balanceStable);
