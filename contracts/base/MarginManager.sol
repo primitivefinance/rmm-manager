@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+/// @title   MarginManager
+/// @author  Primitive
+/// @notice  Manages the margins
+
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-
 import "../interfaces/IMarginManager.sol";
 import "./HouseBase.sol";
 import "../libraries/TransferHelper.sol";
 import "../libraries/Margin.sol";
 
-/// @title   MarginManager
-/// @author  Primitive
-/// @notice  Manages the margins
 abstract contract MarginManager is IMarginManager, HouseBase {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
@@ -35,13 +35,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
             address(this),
             delRisky,
             delStable,
-            abi.encode(
-                CallbackData({
-                    payer: msg.sender,
-                    risky: risky,
-                    stable: stable
-                })
-            )
+            abi.encode(CallbackData({payer: msg.sender, risky: risky, stable: stable}))
         );
 
         margins[recipient][engine].deposit(delRisky, delStable);

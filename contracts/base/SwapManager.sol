@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+/// @title   SwapManager
+/// @author  Primitive
+/// @dev     Manages the swaps
+
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "@primitivefinance/v2-core/contracts/libraries/ReplicationMath.sol";
 
 import "../interfaces/ISwapManager.sol";
-import "../interfaces/IERC20.sol";
+import "../interfaces/external/IERC20.sol";
 import "./MarginManager.sol";
 import "./HouseBase.sol";
 
 import "hardhat/console.sol";
 
-/// @title   SwapManager
-/// @author  Primitive
-/// @dev     Manages the swaps
 abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
@@ -28,8 +29,19 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     error DeltaInError();
     error DeltaOutError();
 
-    /// @inheritdoc ISwapManager
-    function swap(SwapParameters memory params) external override lock checkDeadline(params.deadline) {
+    /*
+
+    function swapExactIn(SwapParameters memory params) external lock checkDeadline(params.deadline) {
+        _swap(params);
+    }
+
+    function swapExactOut(SwapParameters memory params) external lock checkDeadline(params.deadline) {
+        _swap(params);
+    }
+
+    */
+
+    function swap(SwapParms memory params) external override {
         CallbackData memory callbackData = CallbackData({
             payer: msg.sender,
             risky: params.risky,

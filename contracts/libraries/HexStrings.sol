@@ -1,5 +1,8 @@
-// SPDX-License-Identifier: GPL-3.0-only
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.6;
+
+/// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/HexStrings.sol
+/// @notice  Utils functions to convert numbers into hex strings
 
 library HexStrings {
     bytes16 internal constant ALPHABET = "0123456789abcdef";

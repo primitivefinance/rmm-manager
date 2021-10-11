@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
+/// @title   PositionRenderer
+/// @author  Primitive
+/// @notice  Manages the NFT rendering of the position tokens
+
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-
 import "./interfaces/IPositionRenderer.sol";
-import "./interfaces/IERC20WithOptions.sol";
-
+import "./interfaces/external/IERC20WithMetadata.sol";
 import "./libraries/HexStrings.sol";
 
 contract PositionRenderer is IPositionRenderer {
@@ -39,10 +41,10 @@ contract PositionRenderer is IPositionRenderer {
 
     function uri(address engineAddress, uint256 tokenId) external view override returns (string memory) {
         address risky = IPrimitiveEngineView(engineAddress).risky();
-        string memory riskySymbol = IERC20WithOptions(risky).symbol();
+        string memory riskySymbol = IERC20WithMetadata(risky).symbol();
 
         address stable = IPrimitiveEngineView(engineAddress).stable();
-        string memory stableSymbol = IERC20WithOptions(stable).symbol();
+        string memory stableSymbol = IERC20WithMetadata(stable).symbol();
 
         return
             string(
