@@ -1,6 +1,0 @@
-// SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.6;
-
-import "@primitivefinance/v2-core/contracts/PrimitiveFactory.sol";
-
-contract MockFactory is PrimitiveFactory {}

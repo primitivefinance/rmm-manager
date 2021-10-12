@@ -2,14 +2,15 @@ import { expect } from 'chai'
 
 import { runTest, deploy } from './context'
 import { computeEngineAddress } from '../shared/utilities'
-import { TestEngineAddress, PrimitiveEngine__factory } from '../../typechain'
+import { TestEngineAddress } from '../../typechain'
+import { bytecode as EngineBytecode } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 runTest('testEngineAddress', function () {
   it('computes the engine addresse', async function () {
     const testEngineAddress = (await deploy('TestEngineAddress', this.deployer)) as TestEngineAddress
 
     expect(await testEngineAddress.computeAddress(this.factory.address, this.risky.address, this.stable.address)).to.equal(
-      computeEngineAddress(this.factory.address, this.risky.address, this.stable.address, PrimitiveEngine__factory.bytecode)
+      computeEngineAddress(this.factory.address, this.risky.address, this.stable.address, EngineBytecode)
     )
   })
 })
