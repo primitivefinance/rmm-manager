@@ -3,11 +3,11 @@ import * as ContractTypes from '../typechain'
 import { Fixture } from '@ethereum-waffle/provider'
 
 export interface Contracts {
-  factory: ContractTypes.MockFactory
+  factory: ContractTypes.PrimitiveFactory
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token
-  engine: ContractTypes.MockEngine
+  engine: ContractTypes.PrimitiveEngine
 }
 
 declare module 'mocha' {
