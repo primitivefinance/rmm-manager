@@ -4,7 +4,9 @@ import hre, { ethers, waffle } from 'hardhat'
 import { deployContract, createFixtureLoader } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
 import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import FactoryArtifact from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
 import { Calibration } from '../shared/calibration'
+import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
 
 export async function deploy(contractName: string, deployer: Wallet, args: any[] = []): Promise<Contract> {
   const artifact = await hre.artifacts.readArtifact(contractName)
@@ -27,12 +29,14 @@ export function runTest(description: string, runTests: Function): void {
         const risky = (await deploy('Token', deployer)) as ContractTypes.Token
         const stable = (await deploy('Token', deployer)) as ContractTypes.Token
 
-        const factory = (await deploy('PrimitiveFactory', deployer)) as ContractTypes.PrimitiveFactory
+        const factory = (await deployContract(deployer, FactoryArtifact, [], {
+          gasLimit: 9500000,
+        })) as PrimitiveFactory
 
         // const factory = (await deployContract(deployer, PrimitiveFactoryArtifact)) as PrimitiveFactory
         await factory.deploy(risky.address, stable.address)
         const addr = await factory.getEngine(risky.address, stable.address)
-        const engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as ContractTypes.PrimitiveEngine
+        const engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as PrimitiveEngine
 
         // Periphery
         const house = (await deploy('PrimitiveHouse', deployer, [
