@@ -12,7 +12,7 @@ export async function deploy(contractName: string, deployer: Wallet, args: any[]
   return contract
 }
 
-export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, Time.YearInSeconds + 1, 1, 10, parsePercentage(0.0015))
+export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, 1697095396, 1, 10, parsePercentage(0.0015))
 
 export function runTest(description: string, runTests: Function): void {
   const loadFixture = createFixtureLoader()
