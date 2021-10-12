@@ -7,7 +7,7 @@ pragma solidity 0.8.6;
 library EngineAddress {
     /// @notice Hash of the bytecode of the PrimitiveEngine
     bytes32 internal constant ENGINE_INIT_CODE_HASH =
-        0x4515c5367b203022cd8aec15c472f4b347a846943192694634b844b2c0aabaa9;
+        0x35e9da16814730a3cb5bafa10112a408205222da69fd189fe4c188e66cf81800;
 
     /// @notice         Computes the address of an engine
     /// @param factory  Address of the factory
