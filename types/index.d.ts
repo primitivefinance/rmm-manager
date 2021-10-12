@@ -1,13 +1,14 @@
 import { Wallet } from 'ethers'
 import * as ContractTypes from '../typechain'
 import { Fixture } from '@ethereum-waffle/provider'
+import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
 
 export interface Contracts {
-  factory: ContractTypes.PrimitiveFactory
+  factory: PrimitiveFactory
   house: ContractTypes.PrimitiveHouse
   risky: ContractTypes.Token
   stable: ContractTypes.Token
-  engine: ContractTypes.PrimitiveEngine
+  engine: PrimitiveEngine
 }
 
 declare module 'mocha' {
