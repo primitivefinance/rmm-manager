@@ -3,7 +3,7 @@ import { Time, parsePercentage } from 'web3-units'
 import hre, { ethers, waffle } from 'hardhat'
 import { deployContract, createFixtureLoader } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
-import { MockEngine__factory } from '../../typechain'
+import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 import { Calibration } from '../shared/calibration'
 
 export async function deploy(contractName: string, deployer: Wallet, args: any[] = []): Promise<Contract> {
@@ -27,12 +27,12 @@ export function runTest(description: string, runTests: Function): void {
         const risky = (await deploy('Token', deployer)) as ContractTypes.Token
         const stable = (await deploy('Token', deployer)) as ContractTypes.Token
 
-        const factory = (await deploy('MockFactory', deployer)) as ContractTypes.MockFactory
+        const factory = (await deploy('PrimitiveFactory', deployer)) as ContractTypes.PrimitiveFactory
 
         // const factory = (await deployContract(deployer, PrimitiveFactoryArtifact)) as PrimitiveFactory
         await factory.deploy(risky.address, stable.address)
         const addr = await factory.getEngine(risky.address, stable.address)
-        const engine = (await ethers.getContractAt(MockEngine__factory.abi, addr)) as ContractTypes.MockEngine
+        const engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as ContractTypes.PrimitiveEngine
 
         // Periphery
         const house = (await deploy('PrimitiveHouse', deployer, [
