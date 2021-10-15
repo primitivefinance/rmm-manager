@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.6;
+pragma solidity 0.8.9;
 
 /// @title   SelfPermit
 /// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/SelfPermit.sol
@@ -21,7 +21,7 @@ abstract contract SelfPermit is ISelfPermit {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public payable override {
+    ) public payable {
         IERC20Permit(token).permit(msg.sender, address(this), value, deadline, v, r, s);
     }
 
@@ -33,7 +33,7 @@ abstract contract SelfPermit is ISelfPermit {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external payable override {
+    ) external payable {
         if (IERC20(token).allowance(msg.sender, address(this)) < value) selfPermit(token, value, deadline, v, r, s);
     }
 
@@ -45,7 +45,7 @@ abstract contract SelfPermit is ISelfPermit {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public payable override {
+    ) public payable {
         IERC20PermitAllowed(token).permit(msg.sender, address(this), nonce, expiry, true, v, r, s);
     }
 
@@ -57,7 +57,7 @@ abstract contract SelfPermit is ISelfPermit {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external payable override {
+    ) external payable {
         if (IERC20(token).allowance(msg.sender, address(this)) < type(uint256).max)
             selfPermitAllowed(token, nonce, expiry, v, r, s);
     }
