@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.6;
+pragma solidity 0.8.9;
 
 /// @title   PositionRenderer
 /// @author  Primitive
@@ -39,7 +39,7 @@ contract PositionRenderer is IPositionRenderer {
         day = uint256(_day);
     }
 
-    function uri(address engineAddress, uint256 tokenId) external view override returns (string memory) {
+    function uri(address engineAddress, uint256 tokenId) external view returns (string memory) {
         address risky = IPrimitiveEngineView(engineAddress).risky();
         string memory riskySymbol = IERC20WithMetadata(risky).symbol();
 

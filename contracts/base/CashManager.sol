@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.6;
+pragma solidity 0.8.9;
 
 /// @title   CashManager
 /// @author  Primitive
@@ -19,7 +19,7 @@ abstract contract CashManager is ICashManager, HouseBase {
     }
 
     /// @inheritdoc ICashManager
-    function unwrap(uint256 amountMin, address recipient) external payable override {
+    function unwrap(uint256 amountMin, address recipient) external payable {
         uint256 balance = IWETH10(WETH10).balanceOf(address(this));
 
         if (balance < amountMin) revert AmountTooLow(amountMin, balance);
@@ -35,7 +35,7 @@ abstract contract CashManager is ICashManager, HouseBase {
         address token,
         uint256 amountMin,
         address recipient
-    ) external payable override {
+    ) external payable {
         uint256 balance = IERC20(token).balanceOf(address(this));
         if (balance < amountMin) revert AmountTooLow(amountMin, balance);
 
@@ -45,7 +45,7 @@ abstract contract CashManager is ICashManager, HouseBase {
     }
 
     /// @inheritdoc ICashManager
-    function refundETH() external payable override {
+    function refundETH() external payable {
         if (address(this).balance > 0) TransferHelper.safeTransferETH(msg.sender, address(this).balance);
     }
 }

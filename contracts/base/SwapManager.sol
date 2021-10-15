@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.6;
+pragma solidity 0.8.9;
 
 /// @title   SwapManager
 /// @author  Primitive
@@ -25,7 +25,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     }
 
     /// @inheritdoc ISwapManager
-    function swap(SwapParams memory params) external override checkDeadline(params.deadline) {
+    function swap(SwapParams memory params) external checkDeadline(params.deadline) {
         CallbackData memory callbackData = CallbackData({
             payer: msg.sender,
             risky: params.risky,
@@ -77,7 +77,7 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
-    ) external override {
+    ) external {
         CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
