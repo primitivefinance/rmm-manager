@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.9;
+pragma solidity 0.8.6;
 
 /// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/libraries/HexStrings.sol
 /// @notice  Utils functions to convert numbers into hex strings

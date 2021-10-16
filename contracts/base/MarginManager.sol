@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.9;
+pragma solidity 0.8.6;
 
 /// @title   MarginManager
 /// @author  Primitive
@@ -17,7 +17,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
     using Margin for Margin.Data;
 
     /// @inheritdoc IMarginManager
-    mapping(address => mapping(address => Margin.Data)) public margins;
+    mapping(address => mapping(address => Margin.Data)) public override margins;
 
     /// @inheritdoc IMarginManager
     function deposit(
@@ -26,7 +26,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         address stable,
         uint256 delRisky,
         uint256 delStable
-    ) external lock {
+    ) external override lock {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         address engine = EngineAddress.computeAddress(factory, risky, stable);
@@ -49,7 +49,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         address engine,
         uint256 delRisky,
         uint256 delStable
-    ) external lock {
+    ) external override lock {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         // Reverts the call early if margins are insufficient
@@ -79,7 +79,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
-    ) external {
+    ) external override {
         CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);

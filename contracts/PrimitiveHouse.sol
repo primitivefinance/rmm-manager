@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.9;
+pragma solidity 0.8.6;
 
 /// @title   Primitive House
 /// @author  Primitive
@@ -39,6 +39,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 delLiquidity
     )
         external
+        override
         lock
         returns (
             bytes32 poolId,
@@ -78,7 +79,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 delRisky,
         uint256 delStable,
         bool fromMargin
-    ) external lock returns (uint256 delLiquidity) {
+    ) external override lock returns (uint256 delLiquidity) {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
@@ -105,7 +106,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address engine,
         bytes32 poolId,
         uint256 delLiquidity
-    ) external lock returns (uint256 delRisky, uint256 delStable) {
+    ) external override lock returns (uint256 delRisky, uint256 delStable) {
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
         (delRisky, delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
@@ -124,7 +125,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
-    ) external {
+    ) external override {
         CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
@@ -139,7 +140,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 delRisky,
         uint256 delStable,
         bytes calldata data
-    ) external {
+    ) external override {
         CallbackData memory decoded = abi.decode(data, (CallbackData));
 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
