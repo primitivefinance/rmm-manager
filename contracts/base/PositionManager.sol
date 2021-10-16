@@ -51,33 +51,82 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
     }
 
     function getMetadata(uint256 tokenId) internal view returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    'data:application/json;utf8,{"name":"',
+                    "Name goes here",
+                    '","image":"data:image/svg+xml;utf8,',
+                    IPositionRenderer(positionRenderer).render(cache[tokenId], tokenId),
+                    '","license":"License goes here","creator":"creator goes here",',
+                    '"description":"Description goes here",',
+                    getProperties(tokenId)
+                )
+            );
+    }
+
+    function getProperties(uint256 tokenId) internal view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
 
-        return "";
-        /*
-        return string(abi.encodePacked(
-            'data:application/json;utf8,{"name":"',
-            "Name goes here",
-            '","image":"data:image/svg+xml;utf8,',
-            IPositionRenderer(positionRenderer).render(cache[tokenId], tokenId),
-            '",',
-            '"license":"License goes here","creator":"creator goes here",',
-            '"description":"Description goes here",',
-            '"properties": {',
-            '"risky":"',
-            "RISKY goes here",
-            '","stable":"',
-            "Stable goes here",
-            '","strike":"',
-            "Strike goes here",
-            '","maturity":"',
-            "Maturity goes here",
-            '","sigma":"',
-            "Sigma goes here",
-            '","invariant":"',
-            "Invariant goes here",
-            '"}}'
-        ));
-        */
+        (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 creationTimestamp) = engine
+            .calibrations(bytes32(tokenId));
+
+        return
+            string(
+                abi.encodePacked(
+                    '"properties": {"risky":"',
+                    addressToString(engine.risky()),
+                    '","stable":"',
+                    addressToString(engine.stable()),
+                    '","strike":"',
+                    uint2str(strike),
+                    '","maturity":"',
+                    uint2str(maturity),
+                    '","sigma":"',
+                    uint2str(sigma),
+                    '","invariant":"',
+                    "Invariant goes here",
+                    '"}}'
+                )
+            );
+    }
+
+    function addressToString(address _addr) public pure returns (string memory) {
+        bytes32 value = bytes32(uint256(uint160(_addr)));
+        bytes memory alphabet = "0123456789abcdef";
+
+        bytes memory str = new bytes(51);
+        str[0] = "0";
+        str[1] = "x";
+        for (uint256 i = 0; i < 20; i++) {
+            str[2 + i * 2] = alphabet[uint256(uint8(value[i + 12] >> 4))];
+            str[3 + i * 2] = alphabet[uint256(uint8(value[i + 12] & 0x0f))];
+        }
+        return string(str);
+    }
+
+    function uint2str(uint256 _i) internal pure returns (string memory str) {
+        if (_i == 0) {
+            return "0";
+        }
+
+        uint256 j = _i;
+        uint256 length;
+
+        while (j != 0) {
+            length++;
+            j /= 10;
+        }
+
+        bytes memory bstr = new bytes(length);
+        uint256 k = length;
+        j = _i;
+
+        while (j != 0) {
+            bstr[--k] = bytes1(uint8(48 + (j % 10)));
+            j /= 10;
+        }
+
+        str = string(bstr);
     }
 }
