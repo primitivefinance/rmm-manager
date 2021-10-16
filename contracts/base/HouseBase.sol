@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.9;
+pragma solidity 0.8.6;
 
 /// @title   HouseBase
 /// @author  Primitive
@@ -19,13 +19,13 @@ abstract contract HouseBase is IHouseBase, Reentrancy {
     }
 
     /// @inheritdoc IHouseBase
-    address public immutable factory;
+    address public immutable override factory;
 
     /// @inheritdoc IHouseBase
-    address public immutable WETH10;
+    address public immutable override WETH10;
 
     /// @inheritdoc IHouseBase
-    address public immutable positionRenderer;
+    address public immutable override positionRenderer;
 
     /// @param factory_  Address of a PrimitiveFactory
     /// @param WETH10_   Address of WETH10
