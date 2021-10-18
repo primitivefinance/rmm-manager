@@ -3,7 +3,7 @@ pragma solidity 0.8.6;
 
 /// @title   PositionRenderer
 /// @author  Primitive
-/// @notice  Manages the NFT rendering of the position tokens
+/// @notice  Renders the visual of the position tokens
 
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "./interfaces/IPositionRenderer.sol";
@@ -11,6 +11,24 @@ import "./interfaces/external/IERC20WithMetadata.sol";
 import "./libraries/HexStrings.sol";
 
 contract PositionRenderer is IPositionRenderer {
+    function render(address engineAddress, uint256 tokenId) external view override returns (string memory) {
+        address risky = IPrimitiveEngineView(engineAddress).risky();
+        string memory riskySymbol = IERC20WithMetadata(risky).symbol();
+
+        address stable = IPrimitiveEngineView(engineAddress).stable();
+        string memory stableSymbol = IERC20WithMetadata(stable).symbol();
+
+        return
+            string(
+                abi.encodePacked(
+                    '<svg width="260" height="260" xmlns="http://www.w3.org/2000/svg">',
+                    returnGradient(risky, stable),
+                    '<rect x="0" y="0" width="260" height="260" rx="15" ry="15"  fill="url(#g)"/>',
+                    "</svg>"
+                )
+            );
+    }
+
     /// @notice Credits https://github.com/bokkypoobah/BokkyPooBahsDateTimeLibrary/
     function _daysToDate(uint256 _days)
         internal
@@ -37,40 +55,6 @@ contract PositionRenderer is IPositionRenderer {
         year = uint256(_year);
         month = uint256(_month);
         day = uint256(_day);
-    }
-
-    function uri(address engineAddress, uint256 tokenId) external view override returns (string memory) {
-        address risky = IPrimitiveEngineView(engineAddress).risky();
-        string memory riskySymbol = IERC20WithMetadata(risky).symbol();
-
-        address stable = IPrimitiveEngineView(engineAddress).stable();
-        string memory stableSymbol = IERC20WithMetadata(stable).symbol();
-
-        return
-            string(
-                abi.encodePacked(
-                    'data:application/json;utf8,{"name":"',
-                    "Put a name here",
-                    '","image":"data:image/svg+xml;utf8,',
-                    renderSVG(risky, stable),
-                    '",',
-                    '"license":"Put license here","creator":"@PrimitiveFi",',
-                    '"description":"Put a description here"',
-                    "}"
-                )
-            );
-    }
-
-    function renderSVG(address risky, address stable) public view returns (string memory) {
-        return
-            string(
-                abi.encodePacked(
-                    '<svg width="260" height="260" xmlns="http://www.w3.org/2000/svg">',
-                    returnGradient(risky, stable),
-                    '<rect x="0" y="0" width="260" height="260" rx="15" ry="15"  fill="url(#g)"/>',
-                    "</svg>"
-                )
-            );
     }
 
     function returnGradient(address risky, address stable) public pure returns (string memory) {
