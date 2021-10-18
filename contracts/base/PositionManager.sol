@@ -50,7 +50,10 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
         _burn(account, uint256(poolId), amount);
     }
 
-    function getMetadata(uint256 tokenId) internal view returns (string memory) {
+    /// @notice         Returns the metadata of a token
+    /// @param tokenId  Id of the token (same as pool id)
+    /// @return         JSON metadata of the token
+    function getMetadata(uint256 tokenId) private view returns (string memory) {
         return
             string(
                 abi.encodePacked(
@@ -65,7 +68,10 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
             );
     }
 
-    function getProperties(uint256 tokenId) internal view returns (string memory) {
+    /// @notice         Returns the properties of a token
+    /// @param tokenId  Id of the token (same as pool id)
+    /// @return         Properties of the token formatted as JSON
+    function getProperties(uint256 tokenId) private view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
 
         (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 creationTimestamp) = engine
@@ -91,8 +97,11 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
             );
     }
 
-    function addressToString(address _addr) public pure returns (string memory) {
-        bytes32 value = bytes32(uint256(uint160(_addr)));
+    /// @notice      Converts an address into a string
+    /// @param addr  Address to convert
+    /// @return      Address converted into a memory string
+    function addressToString(address addr) private pure returns (string memory) {
+        bytes32 value = bytes32(uint256(uint160(addr)));
         bytes memory alphabet = "0123456789abcdef";
 
         bytes memory str = new bytes(51);
@@ -105,12 +114,15 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
         return string(str);
     }
 
-    function uint2str(uint256 _i) internal pure returns (string memory str) {
-        if (_i == 0) {
+    /// @notice   Converts a uint256 into a string
+    /// @param i  Number of type uint256 to convert
+    /// @return   Number converted into a memory string
+    function uint2str(uint256 i) private pure returns (string memory) {
+        if (i == 0) {
             return "0";
         }
 
-        uint256 j = _i;
+        uint256 j = i;
         uint256 length;
 
         while (j != 0) {
@@ -120,13 +132,13 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
 
         bytes memory bstr = new bytes(length);
         uint256 k = length;
-        j = _i;
+        j = i;
 
         while (j != 0) {
             bstr[--k] = bytes1(uint8(48 + (j % 10)));
             j /= 10;
         }
 
-        str = string(bstr);
+        return string(bstr);
     }
 }
