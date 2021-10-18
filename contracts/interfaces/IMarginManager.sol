@@ -80,11 +80,11 @@ interface IMarginManager is IPrimitiveDepositCallback {
 
     /// VIEW FUNCTIONS ///
 
-    /// @notice               Returns the margin of an account for a specific engine
-    /// @param account        Address of the account
-    /// @param engine         Address of the engine
-    /// @return balanceRisky  The balance of risky in the margin of the user
-    /// balanceStable         The balance of stable in the margin of the user
+    /// @notice                Returns the margin of an account for a specific engine
+    /// @param account         Address of the account
+    /// @param engine          Address of the engine
+    /// @return balanceRisky   Balance of risky in the margin of the user
+    /// @return balanceStable  Balance of stable in the margin of the user
     function margins(address account, address engine)
         external
         view
