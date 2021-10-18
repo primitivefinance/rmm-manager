@@ -6,12 +6,15 @@ pragma solidity 0.8.6;
 /// @notice  Wraps the positions into ERC1155 tokens
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "../interfaces/IPositionManager.sol";
 import "../interfaces/IPositionRenderer.sol";
 import "../base/HouseBase.sol";
 
 abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
+    using Strings for uint256;
+
     /// @dev Keeps track of the pool ids and the engines
     mapping(uint256 => address) private cache;
 
@@ -74,71 +77,27 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
     function getProperties(uint256 tokenId) private view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
 
-        (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 creationTimestamp) = engine
-            .calibrations(bytes32(tokenId));
+        (uint128 strike, uint64 sigma, uint32 maturity, , ) = engine.calibrations(bytes32(tokenId));
+        int128 invariant = engine.invariantOf(bytes32(tokenId));
 
         return
             string(
                 abi.encodePacked(
                     '"properties": {"risky":"',
-                    addressToString(engine.risky()),
+                    uint256(uint160(engine.risky())).toHexString(),
                     '","stable":"',
-                    addressToString(engine.stable()),
+                    uint256(uint160(engine.stable())).toHexString(),
                     '","strike":"',
-                    uint2str(strike),
+                    uint256(strike).toString(),
                     '","maturity":"',
-                    uint2str(maturity),
+                    uint256(maturity).toString(),
                     '","sigma":"',
-                    uint2str(sigma),
+                    uint256(sigma).toString(),
                     '","invariant":"',
-                    "Invariant goes here",
+                    invariant < 0 ? "-" : "",
+                    uint256((uint128(invariant < 0 ? ~invariant + 1 : invariant))).toString(),
                     '"}}'
                 )
             );
-    }
-
-    /// @notice      Converts an address into a string
-    /// @param addr  Address to convert
-    /// @return      Address converted into a memory string
-    function addressToString(address addr) private pure returns (string memory) {
-        bytes32 value = bytes32(uint256(uint160(addr)));
-        bytes memory alphabet = "0123456789abcdef";
-
-        bytes memory str = new bytes(51);
-        str[0] = "0";
-        str[1] = "x";
-        for (uint256 i = 0; i < 20; i++) {
-            str[2 + i * 2] = alphabet[uint256(uint8(value[i + 12] >> 4))];
-            str[3 + i * 2] = alphabet[uint256(uint8(value[i + 12] & 0x0f))];
-        }
-        return string(str);
-    }
-
-    /// @notice   Converts a uint256 into a string
-    /// @param i  Number of type uint256 to convert
-    /// @return   Number converted into a memory string
-    function uint2str(uint256 i) private pure returns (string memory) {
-        if (i == 0) {
-            return "0";
-        }
-
-        uint256 j = i;
-        uint256 length;
-
-        while (j != 0) {
-            length++;
-            j /= 10;
-        }
-
-        bytes memory bstr = new bytes(length);
-        uint256 k = length;
-        j = i;
-
-        while (j != 0) {
-            bstr[--k] = bytes1(uint8(48 + (j % 10)));
-            j /= 10;
-        }
-
-        return string(bstr);
     }
 }
