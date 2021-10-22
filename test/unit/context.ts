@@ -38,11 +38,14 @@ export function runTest(description: string, runTests: Function): void {
         const addr = await factory.getEngine(risky.address, stable.address)
         const engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as PrimitiveEngine
 
+        // PositionRenderer
+        const positionRenderer = (await deploy('PositionRenderer', deployer)) as ContractTypes.PositionRenderer
+
         // Periphery
         const house = (await deploy('PrimitiveHouse', deployer, [
           factory.address,
           '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F',
-          '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F', // Random address for testing purposes
+          positionRenderer.address,
         ])) as ContractTypes.PrimitiveHouse
 
         return {
@@ -51,6 +54,7 @@ export function runTest(description: string, runTests: Function): void {
           factory,
           engine,
           house,
+          positionRenderer,
         }
       })
 
@@ -59,6 +63,7 @@ export function runTest(description: string, runTests: Function): void {
       this.factory = loadedFixture.factory
       this.engine = loadedFixture.engine
       this.house = loadedFixture.house
+      this.positionRenderer = loadedFixture.positionRenderer
 
       this.deployer = deployer
       this.alice = signers[1]
