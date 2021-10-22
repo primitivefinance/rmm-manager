@@ -98,6 +98,9 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
             );
     }
 
+    /// @notice         Returns the calibration of pool as JSON
+    /// @param tokenId  Id of the token (same as pool id)
+    /// @return         Calibration of the pool formatted as JSON
     function getCalibration(uint256 tokenId) private view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
 
@@ -122,6 +125,9 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
             );
     }
 
+    /// @notice         Returns the reservers of pool as JSON
+    /// @param tokenId  Id of the token (same as pool id)
+    /// @return         Reserves of the pool formatted as JSON
     function getReserve(uint256 tokenId) private view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
 
