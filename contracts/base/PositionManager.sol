@@ -63,7 +63,7 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
                     'data:application/json;utf8,{"name":"',
                     "Name goes here",
                     '","image":"data:image/svg+xml;utf8,',
-                    IPositionRenderer(positionRenderer).render(cache[tokenId], tokenId),
+                    // IPositionRenderer(positionRenderer).render(cache[tokenId], tokenId),
                     '","license":"License goes here","creator":"creator goes here",',
                     '"description":"Description goes here",',
                     getProperties(tokenId)
@@ -77,26 +77,82 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
     function getProperties(uint256 tokenId) private view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
 
-        (uint128 strike, uint64 sigma, uint32 maturity, , ) = engine.calibrations(bytes32(tokenId));
         int128 invariant = engine.invariantOf(bytes32(tokenId));
 
         return
             string(
                 abi.encodePacked(
-                    '"properties": {"risky":"',
+                    '"properties": {',
+                    '"risky":"',
                     uint256(uint160(engine.risky())).toHexString(),
                     '","stable":"',
                     uint256(uint160(engine.stable())).toHexString(),
-                    '","strike":"',
-                    uint256(strike).toString(),
-                    '","maturity":"',
-                    uint256(maturity).toString(),
-                    '","sigma":"',
-                    uint256(sigma).toString(),
                     '","invariant":"',
                     invariant < 0 ? "-" : "",
                     uint256((uint128(invariant < 0 ? ~invariant + 1 : invariant))).toString(),
-                    '"}}'
+                    '",',
+                    getCalibration(tokenId),
+                    getReserve(tokenId),
+                    "}}"
+                )
+            );
+    }
+
+    function getCalibration(uint256 tokenId) private view returns (string memory) {
+        IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
+
+        (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 creationTimestamp) = engine
+            .calibrations(bytes32(tokenId));
+
+        return
+            string(
+                abi.encodePacked(
+                    '"strike":"',
+                    uint256(strike).toString(),
+                    '","sigma":"',
+                    uint256(sigma).toString(),
+                    '","maturity":"',
+                    uint256(maturity).toString(),
+                    '","lastTimestamp":"',
+                    uint256(lastTimestamp).toString(),
+                    '","creationTimestamp":"',
+                    uint256(creationTimestamp).toString(),
+                    '",'
+                )
+            );
+    }
+
+    function getReserve(uint256 tokenId) private view returns (string memory) {
+        IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
+
+        (
+            uint128 reserveRisky,
+            uint128 reserveStable,
+            uint128 liquidity,
+            uint32 blockTimestamp,
+            uint256 cumulativeRisky,
+            uint256 cumulativeStable,
+            uint256 cumulativeLiquidity
+        ) = engine.reserves(bytes32(tokenId));
+
+        return
+            string(
+                abi.encodePacked(
+                    '"reserveRisky":"',
+                    uint256(reserveRisky).toString(),
+                    '","reserveStable":"',
+                    uint256(reserveStable).toString(),
+                    '","liquidity":"',
+                    uint256(liquidity).toString(),
+                    '","blockTimestamp":"',
+                    uint256(blockTimestamp).toString(),
+                    '","cumulativeRisky":"',
+                    uint256(cumulativeRisky).toString(),
+                    '","cumulativeStable":"',
+                    uint256(cumulativeStable).toString(),
+                    '","cumulativeLiquidity":"',
+                    uint256(cumulativeLiquidity).toString(),
+                    '"'
                 )
             );
     }
