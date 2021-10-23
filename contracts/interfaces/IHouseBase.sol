@@ -11,8 +11,8 @@ interface IHouseBase {
     /// @notice Returns the address of the factory
     function factory() external view returns (address);
 
-    /// @notice Returns the address of WETH10
-    function WETH10() external view returns (address);
+    /// @notice Returns the address of WETH9
+    function WETH9() external view returns (address);
 
     /// @notice Returns the address of the position renderer
     function positionRenderer() external view returns (address);

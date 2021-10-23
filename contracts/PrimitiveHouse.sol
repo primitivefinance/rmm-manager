@@ -21,12 +21,12 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     /// EFFECT FUNCTIONS ///
 
     /// @param factory_  Address of a PrimitiveFactory
-    /// @param WETH10_   Address of WETH10
+    /// @param WETH9_   Address of WETH9
     constructor(
         address factory_,
-        address WETH10_,
+        address WETH9_,
         address positionRenderer_
-    ) HouseBase(factory_, WETH10_, positionRenderer_) {}
+    ) HouseBase(factory_, WETH9_, positionRenderer_) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
