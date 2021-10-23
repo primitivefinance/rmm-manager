@@ -44,7 +44,7 @@ export function runTest(description: string, runTests: Function): void {
         // Periphery
         const house = (await deploy('PrimitiveHouse', deployer, [
           factory.address,
-          '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F',
+          '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
           positionRenderer.address,
         ])) as ContractTypes.PrimitiveHouse
 

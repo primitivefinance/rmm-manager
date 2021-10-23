@@ -7,8 +7,8 @@ runTest('constructor', function () {
       expect(await this.house.factory()).to.equal(this.factory.address)
     })
 
-    it('sets the address of WETH10', async function () {
-      expect(await this.house.WETH10()).to.equal('0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F')
+    it('sets the address of WETH9', async function () {
+      expect(await this.house.WETH9()).to.equal('0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2')
     })
   })
 })
