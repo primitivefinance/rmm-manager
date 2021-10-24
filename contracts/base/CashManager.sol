@@ -17,7 +17,7 @@ abstract contract CashManager is ICashManager, HouseBase {
     }
 
     /// @inheritdoc ICashManager
-    function wrap(uint256 value) external payable {
+    function wrap(uint256 value) external payable override {
         if (address(this).balance >= value) {
             IWETH9(WETH9).deposit{value: value}();
             IWETH9(WETH9).transfer(msg.sender, value);
