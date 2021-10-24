@@ -26,8 +26,8 @@ export function runTest(description: string, runTests: Function): void {
 
       const loadedFixture = await loadFixture(async function () {
         // Core
-        const risky = (await deploy('Token', deployer)) as ContractTypes.Token
-        const stable = (await deploy('Token', deployer)) as ContractTypes.Token
+        const risky = (await deploy('TestToken', deployer)) as ContractTypes.TestToken
+        const stable = (await deploy('TestToken', deployer)) as ContractTypes.TestToken
 
         const factory = (await deployContract(deployer, FactoryArtifact, [], {
           gasLimit: 9500000,
