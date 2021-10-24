@@ -1,95 +1,99 @@
 import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
-import expect from '../../../shared/expect'
-import { runTest } from '../../context'
+import expect from '../../shared/expect'
+import { runTest } from '../context'
 
-runTest('deposit', function () {
+runTest('withdraw', function () {
   beforeEach(async function () {
     await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
     await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
     await this.risky.approve(this.house.address, constants.MaxUint256)
     await this.stable.approve(this.house.address, constants.MaxUint256)
+
+    await this.house.deposit(
+      this.deployer.address,
+      this.risky.address,
+      this.stable.address,
+      parseWei('1000').raw,
+      parseWei('1000').raw
+    )
   })
 
   describe('success cases', function () {
-    it('deposits risky and stable to margin', async function () {
-      await this.house.deposit(
+    it('withdraws 1000 risky and 1000 stable from margin', async function () {
+      await this.house.withdraw(
         this.deployer.address,
-        this.risky.address,
-        this.stable.address,
+        this.engine.address,
         parseWei('1000').raw,
         parseWei('1000').raw
       )
     })
 
-    it('increases the margin', async function () {
-      await this.house.deposit(
+    it('reduces the margin of the sender', async function () {
+      await this.house.withdraw(
         this.deployer.address,
-        this.risky.address,
-        this.stable.address,
+        this.engine.address,
         parseWei('1000').raw,
         parseWei('1000').raw
       )
 
       const margin = await this.house.margins(this.deployer.address, this.engine.address)
-      expect(margin.balanceRisky).to.equal(parseWei('1000').raw)
-      expect(margin.balanceStable).to.equal(parseWei('1000').raw)
+
+      expect(margin.balanceRisky).to.equal(parseWei('0').raw)
+      expect(margin.balanceStable).to.equal(parseWei('0').raw)
     })
 
-    it('reduces the balance of the sender', async function () {
-      const stableBalance = await this.stable.balanceOf(this.deployer.address)
-      const riskyBalance = await this.risky.balanceOf(this.deployer.address)
-
-      await this.house.deposit(
-        this.deployer.address,
-        this.risky.address,
-        this.stable.address,
-        parseWei('1000').raw,
-        parseWei('1000').raw
-      )
-
-      expect(
-        await this.stable.balanceOf(this.deployer.address)
-      ).to.equal(stableBalance.sub(parseWei('1000').raw))
-
-      expect(
-        await this.risky.balanceOf(this.deployer.address)
-      ).to.equal(riskyBalance.sub(parseWei('1000').raw))
-    })
-
-    it('increases the balance of the engine', async function () {
+    it('reduces the balance of the engine', async function () {
       const stableBalance = await this.stable.balanceOf(this.engine.address)
       const riskyBalance = await this.risky.balanceOf(this.engine.address)
 
-      await this.house.deposit(
+      await this.house.withdraw(
         this.deployer.address,
-        this.risky.address,
-        this.stable.address,
+        this.engine.address,
         parseWei('1000').raw,
         parseWei('1000').raw
       )
 
       expect(
         await this.stable.balanceOf(this.engine.address)
-      ).to.equal(stableBalance.add(parseWei('1000').raw))
+      ).to.equal(stableBalance.sub(parseWei('1000').raw))
 
       expect(
         await this.risky.balanceOf(this.engine.address)
+      ).to.equal(riskyBalance.sub(parseWei('1000').raw))
+    })
+
+    it('increases the balance of the sender', async function () {
+      const stableBalance = await this.stable.balanceOf(this.deployer.address)
+      const riskyBalance = await this.risky.balanceOf(this.deployer.address)
+
+      await this.house.withdraw(
+        this.deployer.address,
+        this.engine.address,
+        parseWei('1000').raw,
+        parseWei('1000').raw
+      )
+
+      expect(
+        await this.stable.balanceOf(this.deployer.address)
+      ).to.equal(stableBalance.add(parseWei('1000').raw))
+
+      expect(
+        await this.risky.balanceOf(this.deployer.address)
       ).to.equal(riskyBalance.add(parseWei('1000').raw))
     })
 
-    it('emits the Deposited event', async function () {
+    it('emits the Withdrawn event', async function () {
       await expect(
-        this.house.deposit(
+        this.house.withdraw(
           this.deployer.address,
-          this.risky.address,
-          this.stable.address,
+          this.engine.address,
           parseWei('1000').raw,
           parseWei('1000').raw
         )
       )
-        .to.emit(this.house, 'Deposit')
+        .to.emit(this.house, 'Withdraw')
         .withArgs(
           this.deployer.address,
           this.deployer.address,
@@ -103,18 +107,14 @@ runTest('deposit', function () {
   })
 
   describe('fail cases', function () {
-    it('reverts if the owner does not have enough tokens', async function () {
-      // TODO: Update to custom error
+    it('fails on attempt to withdraw more than margin balance', async function () {
       await expect(
-        this.house
-          .connect(this.bob)
-          .deposit(
-            this.deployer.address,
-            this.risky.address,
-            this.stable.address,
-            parseWei('1000').raw,
-            parseWei('1000').raw
-          )
+        this.house.withdraw(
+          this.deployer.address,
+          this.engine.address,
+          parseWei('1001').raw,
+          parseWei('1001').raw
+        )
       ).to.be.reverted
     })
 
@@ -124,7 +124,7 @@ runTest('deposit', function () {
         [this.house.address, this.risky.address, this.stable.address, '0', '0']
       );
 
-      await expect(this.house.depositCallback(0, 0, data)).to.be.revertedWith('NotEngineError()')
+      await expect(this.house.depositCallback(0, 0, data)).to.be.reverted
     })
   })
 })
