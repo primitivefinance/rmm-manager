@@ -6,8 +6,8 @@ import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typ
 export interface Contracts {
   factory: PrimitiveFactory
   house: ContractTypes.PrimitiveHouse
-  risky: ContractTypes.Token
-  stable: ContractTypes.Token
+  risky: ContractTypes.TestToken
+  stable: ContractTypes.TestToken
   engine: PrimitiveEngine
   positionRenderer: ContractTypes.PositionRenderer
   weth: ContractTypes.WETH9
