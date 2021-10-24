@@ -1,14 +1,9 @@
-import { parseWei, Wei } from 'web3-units'
+import { parseWei } from 'web3-units'
 
-import { DEFAULT_CONFIG } from '../../context'
-import expect from '../../../shared/expect'
-import { runTest } from '../../context'
+import expect from '../../shared/expect'
+import { runTest } from '../context'
 
 runTest('wrap', function () {
-  beforeEach(async function () {
-
-  })
-
   describe('success cases', function () {
     it('wraps ETH into WETH', async function () {
       await this.house.wrap(parseWei('1').raw, {
@@ -21,11 +16,11 @@ runTest('wrap', function () {
     })
   })
 
-  /*
   describe('fail cases', function () {
-    it('fails to allocate more than margin balance', async function () {
-
+    it('fails to wrap if not enough value is sent', async function () {
+      await expect(
+        this.house.wrap(parseWei('1').raw),
+      ).to.be.reverted
     })
   })
-  */
 })
