@@ -41,10 +41,13 @@ export function runTest(description: string, runTests: Function): void {
         // PositionRenderer
         const positionRenderer = (await deploy('PositionRenderer', deployer)) as ContractTypes.PositionRenderer
 
+        // WETH
+        const weth = (await deploy('WETH9', deployer)) as ContractTypes.WETH9
+
         // Periphery
         const house = (await deploy('PrimitiveHouse', deployer, [
           factory.address,
-          '0x4f5704D9D2cbCcAf11e70B34048d41A0d572993F',
+          weth.address,
           positionRenderer.address,
         ])) as ContractTypes.PrimitiveHouse
 
@@ -55,6 +58,7 @@ export function runTest(description: string, runTests: Function): void {
           engine,
           house,
           positionRenderer,
+          weth,
         }
       })
 
@@ -64,6 +68,7 @@ export function runTest(description: string, runTests: Function): void {
       this.engine = loadedFixture.engine
       this.house = loadedFixture.house
       this.positionRenderer = loadedFixture.positionRenderer
+      this.weth = loadedFixture.weth
 
       this.deployer = deployer
       this.alice = signers[1]
