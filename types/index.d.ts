@@ -10,6 +10,7 @@ export interface Contracts {
   stable: ContractTypes.Token
   engine: PrimitiveEngine
   positionRenderer: ContractTypes.PositionRenderer
+  weth: ContractTypes.WETH9
 }
 
 declare module 'mocha' {
