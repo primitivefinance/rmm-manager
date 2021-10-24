@@ -9,7 +9,6 @@ const value = parseWei('1').raw
 runTest('unwrap', function () {
   describe('success cases', function () {
     it('unwraps WETH into ETH', async function () {
-
       await this.house.wrap(value, {
         value,
       })
