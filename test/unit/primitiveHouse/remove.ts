@@ -1,10 +1,10 @@
 import { constants } from 'ethers'
 import { parseWei, Wei } from 'web3-units'
 
-import { DEFAULT_CONFIG } from '../../context'
-import { computePoolId } from '../../../shared/utilities'
-import expect from '../../../shared/expect'
-import { runTest } from '../../context'
+import { DEFAULT_CONFIG } from '../context'
+import { computePoolId } from '../../shared/utilities'
+import expect from '../../shared/expect'
+import { runTest } from '../context'
 
 const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
 let poolId: string
