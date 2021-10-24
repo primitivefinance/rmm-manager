@@ -19,6 +19,10 @@ interface ICashManager {
 
     /// EFFECT FUNCTIONS ///
 
+    /// @notice       Wraps ETH into WETH and transfers to the msg.sender
+    /// @param value  Amount of ETH to wrap
+    function wrap(uint256 value) external payable;
+
     /// @notice           Unwraps WETH to ETH and transfers to a recipient
     /// @param amountMin  Minimum amount to unwrap
     /// @param recipient  Address of the recipient
