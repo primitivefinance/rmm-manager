@@ -1,7 +1,7 @@
 import { Wallet, BigNumber } from 'ethers'
 import * as ContractTypes from '../typechain'
 import { Fixture } from '@ethereum-waffle/provider'
-import { PrimitiveEngine, PrimitiveFactory, MockEngine } from '@primitivefinance/v2-core/typechain'
+import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
 
 export interface Contracts {
   factory: PrimitiveFactory
@@ -22,16 +22,15 @@ declare module 'mocha' {
   }
 }
 
-export type EngineTypes = PrimitiveEngine | MockEngine
-
 declare global {
   export namespace Chai {
     interface Assertion {
       revertWithCustomError(errorName: string, params: any[]): AsyncAssertion
-      increaseMargin(engine: EngineTypes, account: string, risky: BigNumber, stable: BigNumber): AsyncAssertion
-      decreaseMargin(engine: EngineTypes, account: string, risky: BigNumber, stable: BigNumber): AsyncAssertion
-      increasePositionLiquidity(engine: EngineTypes, account: string, poolId: string, liquidity: BigNumber): AsyncAssertion
-      decreasePositionLiquidity(engine: EngineTypes, account: string, poolId: string, liquidity: BigNumber): AsyncAssertion
+      updateMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
+      increaseMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
+      decreaseMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
+      increasePositionLiquidity(house: ContractTypes.PrimitiveHouse, account: string, poolId: string, liquidity: BigNumber): AsyncAssertion
+      decreasePositionLiquidity(house: ContractTypes.PrimitiveHouse, account: string, poolId: string, liquidity: BigNumber): AsyncAssertion
     }
   }
 }
