@@ -54,8 +54,8 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
 
         if (params.toMargin) {
             margins[params.recipient][engine].deposit(
-                params.riskyForStable ? params.deltaOut : 0,
-                params.riskyForStable ? 0 : params.deltaOut
+                params.riskyForStable ? 0 : params.deltaOut,
+                params.riskyForStable ? params.deltaOut : 0
             );
         }
 
