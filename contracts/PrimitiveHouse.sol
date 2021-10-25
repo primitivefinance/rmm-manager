@@ -83,6 +83,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address engine = EngineAddress.computeAddress(factory, risky, stable);
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
+        if (engine == address(0)) revert EngineNotDeployedError();
 
         (delLiquidity) = IPrimitiveEngineActions(engine).allocate(
             poolId,
@@ -108,6 +109,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 delLiquidity
     ) external override lock returns (uint256 delRisky, uint256 delStable) {
         if (delLiquidity == 0) revert ZeroLiquidityError();
+        if (engine == address(0)) revert EngineNotDeployedError();
 
         (delRisky, delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
         _remove(msg.sender, poolId, delLiquidity);
