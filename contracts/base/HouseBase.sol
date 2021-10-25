@@ -35,6 +35,12 @@ abstract contract HouseBase is IHouseBase, Reentrancy {
         address WETH9_,
         address positionRenderer_
     ) {
+        if (
+            factory_ == address(0)
+            || WETH9_ == address(0)
+            || positionRenderer_ == address(0)
+        ) revert WrongConstructorParametersError();
+
         factory = factory_;
         WETH9 = WETH9_;
         positionRenderer = positionRenderer_;
