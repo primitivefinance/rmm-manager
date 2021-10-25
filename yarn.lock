@@ -720,10 +720,10 @@
   dependencies:
     mocha "^9.0.3"
 
-"@primitivefinance/v2-math@^1.4.1":
-  version "1.4.1"
-  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-math/1.4.1/90f425aefcbe4bfee9195c70b0ace643d249a332be77cc55a8799aa9187ac931#386e6620a29578d7d40aaacedacecd2a33d0ac2e"
-  integrity sha512-z9XfDL88BgsJYbc1wSy5z1SP2ixb/ahrnFeuBvKcpkiaAnmH1H04Hg0OSeeW1RvRUtiLhBweqnn4JNUG2YWeWw==
+"@primitivefinance/v2-math@^1.5.0":
+  version "1.5.0"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-math/1.5.0/556252d7a20ab5c2b14c6ced020b4ce316404f69262b80f921cb26c582baf8db#7bd4bba7c2f1eeeacba294211af57cafa71d7145"
+  integrity sha512-C4gemj3hPzB+fYPFvhAooAgfWqHrjRHXKpwBpYy/G+NCY72QRBUfhbMbYHkQ0QnXFo0/BOF1kX+sU60hFVgUWA==
   dependencies:
     gaussian "^1.2.0"
     numeric "^1.2.6"
