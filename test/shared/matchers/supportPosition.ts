@@ -1,17 +1,15 @@
 import { BigNumber } from 'ethers'
-import { EngineTypes } from '../../../types'
+import { PrimitiveHouse } from '../../../typechain'
 
 // Chai matchers for the positions of the PrimitiveEngine
 
 export default function supportPosition(Assertion: Chai.AssertionStatic) {
-  // Liquidity methods
-
   Assertion.addMethod(
     'increasePositionLiquidity',
-    async function (this: any, engine: EngineTypes, account: string, poolId: string, liquidity: BigNumber) {
-      const oldPosition = await engine.liquidity(account, poolId)
+    async function (this: any, house: PrimitiveHouse, account: string, poolId: string, liquidity: BigNumber) {
+      const oldPosition = await house.balanceOf(account, poolId)
       await this._obj
-      const newPosition = await engine.liquidity(account, poolId)
+      const newPosition = await house.balanceOf(account, poolId)
 
       const expectedLiquidity = oldPosition.add(liquidity)
 
@@ -27,10 +25,10 @@ export default function supportPosition(Assertion: Chai.AssertionStatic) {
 
   Assertion.addMethod(
     'decreasePositionLiquidity',
-    async function (this: any, engine: EngineTypes, account: string, poolId: string, liquidity: BigNumber) {
-      const oldPosition = await engine.liquidity(account, poolId)
+    async function (this: any, house: PrimitiveHouse, account: string, poolId: string, liquidity: BigNumber) {
+      const oldPosition = await house.balanceOf(account, poolId)
       await this._obj
-      const newPosition = await engine.liquidity(account, poolId)
+      const newPosition = await house.balanceOf(account, poolId)
 
       const expectedLiquidity = oldPosition.sub(liquidity)
 
