@@ -25,7 +25,7 @@ declare module 'mocha' {
 declare global {
   export namespace Chai {
     interface Assertion {
-      revertWithCustomError(errorName: string, params: any[]): AsyncAssertion
+      revertWithCustomError(errorName: string, params?: any[]): AsyncAssertion
       updateMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
       increaseMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
       decreaseMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
