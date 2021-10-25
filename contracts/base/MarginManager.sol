@@ -65,7 +65,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
 
         emit Withdraw(
             msg.sender,
-            recipient,
+            recipient == address(0) ? msg.sender : recipient,
             engine,
             IPrimitiveEngineView(engine).risky(), // FIXME: A bit expensive for just an event no?
             IPrimitiveEngineView(engine).stable(), // FIXME: A bit expensive for just an event no?
