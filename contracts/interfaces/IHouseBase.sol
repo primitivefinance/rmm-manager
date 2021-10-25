@@ -5,8 +5,15 @@ pragma solidity 0.8.6;
 /// @author  Primitive
 
 interface IHouseBase {
+    /// ERRORS ///
+
     /// @notice Thrown when the sender is not an engine
     error NotEngineError();
+
+    /// @notice Thrown when the constructor parameters are wrong
+    error WrongConstructorParametersError();
+
+    /// VIEW FUNCTIONS ///
 
     /// @notice Returns the address of the factory
     function factory() external view returns (address);
