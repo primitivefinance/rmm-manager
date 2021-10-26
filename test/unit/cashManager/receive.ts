@@ -10,7 +10,7 @@ runTest('receive', function () {
         this.deployer.sendTransaction({
           to: this.house.address,
           value: parseWei('1').raw,
-        }),
+        })
       ).to.be.reverted
     })
   })
