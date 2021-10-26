@@ -34,18 +34,17 @@ runTest('create', function () {
     })
 
     it('updates the sender position', async function () {
-      await this.house.create(
-        this.risky.address,
-        this.stable.address,
-        strike.raw,
-        sigma.raw,
-        maturity.raw,
-        parseWei(1).sub(parseWei(delta)).raw,
-        delLiquidity.raw
-      )
-
-      const liquidity = await this.house.balanceOf(this.deployer.address, poolId)
-      expect(liquidity).to.equal(parseWei('1').raw.sub('1000'))
+      await expect(
+        this.house.create(
+          this.risky.address,
+          this.stable.address,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          parseWei(1).sub(parseWei(delta)).raw,
+          delLiquidity.raw
+        )
+      ).to.increasePositionLiquidity(this.house, this.deployer.address, poolId, parseWei('1').raw.sub('1000'))
     })
 
     it('emits the Created event', async function () {
