@@ -26,7 +26,6 @@ runTest('unwrap', function () {
 
   describe('fail cases', function () {
     it('fails to unwrap if not enough value is in the House', async function () {
-      await expect(this.house.unwrap(value, this.deployer.address)).to.be.reverted
       await expect(this.house.unwrap(value, this.deployer.address)).to.revertWithCustomError('BalanceTooLowError', [
         '0',
         value.toString(),
