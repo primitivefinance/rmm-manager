@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   Primitive House contract
+/// @title   PrimitiveHouse contract
 /// @author  Primitive
 /// @notice  Interacts with Primitive Engine contracts
 
