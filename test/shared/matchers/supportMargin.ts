@@ -12,14 +12,16 @@ export default function supportMargin(Assertion: Chai.AssertionStatic) {
       account: string,
       engine: string,
       delRisky: BigNumber,
-      delStable: BigNumber
+      riskyIncrease: boolean,
+      delStable: BigNumber,
+      stableIncrease: boolean
     ) {
       const oldMargin = await house.margins(account, engine)
       await this._obj
       const newMargin = await house.margins(account, engine)
 
-      const expectedRisky = oldMargin.balanceRisky.add(delRisky)
-      const expectedStable = oldMargin.balanceStable.add(delStable)
+      const expectedRisky = riskyIncrease ? oldMargin.balanceRisky.add(delRisky): oldMargin.balanceRisky.sub(delRisky)
+      const expectedStable = stableIncrease ? oldMargin.balanceStable.add(delStable) : oldMargin.balanceStable.sub(delStable)
 
       this.assert(
         newMargin.balanceRisky.eq(expectedRisky),

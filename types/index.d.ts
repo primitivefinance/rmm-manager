@@ -26,7 +26,15 @@ declare global {
   export namespace Chai {
     interface Assertion {
       revertWithCustomError(errorName: string, params?: any[]): AsyncAssertion
-      updateMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
+      updateMargin(
+        house: ContractTypes.PrimitiveHouse,
+        account: string,
+        engine: string,
+        delRisky: BigNumber,
+        riskyIncrease: boolean,
+        delStable: BigNumber,
+        stableIncrease: boolean,
+      ): AsyncAssertion
       increaseMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
       decreaseMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
       increasePositionLiquidity(house: ContractTypes.PrimitiveHouse, account: string, poolId: string, liquidity: BigNumber): AsyncAssertion
