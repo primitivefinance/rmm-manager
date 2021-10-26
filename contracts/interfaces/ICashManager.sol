@@ -7,10 +7,8 @@ pragma solidity >=0.8.6;
 interface ICashManager {
     /// ERRORS ///
 
-    /// @notice          Thrown when the sender is not WETH
-    /// @param expected  Expected sender (WETH)
-    /// @param actual    Actual sender
-    error WrongSender(address expected, address actual);
+    /// @notice  Thrown when the sender is not WETH
+    error OnlyWETHError();
 
     /// @notice          Thrown when the amount required is above balance
     /// @param expected  Expected amount
@@ -38,6 +36,6 @@ interface ICashManager {
         address recipient
     ) external payable;
 
-    /// @notice Transfers the ETH balance of the contract to the caller
+    /// @notice  Transfers the ETH balance of the contract to the caller
     function refundETH() external payable;
 }
