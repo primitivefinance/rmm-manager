@@ -17,7 +17,10 @@ runTest('sweepToken', function () {
 
   describe('fail cases', function () {
     it('fails to sweep tokens if not enough balance in the House contract', async function () {
-      await expect(this.house.sweepToken(this.risky.address, amount, this.alice.address)).to.be.reverted
+      await expect(this.house.sweepToken(this.risky.address, amount, this.alice.address)).to.revertWithCustomError(
+        'BalanceTooLowError',
+        ['0', amount.toString()]
+      )
     })
   })
 })
