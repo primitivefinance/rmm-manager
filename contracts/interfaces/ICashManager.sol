@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
-/// @title   CashManager Interface
+/// @title   Interface of CashManager contract
 /// @author  Primitive
 
 interface ICashManager {
