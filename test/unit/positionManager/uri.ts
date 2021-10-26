@@ -11,6 +11,31 @@ let poolId: string
 let delRisky: Wei, delStable: Wei
 const delLiquidity = parseWei('10')
 
+type Metadata = {
+  name: string;
+  image: string;
+  license: string;
+  creator: string;
+  description: string;
+  properties: {
+    risky: string;
+    stable: string;
+    invariant: string;
+    strike: string;
+    sigma: string;
+    maturity: string;
+    lastTimestamp: string;
+    creationTimestamp: string;
+    reserveRisky: string;
+    reserveStable: string;
+    liquidity: string;
+    blockTimestamp: string;
+    cumulativeRisky: string;
+    cumulativeStable: string;
+    cumulativeLiquidity: string;
+  }
+}
+
 runTest('uri', function () {
   beforeEach(async function () {
     await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
@@ -28,29 +53,28 @@ runTest('uri', function () {
       delLiquidity.raw
     )
 
-    await this.house.deposit(
-      this.deployer.address,
-      this.risky.address,
-      this.stable.address,
-      parseWei('1000').raw,
-      parseWei('1000').raw
-    )
-
     poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
 
-    const amount = parseWei('10')
     const res = await this.engine.reserves(poolId)
-    delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
-    delStable = amount.mul(res.reserveStable).div(res.liquidity)
+    delRisky = delLiquidity.mul(res.reserveRisky).div(res.liquidity)
+    delStable = delLiquidity.mul(res.reserveStable).div(res.liquidity)
   })
 
   describe('success cases', function () {
-    describe('when adding liquidity from margin', function () {
-      it('allocates 1 LP share and returns the URI', async function () {
-        await this.house.allocate(poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, true)
-        const uri = await this.house.uri(poolId)
-        console.log(uri)
-      })
+    it('returns the URI', async function () {
+      const uri = await this.house.uri(poolId)
+      const metadata: Metadata = JSON.parse(uri.substr(27, uri.length))
+      console.log(metadata)
+
+      expect(metadata.name).to.be.equal('Name goes here')
+      expect(metadata.image).to.be.equal('data:image/svg+xml;utf8,')
+      expect(metadata.license).to.be.equal('License goes here')
+      expect(metadata.creator).to.be.equal('creator goes here')
+      expect(metadata.description).to.be.equal('Description goes here')
+      expect(utils.getAddress(metadata.properties.risky))
+        .to.be.equal(this.risky.address)
+      expect(utils.getAddress(metadata.properties.stable))
+        .to.be.equal(this.stable.address)
     })
   })
 })
