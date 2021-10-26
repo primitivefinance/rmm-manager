@@ -16,7 +16,10 @@ runTest('wrap', function () {
 
   describe('fail cases', function () {
     it('fails to wrap if not enough value is sent', async function () {
-      await expect(this.house.wrap(parseWei('1').raw)).to.be.reverted
+      await expect(this.house.wrap(parseWei('1').raw)).to.revertWithCustomError('BalanceTooLowError', [
+        '0',
+        parseWei('1').raw.toString(),
+      ])
     })
   })
 })
