@@ -29,7 +29,7 @@ runTest('create', function () {
         sigma.raw,
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
-        delLiquidity.raw,
+        delLiquidity.raw
       )
     })
 
@@ -41,7 +41,7 @@ runTest('create', function () {
         sigma.raw,
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
-        delLiquidity.raw,
+        delLiquidity.raw
       )
 
       const liquidity = await this.house.balanceOf(this.deployer.address, poolId)
@@ -49,26 +49,51 @@ runTest('create', function () {
     })
 
     it('emits the Created event', async function () {
-      await expect(this.house.create(
-        this.risky.address,
-        this.stable.address,
-        strike.raw,
-        sigma.raw,
-        maturity.raw,
-        parseWei(1).sub(parseWei(delta)).raw,
-        delLiquidity.raw,
-      )).to.emit(this.house, 'Create').withArgs(
-        this.deployer.address,
-        this.engine.address,
-        poolId,
-        strike.raw,
-        sigma.raw,
-        maturity.raw
+      await expect(
+        this.house.create(
+          this.risky.address,
+          this.stable.address,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          parseWei(1).sub(parseWei(delta)).raw,
+          delLiquidity.raw
+        )
       )
+        .to.emit(this.house, 'Create')
+        .withArgs(this.deployer.address, this.engine.address, poolId, strike.raw, sigma.raw, maturity.raw)
     })
   })
 
   describe('fail cases', function () {
+    it('reverts if the engine is not deployed', async function () {
+      await expect(
+        this.house.create(
+          this.stable.address,
+          this.risky.address,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          parseWei(1).sub(parseWei(delta)).raw,
+          delLiquidity.raw
+        )
+      ).to.be.reverted
+    })
+
+    it('reverts if the liquidity is 0', async function () {
+      await expect(
+        this.house.create(
+          this.stable.address,
+          this.risky.address,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          parseWei(1).sub(parseWei(delta)).raw,
+          '0'
+        )
+      ).to.revertWithCustomError('ZeroLiquidityError')
+    })
+
     it('reverts if the curve is already created', async function () {
       await this.house.create(
         this.risky.address,
@@ -77,38 +102,44 @@ runTest('create', function () {
         sigma.raw,
         maturity.raw,
         parseWei(1).sub(parseWei(delta)).raw,
-        delLiquidity.raw,
+        delLiquidity.raw
       )
-      await expect(this.house.create(
-        this.risky.address,
-        this.stable.address,
-        strike.raw,
-        sigma.raw,
-        maturity.raw,
-        parseWei(1).sub(parseWei(delta)).raw,
-        delLiquidity.raw,
-      )).to.be.reverted
+      await expect(
+        this.house.create(
+          this.risky.address,
+          this.stable.address,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          parseWei(1).sub(parseWei(delta)).raw,
+          delLiquidity.raw
+        )
+      ).to.be.reverted
     })
 
     it('reverts if the sender has insufficient funds', async function () {
-      await expect(this.house.connect(this.alice).create(
-        this.risky.address,
-        this.stable.address,
-        strike.raw,
-        sigma.raw,
-        maturity.raw,
-        parseWei(1).sub(parseWei(delta)).raw,
-        delLiquidity.raw,
-      )).to.be.reverted
+      await expect(
+        this.house
+          .connect(this.alice)
+          .create(
+            this.risky.address,
+            this.stable.address,
+            strike.raw,
+            sigma.raw,
+            maturity.raw,
+            parseWei(1).sub(parseWei(delta)).raw,
+            delLiquidity.raw
+          )
+      ).to.be.reverted
     })
 
     it('reverts if the callback function is called directly', async function () {
       const data = utils.defaultAbiCoder.encode(
         ['address', 'address', 'address', 'uint256', 'uint256'],
         [this.house.address, this.risky.address, this.stable.address, '0', '0']
-      );
+      )
 
-      await expect(this.house.createCallback(0, 0, data)).to.be.revertedWith('NotEngineError()')
+      await expect(this.house.createCallback(0, 0, data)).to.revertWithCustomError('NotEngineError')
     })
   })
 })
