@@ -10,9 +10,6 @@ import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquid
 interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallback {
     /// ERRORS ///
 
-    /// @notice Emitted when the engine is not deployed
-    error EngineNotDeployedError();
-
     /// @notice Emitted when the liquidity is zero
     error ZeroLiquidityError();
 
