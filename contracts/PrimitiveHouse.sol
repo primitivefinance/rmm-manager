@@ -21,7 +21,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     /// EFFECT FUNCTIONS ///
 
     /// @param factory_  Address of a PrimitiveFactory
-    /// @param WETH9_   Address of WETH9
+    /// @param WETH9_    Address of WETH9
     constructor(
         address factory_,
         address WETH9_,
