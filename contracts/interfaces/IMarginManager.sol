@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
-/// @title   MarginManager Interface
+/// @title   Interface of MarginManager contract
 /// @author  Primitive
 
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
@@ -9,14 +9,14 @@ import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDeposi
 interface IMarginManager is IPrimitiveDepositCallback {
     /// ERRORS ///
 
-    /// @notice Thrown when the risky and stable amounts are 0
+    /// @notice Thrown when trying to deposit or withdraw 0 risky and stable
     error ZeroDelError();
 
     /// EVENTS ///
 
     /// @notice           Emitted when funds are deposited
     /// @param payer      Address depositing the funds
-    /// @param recipient  Address receiving the funds (in their margin)
+    /// @param recipient  Address receiving the funds in their margin
     /// @param engine     Engine receiving the funds
     /// @param risky      Address of the risky token
     /// @param stable     Address of the stable token
@@ -34,7 +34,7 @@ interface IMarginManager is IPrimitiveDepositCallback {
 
     /// @notice           Emitted when funds are withdrawn
     /// @param payer      Address withdrawing the funds
-    /// @param recipient  Address receiving the funds (in their wallet)
+    /// @param recipient  Address receiving the funds in their wallet
     /// @param engine     Engine where the funds are withdrawn from
     /// @param risky      Address of the risky token
     /// @param stable     Address of the stable token
@@ -52,7 +52,9 @@ interface IMarginManager is IPrimitiveDepositCallback {
 
     /// EFFECT FUNCTIONS ///
 
-    /// @notice           Deposits funds into the margin of an engine
+    /// @notice           Deposits funds into the margin of a Primitive Engine
+    /// @dev              Since the Primitive House contract keeps track of the margins, it
+    ///                   will deposit the funds into the Primitive Engine using its own address
     /// @param recipient  Address receiving the funds in their margin
     /// @param risky      Address of the risky token
     /// @param stable     Address of the stable token
@@ -66,9 +68,9 @@ interface IMarginManager is IPrimitiveDepositCallback {
         uint256 delStable
     ) external;
 
-    /// @notice           Withdraw funds from the margin of an engine
+    /// @notice           Withdraws funds from the margin of a Primitive Engine
     /// @param recipient  Address receiving the funds in their wallet
-    /// @param engine     Engine to withdraw from
+    /// @param engine     Primitive Engine to withdraw from
     /// @param delRisky   Amount of risky token to withdraw
     /// @param delStable  Amount of stable token to withdraw
     function withdraw(
@@ -80,7 +82,7 @@ interface IMarginManager is IPrimitiveDepositCallback {
 
     /// VIEW FUNCTIONS ///
 
-    /// @notice                Returns the margin of an account for a specific engine
+    /// @notice                Returns the margin of an account for a specific Primitive Engine
     /// @param account         Address of the account
     /// @param engine          Address of the engine
     /// @return balanceRisky   Balance of risky in the margin of the user

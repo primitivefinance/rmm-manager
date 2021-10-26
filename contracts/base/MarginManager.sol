@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   MarginManager
+/// @title   MarginManager contract
 /// @author  Primitive
 /// @notice  Manages the margins
 
@@ -18,6 +18,8 @@ abstract contract MarginManager is IMarginManager, HouseBase {
 
     /// @inheritdoc IMarginManager
     mapping(address => mapping(address => Margin.Data)) public override margins;
+
+    /// EFFECT FUNCTIONS ///
 
     /// @inheritdoc IMarginManager
     function deposit(
@@ -67,12 +69,14 @@ abstract contract MarginManager is IMarginManager, HouseBase {
             msg.sender,
             recipient == address(0) ? msg.sender : recipient,
             engine,
-            IPrimitiveEngineView(engine).risky(), // FIXME: A bit expensive for just an event no?
-            IPrimitiveEngineView(engine).stable(), // FIXME: A bit expensive for just an event no?
+            IPrimitiveEngineView(engine).risky(),
+            IPrimitiveEngineView(engine).stable(),
             delRisky,
             delStable
         );
     }
+
+    /// CALLBACK IMPLEMENTATIONS ///
 
     /// @inheritdoc IPrimitiveDepositCallback
     function depositCallback(
