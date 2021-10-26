@@ -10,10 +10,10 @@ interface ICashManager {
     /// @notice  Thrown when the sender is not WETH
     error OnlyWETHError();
 
-    /// @notice          Thrown when the amount required is above balance
-    /// @param expected  Expected amount
-    /// @param actual    Actual amount
-    error AmountTooLow(uint256 expected, uint256 actual);
+    /// @notice                Thrown when the amount required is above balance
+    /// @param balance         Actual ETH or token balance of the contract
+    /// @param requiredAmount  ETH or token amount required by the user
+    error BalanceTooLowError(uint256 balance, uint256 requiredAmount);
 
     /// EFFECT FUNCTIONS ///
 

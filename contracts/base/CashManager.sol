@@ -19,7 +19,7 @@ abstract contract CashManager is ICashManager, HouseBase {
     /// @inheritdoc ICashManager
     function wrap(uint256 value) external payable override {
         if (address(this).balance < value) {
-            revert AmountTooLow(address(this).balance, value);
+            revert BalanceTooLowError(address(this).balance, value);
         }
 
         IWETH9(WETH9).deposit{value: value}();
@@ -30,7 +30,7 @@ abstract contract CashManager is ICashManager, HouseBase {
     function unwrap(uint256 amountMin, address recipient) external payable override {
         uint256 balance = IWETH9(WETH9).balanceOf(address(this));
 
-        if (balance < amountMin) revert AmountTooLow(amountMin, balance);
+        if (balance < amountMin) revert BalanceTooLowError(balance, amountMin);
 
         if (balance > 0) {
             IWETH9(WETH9).withdraw(balance);
@@ -45,7 +45,7 @@ abstract contract CashManager is ICashManager, HouseBase {
         address recipient
     ) external payable override {
         uint256 balance = IERC20(token).balanceOf(address(this));
-        if (balance < amountMin) revert AmountTooLow(amountMin, balance);
+        if (balance < amountMin) revert BalanceTooLowError(balance, amountMin);
 
         if (balance > 0) {
             TransferHelper.safeTransfer(token, recipient, balance);
