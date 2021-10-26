@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   CashManager
+/// @title   CashManager contract
 /// @author  Primitive
 /// @notice  Utils contract to manage ETH and token balances
 
@@ -13,7 +13,7 @@ import "../interfaces/external/IWETH9.sol";
 abstract contract CashManager is ICashManager, HouseBase {
     /// @notice Only WETH9 can send ETH to this contract
     receive() external payable {
-        if (msg.sender != WETH9) revert WrongSender(WETH9, msg.sender);
+        if (msg.sender != WETH9) revert OnlyWETHError();
     }
 
     /// @inheritdoc ICashManager
