@@ -1,5 +1,3 @@
-import { parseWei } from 'web3-units'
-
 import expect from '../../shared/expect'
 import { runTest } from '../context'
 
