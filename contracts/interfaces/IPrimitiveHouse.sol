@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
-/// @title   Interface of PrimitiveHouse
+/// @title   Interface of PrimitiveHouse contract
 /// @author  Primitive
 
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
