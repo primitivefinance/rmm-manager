@@ -1,23 +1,24 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   PositionManager
+/// @title   PositionManager contract
 /// @author  Primitive
 /// @notice  Wraps the positions into ERC1155 tokens
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-import "../interfaces/IPositionManager.sol";
 import "../interfaces/IPositionRenderer.sol";
 import "../base/HouseBase.sol";
 
-abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
+abstract contract PositionManager is HouseBase, ERC1155("") {
     using Strings for uint256;
 
-    /// @dev Keeps track of the pool ids and the engines
+    /// @dev  Ties together pool ids with engine addresses, this is necessary because
+    ///       there is no way to get the Primitive Engine address from a pool id
     mapping(uint256 => address) private cache;
 
+    /// @dev  Empty variable to pass to the _mint function
     bytes private _empty;
 
     /// @notice         Returns the metadata of a token
@@ -27,8 +28,9 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
         return getMetadata(tokenId);
     }
 
-    /// @notice         Allocates liquidity
+    /// @notice         Allocates {amount} of {poolId} liquidity to {account} balance
     /// @param account  Recipient of the liquidity
+    /// @param engine   Address of the Primitive Engine
     /// @param poolId   Id of the pool
     /// @param amount   Amount of liquidity to allocate
     function _allocate(
@@ -41,7 +43,7 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
         cache[uint256(poolId)] = engine;
     }
 
-    /// @notice         Removes liquidity
+    /// @notice         Removes {amount} of {poolId} liquidity from {account} balance
     /// @param account  Account to remove from
     /// @param poolId   Id of the pool
     /// @param amount   Amount of liquidity to remove
@@ -98,7 +100,7 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
             );
     }
 
-    /// @notice         Returns the calibration of pool as JSON
+    /// @notice         Returns the calibration of a pool as JSON
     /// @param tokenId  Id of the token (same as pool id)
     /// @return         Calibration of the pool formatted as JSON
     function getCalibration(uint256 tokenId) private view returns (string memory) {
@@ -125,7 +127,7 @@ abstract contract PositionManager is IPositionManager, HouseBase, ERC1155("") {
             );
     }
 
-    /// @notice         Returns the reservers of pool as JSON
+    /// @notice         Returns the reserves of a pool as JSON
     /// @param tokenId  Id of the token (same as pool id)
     /// @return         Reserves of the pool formatted as JSON
     function getReserve(uint256 tokenId) private view returns (string memory) {
