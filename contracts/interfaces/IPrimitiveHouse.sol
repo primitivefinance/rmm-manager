@@ -21,13 +21,15 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     /// @param poolId     Id of the new pool
     /// @param strike     Strike of the new pool
     /// @param sigma      Sigma of the new pool
+    /// @param gamma      Gamma of the new pool
     /// @param maturity   Maturity of the new pool
     event Create(
         address indexed payer,
         address indexed engine,
         bytes32 indexed poolId,
         uint256 strike,
-        uint64 sigma,
+        uint32 sigma,
+        uint32 gamma,
         uint32 maturity
     );
 
