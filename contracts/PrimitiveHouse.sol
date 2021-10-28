@@ -33,8 +33,9 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address risky,
         address stable,
         uint256 strike,
-        uint64 sigma,
+        uint32 sigma,
         uint32 maturity,
+        uint32 gamma,
         uint256 riskyPerLp,
         uint256 delLiquidity
     )
@@ -57,6 +58,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
             strike,
             sigma,
             maturity,
+            gamma,
             riskyPerLp,
             delLiquidity,
             abi.encode(callbackData)

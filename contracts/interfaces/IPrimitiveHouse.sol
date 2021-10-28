@@ -73,6 +73,7 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     /// @param strike        Strike price of the pool to calibrate to, with the same decimals as the stable token
     /// @param sigma         Volatility to calibrate to as an unsigned 256-bit integer w/ precision of 1e4, 10000 = 100%
     /// @param maturity      Maturity timestamp of the pool, in seconds
+    /// @param gamma         Multiplied against swap in amounts to apply fee, equal to 1 - fee %, an unsigned 32-bit integer, w/ precision of 1e4, 10000 = 100%
     /// @param riskyPerLp    Risky reserve per liq. with risky decimals, = 1 - N(d1), d1 = (ln(S/K)+(r*sigma^2/2))/sigma*sqrt(tau)
     /// @param delLiquidity  Amount of liquidity to allocate to the curve, wei value with 18 decimals of precision
     /// @return poolId       Id of the new created pool (Keccak256 hash of the engine address, maturity, sigma and strike)
@@ -82,8 +83,9 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
         address risky,
         address stable,
         uint256 strike,
-        uint64 sigma,
+        uint32 sigma,
         uint32 maturity,
+        uint32 gamma,
         uint256 riskyPerLp,
         uint256 delLiquidity
     )
