@@ -68,7 +68,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
         _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
-        emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
+        emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma);
     }
 
     /// @inheritdoc IPrimitiveHouse
