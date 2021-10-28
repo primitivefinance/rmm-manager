@@ -1,8 +1,8 @@
 import { utils, constants } from 'ethers'
 import { parseWei } from 'web3-units'
 
-import expect from '../../../shared/expect'
-import { runTest } from '../../context'
+import expect from '../../shared/expect'
+import { runTest } from '../context'
 
 runTest('deposit', function () {
   beforeEach(async function () {
@@ -23,21 +23,27 @@ runTest('deposit', function () {
       )
     })
 
-    it('increases the margin', async function () {
-      await this.house.deposit(
-        this.deployer.address,
-        this.risky.address,
-        this.stable.address,
+    it('increases the margin of the recipient', async function () {
+      await expect(
+        this.house.deposit(
+          this.alice.address,
+          this.risky.address,
+          this.stable.address,
+          parseWei('1000').raw,
+          parseWei('1000').raw
+        )
+      ).to.updateMargin(
+        this.house,
+        this.alice.address,
+        this.engine.address,
         parseWei('1000').raw,
-        parseWei('1000').raw
+        true,
+        parseWei('1000').raw,
+        true
       )
-
-      const margin = await this.house.margins(this.deployer.address, this.engine.address)
-      expect(margin.balanceRisky).to.equal(parseWei('1000').raw)
-      expect(margin.balanceStable).to.equal(parseWei('1000').raw)
     })
 
-    it('reduces the balance of the sender', async function () {
+    it('reduces the balances of the sender', async function () {
       const stableBalance = await this.stable.balanceOf(this.deployer.address)
       const riskyBalance = await this.risky.balanceOf(this.deployer.address)
 
@@ -49,16 +55,12 @@ runTest('deposit', function () {
         parseWei('1000').raw
       )
 
-      expect(
-        await this.stable.balanceOf(this.deployer.address)
-      ).to.equal(stableBalance.sub(parseWei('1000').raw))
+      expect(await this.stable.balanceOf(this.deployer.address)).to.equal(stableBalance.sub(parseWei('1000').raw))
 
-      expect(
-        await this.risky.balanceOf(this.deployer.address)
-      ).to.equal(riskyBalance.sub(parseWei('1000').raw))
+      expect(await this.risky.balanceOf(this.deployer.address)).to.equal(riskyBalance.sub(parseWei('1000').raw))
     })
 
-    it('increases the balance of the engine', async function () {
+    it('increases the balances of the engine', async function () {
       const stableBalance = await this.stable.balanceOf(this.engine.address)
       const riskyBalance = await this.risky.balanceOf(this.engine.address)
 
@@ -70,13 +72,9 @@ runTest('deposit', function () {
         parseWei('1000').raw
       )
 
-      expect(
-        await this.stable.balanceOf(this.engine.address)
-      ).to.equal(stableBalance.add(parseWei('1000').raw))
+      expect(await this.stable.balanceOf(this.engine.address)).to.equal(stableBalance.add(parseWei('1000').raw))
 
-      expect(
-        await this.risky.balanceOf(this.engine.address)
-      ).to.equal(riskyBalance.add(parseWei('1000').raw))
+      expect(await this.risky.balanceOf(this.engine.address)).to.equal(riskyBalance.add(parseWei('1000').raw))
     })
 
     it('emits the Deposited event', async function () {
@@ -104,7 +102,6 @@ runTest('deposit', function () {
 
   describe('fail cases', function () {
     it('reverts if the owner does not have enough tokens', async function () {
-      // TODO: Update to custom error
       await expect(
         this.house
           .connect(this.bob)
@@ -118,13 +115,19 @@ runTest('deposit', function () {
       ).to.be.reverted
     })
 
+    it('reverts if trying to deposit 0 risky and stable', async function () {
+      await expect(
+        this.house.deposit(this.deployer.address, this.risky.address, this.stable.address, '0', '0')
+      ).to.revertWithCustomError('ZeroDelError')
+    })
+
     it('reverts if the callback function is called directly', async function () {
       const data = utils.defaultAbiCoder.encode(
         ['address', 'address', 'address', 'uint256', 'uint256'],
         [this.house.address, this.risky.address, this.stable.address, '0', '0']
-      );
+      )
 
-      await expect(this.house.depositCallback(0, 0, data)).to.be.revertedWith('NotEngineError()')
+      await expect(this.house.depositCallback(0, 0, data)).to.revertWithCustomError('NotEngineError')
     })
   })
 })

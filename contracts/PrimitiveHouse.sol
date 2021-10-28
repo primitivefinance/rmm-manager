@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   Primitive House
+/// @title   PrimitiveHouse contract
 /// @author  Primitive
 /// @notice  Interacts with Primitive Engine contracts
 
@@ -21,7 +21,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     /// EFFECT FUNCTIONS ///
 
     /// @param factory_  Address of a PrimitiveFactory
-    /// @param WETH9_   Address of WETH9
+    /// @param WETH9_    Address of WETH9
     constructor(
         address factory_,
         address WETH9_,
@@ -33,8 +33,9 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address risky,
         address stable,
         uint256 strike,
-        uint64 sigma,
+        uint32 sigma,
         uint32 maturity,
+        uint32 gamma,
         uint256 riskyPerLp,
         uint256 delLiquidity
     )
@@ -49,8 +50,6 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
 
-        if (engine == address(0)) revert EngineNotDeployedError();
-
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
         CallbackData memory callbackData = CallbackData({risky: risky, stable: stable, payer: msg.sender});
@@ -59,6 +58,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
             strike,
             sigma,
             maturity,
+            gamma,
             riskyPerLp,
             delLiquidity,
             abi.encode(callbackData)
@@ -68,7 +68,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
         _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
-        emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
+        emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma);
     }
 
     /// @inheritdoc IPrimitiveHouse

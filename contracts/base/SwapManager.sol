@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   SwapManager
+/// @title   SwapManager contract
 /// @author  Primitive
 /// @dev     Manages the swaps
 
@@ -18,14 +18,16 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
 
-    /// @notice Reverts the tx above the deadline
+    /// @notice Reverts the transaction is the deadline is reached
     modifier checkDeadline(uint256 deadline) {
-        if (_blockTimestamp() > deadline) revert DeadlineReachedError();
+        if (block.timestamp > deadline) revert DeadlineReachedError();
         _;
     }
 
+    /// EFFECT FUNCTIONS ///
+
     /// @inheritdoc ISwapManager
-    function swap(SwapParams memory params) external override checkDeadline(params.deadline) {
+    function swap(SwapParams memory params) external override lock checkDeadline(params.deadline) {
         CallbackData memory callbackData = CallbackData({
             payer: msg.sender,
             risky: params.risky,
@@ -54,8 +56,8 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
 
         if (params.toMargin) {
             margins[params.recipient][engine].deposit(
-                params.riskyForStable ? params.deltaOut : 0,
-                params.riskyForStable ? 0 : params.deltaOut
+                params.riskyForStable ? 0 : params.deltaOut,
+                params.riskyForStable ? params.deltaOut : 0
             );
         }
 
@@ -72,6 +74,8 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
         );
     }
 
+    /// CALLBACK IMPLEMENTATIONS ///
+
     /// @inheritdoc IPrimitiveSwapCallback
     function swapCallback(
         uint256 delRisky,
@@ -85,10 +89,5 @@ abstract contract SwapManager is ISwapManager, HouseBase, MarginManager {
 
         if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
         if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
-    }
-
-    /// @return blockTimestamp casted as a uint32
-    function _blockTimestamp() internal view virtual returns (uint32 blockTimestamp) {
-        blockTimestamp = uint32(block.timestamp);
     }
 }

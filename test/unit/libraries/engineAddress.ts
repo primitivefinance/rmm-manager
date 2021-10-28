@@ -1,11 +1,11 @@
 import { expect } from 'chai'
 
-import { runTest, deploy } from './context'
-import { computeEngineAddress } from '../shared/utilities'
-import { TestEngineAddress } from '../../typechain'
+import { runTest, deploy } from '../context'
+import { computeEngineAddress } from '../../shared/utilities'
+import { TestEngineAddress } from '../../../typechain'
 import { bytecode as EngineBytecode } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
-runTest('testEngineAddress', function () {
+runTest('EngineAddress', function () {
   it('computes the engine addresse', async function () {
     const testEngineAddress = (await deploy('TestEngineAddress', this.deployer)) as TestEngineAddress
 
