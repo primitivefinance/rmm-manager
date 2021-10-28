@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   PositionRenderer
+/// @title   PositionRenderer contract
 /// @author  Primitive
 /// @notice  Renders the visual of the position tokens
 
@@ -11,11 +11,12 @@ import "./interfaces/external/IERC20WithMetadata.sol";
 import "./libraries/HexStrings.sol";
 
 contract PositionRenderer is IPositionRenderer {
-    function render(address engineAddress, uint256 tokenId) external view override returns (string memory) {
-        address risky = IPrimitiveEngineView(engineAddress).risky();
+    /// @inheritdoc IPositionRenderer
+    function render(address engine, uint256 tokenId) external view override returns (string memory) {
+        address risky = IPrimitiveEngineView(engine).risky();
         string memory riskySymbol = IERC20WithMetadata(risky).symbol();
 
-        address stable = IPrimitiveEngineView(engineAddress).stable();
+        address stable = IPrimitiveEngineView(engine).stable();
         string memory stableSymbol = IERC20WithMetadata(stable).symbol();
 
         return
