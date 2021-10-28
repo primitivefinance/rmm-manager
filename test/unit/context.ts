@@ -1,10 +1,11 @@
 import { Wallet, Contract } from 'ethers'
-import { Time, parsePercentage } from 'web3-units'
+import { parsePercentage } from 'web3-units'
 import hre, { ethers, waffle } from 'hardhat'
 import { deployContract, createFixtureLoader } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
 import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 import FactoryArtifact from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
+
 import { Calibration } from '../shared/calibration'
 import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
 
@@ -14,7 +15,7 @@ export async function deploy(contractName: string, deployer: Wallet, args: any[]
   return contract
 }
 
-export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, 1697095396, 1, 10, parsePercentage(0.0015))
+export const DEFAULT_CONFIG: Calibration = new Calibration(10, 1, 1666969423, 1, 10, parsePercentage(1 - 0.0015))
 
 export function runTest(description: string, runTests: Function): void {
   const loadFixture = createFixtureLoader()
