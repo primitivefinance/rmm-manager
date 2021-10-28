@@ -6,33 +6,33 @@ import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
 
-const { strike, sigma, maturity, delta } = DEFAULT_CONFIG
+const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
 let poolId: string
 let delRisky: Wei, delStable: Wei
 const delLiquidity = parseWei('10')
 
 type Metadata = {
-  name: string;
-  image: string;
-  license: string;
-  creator: string;
-  description: string;
+  name: string
+  image: string
+  license: string
+  creator: string
+  description: string
   properties: {
-    risky: string;
-    stable: string;
-    invariant: string;
-    strike: string;
-    sigma: string;
-    maturity: string;
-    lastTimestamp: string;
-    creationTimestamp: string;
-    reserveRisky: string;
-    reserveStable: string;
-    liquidity: string;
-    blockTimestamp: string;
-    cumulativeRisky: string;
-    cumulativeStable: string;
-    cumulativeLiquidity: string;
+    risky: string
+    stable: string
+    invariant: string
+    strike: string
+    sigma: string
+    maturity: string
+    lastTimestamp: string
+    creationTimestamp: string
+    reserveRisky: string
+    reserveStable: string
+    liquidity: string
+    blockTimestamp: string
+    cumulativeRisky: string
+    cumulativeStable: string
+    cumulativeLiquidity: string
   }
 }
 
@@ -49,11 +49,12 @@ runTest('uri', function () {
       strike.raw,
       sigma.raw,
       maturity.raw,
+      gamma.raw,
       parseWei(1).sub(parseWei(delta)).raw,
       delLiquidity.raw
     )
 
-    poolId = computePoolId(this.engine.address, strike.raw, sigma.raw, maturity.raw)
+    poolId = computePoolId(this.engine.address, maturity.raw, sigma.raw, strike.raw, gamma.raw)
 
     const res = await this.engine.reserves(poolId)
     delRisky = delLiquidity.mul(res.reserveRisky).div(res.liquidity)
@@ -71,10 +72,8 @@ runTest('uri', function () {
       expect(metadata.license).to.be.equal('License goes here')
       expect(metadata.creator).to.be.equal('creator goes here')
       expect(metadata.description).to.be.equal('Description goes here')
-      expect(utils.getAddress(metadata.properties.risky))
-        .to.be.equal(this.risky.address)
-      expect(utils.getAddress(metadata.properties.stable))
-        .to.be.equal(this.stable.address)
+      expect(utils.getAddress(metadata.properties.risky)).to.be.equal(this.risky.address)
+      expect(utils.getAddress(metadata.properties.stable)).to.be.equal(this.stable.address)
     })
   })
 })
