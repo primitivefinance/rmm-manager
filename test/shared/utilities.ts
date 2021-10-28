@@ -16,11 +16,14 @@ const { keccak256, solidityPack } = utils
 
 export function computePoolId(
   engine: string,
-  strike: string | BigNumber,
+  maturity: string | number,
   sigma: string | BigNumber,
-  maturity: string | number
+  strike: string | BigNumber,
+  gamma: string | BigNumber
 ): string {
-  return keccak256(solidityPack(['address', 'uint256', 'uint64', 'uint32'], [engine, strike, sigma, maturity]))
+  return keccak256(
+    solidityPack(['address', 'uint128', 'uint32', 'uint32', 'uint32'], [engine, strike, sigma, maturity, gamma])
+  )
 }
 
 export function computePositionId(account: string, poolId: string): string {
