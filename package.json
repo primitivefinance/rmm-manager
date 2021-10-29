@@ -1,6 +1,6 @@
 {
   "name": "@primitivefinance/v2-periphery",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Primitive V2 periphery smart contracts.",
   "main": "index.js",
   "keywords": [
@@ -11,6 +11,7 @@
   "files": [
     "contracts",
     "artifacts/contracts/PrimitiveHouse.sol/PrimitiveHouse.json",
+    "artifacts/contracts/PositionRenderer.sol/PositionRenderer.json",
     "artifacts/contracts/interfaces/**/*.json",
     "!artifacts/contracts/interfaces/**/*.dbg.json",
     "typechain"
