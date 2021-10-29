@@ -8,11 +8,11 @@ pragma solidity 0.8.6;
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "../interfaces/IMarginManager.sol";
-import "./HouseBase.sol";
+import "./CashManager.sol";
 import "../libraries/TransferHelper.sol";
 import "../libraries/Margin.sol";
 
-abstract contract MarginManager is IMarginManager, HouseBase {
+abstract contract MarginManager is IMarginManager, CashManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
 
@@ -28,7 +28,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         address stable,
         uint256 delRisky,
         uint256 delStable
-    ) external override lock {
+    ) external payable override lock {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         address engine = EngineAddress.computeAddress(factory, risky, stable);
@@ -89,7 +89,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
-        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
     }
 }

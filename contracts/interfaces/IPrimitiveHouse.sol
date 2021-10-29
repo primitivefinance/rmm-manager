@@ -92,6 +92,7 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
         uint256 delLiquidity
     )
         external
+        payable
         returns (
             bytes32 poolId,
             uint256 delRisky,
@@ -113,7 +114,7 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
         uint256 delRisky,
         uint256 delStable,
         bool fromMargin
-    ) external returns (uint256 delLiquidity);
+    ) external payable returns (uint256 delLiquidity);
 
     /// @notice              Removes liquidity from a pool
     /// @param engine        Address of the engine
