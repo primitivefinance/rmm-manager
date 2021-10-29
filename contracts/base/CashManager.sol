@@ -57,10 +57,11 @@ abstract contract CashManager is ICashManager, HouseBase {
         if (address(this).balance > 0) TransferHelper.safeTransferETH(msg.sender, address(this).balance);
     }
 
-    /// @param token The token to transfer as payment
-    /// @param payer The account that pays
-    /// @param recipient The account that receives payment
-    /// @param value The amount to pay
+    /// @dev              Pays {value} of {token] to {recipient} from {payer} wallet
+    /// @param token      Token to transfer as payment
+    /// @param payer      Account that pays
+    /// @param recipient  Account that receives payment
+    /// @param value      Amount to pay
     function pay(
         address token,
         address payer,
