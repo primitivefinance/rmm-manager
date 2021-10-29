@@ -40,6 +40,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 delLiquidity
     )
         external
+        payable
         override
         lock
         returns (
@@ -79,7 +80,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 delRisky,
         uint256 delStable,
         bool fromMargin
-    ) external override lock returns (uint256 delLiquidity) {
+    ) external payable override lock returns (uint256 delLiquidity) {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();

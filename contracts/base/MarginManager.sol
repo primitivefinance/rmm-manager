@@ -28,7 +28,7 @@ abstract contract MarginManager is IMarginManager, CashManager {
         address stable,
         uint256 delRisky,
         uint256 delStable
-    ) external override lock {
+    ) external payable override lock {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         address engine = EngineAddress.computeAddress(factory, risky, stable);
