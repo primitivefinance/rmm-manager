@@ -124,7 +124,7 @@ runTest('allocate', function () {
       })
     })
 
-    describe.only('using weth as risky', function () {
+    describe('using weth as risky', function () {
       let engine: PrimitiveEngine
       beforeEach(async function () {
         await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
@@ -145,7 +145,7 @@ runTest('allocate', function () {
           gamma.raw,
           riskyPerLp.raw,
           delLiquidity.raw,
-          { value: totalRisky.add(1).raw }
+          { value: totalRisky.raw }
         )
 
         await this.house.deposit(
