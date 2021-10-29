@@ -1,6 +1,6 @@
 {
   "name": "@primitivefinance/v2-periphery",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Primitive V2 periphery smart contracts.",
   "main": "index.js",
   "keywords": [
@@ -32,7 +32,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
-    "@primitivefinance/v2-core": "^1.11.0",
+    "@primitivefinance/v2-core": "^1.12.0",
     "@uniswap/v3-core": "^1.0.0",
     "@uniswap/v3-periphery": "^1.0.0",
     "mocha": "^9.1.1"
