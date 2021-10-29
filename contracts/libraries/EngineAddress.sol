@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.6;
+pragma solidity >=0.8.6;
 
 /// @author  Primitive
 /// @notice  Small library to compute the address of the engines
@@ -7,7 +7,7 @@ pragma solidity 0.8.6;
 library EngineAddress {
     /// @notice Hash of the bytecode of the PrimitiveEngine
     bytes32 internal constant ENGINE_INIT_CODE_HASH =
-        0x35e9da16814730a3cb5bafa10112a408205222da69fd189fe4c188e66cf81800;
+        0x0d62364ad54864dd6772b62036f8de0177709709fa3d2e7319eeb5c96560060d;
 
     /// @notice         Computes the address of an engine
     /// @param factory  Address of the factory

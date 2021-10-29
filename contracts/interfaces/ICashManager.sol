@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.6;
+pragma solidity >=0.8.6;
 
-/// @title   CashManager Interface
+/// @title   Interface of CashManager contract
 /// @author  Primitive
 
 interface ICashManager {
     /// ERRORS ///
 
-    /// @notice          Thrown when the sender is not WETH
-    /// @param expected  Expected sender (WETH)
-    /// @param actual    Actual sender
-    error WrongSender(address expected, address actual);
+    /// @notice  Thrown when the sender is not WETH
+    error OnlyWETHError();
 
-    /// @notice          Thrown when the amount required is above balance
-    /// @param expected  Expected amount
-    /// @param actual    Actual amount
-    error AmountTooLow(uint256 expected, uint256 actual);
+    /// @notice                Thrown when the amount required is above balance
+    /// @param balance         Actual ETH or token balance of the contract
+    /// @param requiredAmount  ETH or token amount required by the user
+    error BalanceTooLowError(uint256 balance, uint256 requiredAmount);
 
     /// EFFECT FUNCTIONS ///
+
+    /// @notice       Wraps ETH into WETH and transfers to the msg.sender
+    /// @param value  Amount of ETH to wrap
+    function wrap(uint256 value) external payable;
 
     /// @notice           Unwraps WETH to ETH and transfers to a recipient
     /// @param amountMin  Minimum amount to unwrap
@@ -34,6 +36,6 @@ interface ICashManager {
         address recipient
     ) external payable;
 
-    /// @notice Transfers the ETH balance of the contract to the caller
+    /// @notice  Transfers the ETH balance of the contract to the caller
     function refundETH() external payable;
 }
