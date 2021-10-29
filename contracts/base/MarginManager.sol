@@ -1,23 +1,25 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   MarginManager
+/// @title   MarginManager contract
 /// @author  Primitive
 /// @notice  Manages the margins
 
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
 import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "../interfaces/IMarginManager.sol";
-import "./HouseBase.sol";
+import "./CashManager.sol";
 import "../libraries/TransferHelper.sol";
 import "../libraries/Margin.sol";
 
-abstract contract MarginManager is IMarginManager, HouseBase {
+abstract contract MarginManager is IMarginManager, CashManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
 
     /// @inheritdoc IMarginManager
     mapping(address => mapping(address => Margin.Data)) public override margins;
+
+    /// EFFECT FUNCTIONS ///
 
     /// @inheritdoc IMarginManager
     function deposit(
@@ -26,7 +28,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         address stable,
         uint256 delRisky,
         uint256 delStable
-    ) external override lock {
+    ) external payable override lock {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         address engine = EngineAddress.computeAddress(factory, risky, stable);
@@ -65,14 +67,16 @@ abstract contract MarginManager is IMarginManager, HouseBase {
 
         emit Withdraw(
             msg.sender,
-            recipient,
+            recipient == address(0) ? msg.sender : recipient,
             engine,
-            IPrimitiveEngineView(engine).risky(), // FIXME: A bit expensive for just an event no?
-            IPrimitiveEngineView(engine).stable(), // FIXME: A bit expensive for just an event no?
+            IPrimitiveEngineView(engine).risky(),
+            IPrimitiveEngineView(engine).stable(),
             delRisky,
             delStable
         );
     }
+
+    /// CALLBACK IMPLEMENTATIONS ///
 
     /// @inheritdoc IPrimitiveDepositCallback
     function depositCallback(
@@ -85,7 +89,7 @@ abstract contract MarginManager is IMarginManager, HouseBase {
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
-        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
     }
 }

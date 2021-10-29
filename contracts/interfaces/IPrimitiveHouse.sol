@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
-pragma solidity 0.8.6;
+pragma solidity >=0.8.6;
 
-/// @title   PrimitiveHouse Interface
+/// @title   Interface of PrimitiveHouse contract
 /// @author  Primitive
 
 import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
@@ -10,33 +10,32 @@ import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquid
 interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallback {
     /// ERRORS ///
 
-    /// @notice Emitted when the engine is not deployed
-    error EngineNotDeployedError();
-
     /// @notice Emitted when the liquidity is zero
     error ZeroLiquidityError();
 
     /// EVENTS ///
 
     /// @notice           Emitted when a new pool is created
-    /// @param recipient  Recipient of the liquidity
-    /// @param engine     Address of the engine
+    /// @param payer      Payer sending liquidity
+    /// @param engine     Primitive Engine where the pool is created
     /// @param poolId     Id of the new pool
     /// @param strike     Strike of the new pool
     /// @param sigma      Sigma of the new pool
+    /// @param gamma      Gamma of the new pool
     /// @param maturity   Maturity of the new pool
     event Create(
-        address indexed recipient,
+        address indexed payer,
         address indexed engine,
         bytes32 indexed poolId,
         uint256 strike,
-        uint64 sigma,
+        uint32 sigma,
+        uint32 gamma,
         uint32 maturity
     );
 
     /// @notice              Emitted when liquidity is allocated
     /// @param payer         Payer sending liquidity
-    /// @param engine        Engine receiving liquidity
+    /// @param engine        Primitive Engine receiving liquidity
     /// @param poolId        Id of the pool receiving liquidity
     /// @param delLiquidity  Amount of liquidity allocated
     /// @param delRisky      Amount of risky tokens allocated
@@ -71,35 +70,43 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     /// EFFECT FUNCTIONS ///
 
     /// @notice              Creates a new pool using the specified parameters
-    /// @param strike        Strike price of the pool to calibrate to, with the same decimals as the stable token
     /// @param risky         Address of the risky asset
     /// @param stable        Address of the stable asset
+    /// @param strike        Strike price of the pool to calibrate to, with the same decimals as the stable token
     /// @param sigma         Volatility to calibrate to as an unsigned 256-bit integer w/ precision of 1e4, 10000 = 100%
     /// @param maturity      Maturity timestamp of the pool, in seconds
+    /// @param gamma         Multiplied against swap in amounts to apply fee, equal to 1 - fee %, an unsigned 32-bit integer, w/ precision of 1e4, 10000 = 100%
     /// @param riskyPerLp    Risky reserve per liq. with risky decimals, = 1 - N(d1), d1 = (ln(S/K)+(r*sigma^2/2))/sigma*sqrt(tau)
     /// @param delLiquidity  Amount of liquidity to allocate to the curve, wei value with 18 decimals of precision
+    /// @return poolId       Id of the new created pool (Keccak256 hash of the engine address, maturity, sigma and strike)
+    /// @return delRisky     Amount of risky tokens allocated into the pool
+    /// @return delStable    Amount of stable tokens allocated into the pool
     function create(
         address risky,
         address stable,
         uint256 strike,
-        uint64 sigma,
+        uint32 sigma,
         uint32 maturity,
+        uint32 gamma,
         uint256 riskyPerLp,
         uint256 delLiquidity
     )
         external
+        payable
         returns (
             bytes32 poolId,
             uint256 delRisky,
             uint256 delStable
         );
 
-    /// @notice              Allocates liquidity into a pool
-    /// @param risky         Address of the risky asset
-    /// @param stable        Address of the stable asset
-    /// @param poolId        Id of the pool
-    /// @param delLiquidity  Amount of liquidity to allocate
-    /// @param fromMargin    True if margins should be used
+    /// @notice               Allocates liquidity into a pool
+    /// @param poolId         Id of the pool
+    /// @param risky          Address of the risky asset
+    /// @param stable         Address of the stable asset
+    /// @param delRisky       Amount of risky tokens to allocate
+    /// @param delStable      Amount of stable tokens to allocate
+    /// @param fromMargin     True if the funds of the sender should be used
+    /// @return delLiquidity  Amount of liquidity allocated into the pool
     function allocate(
         bytes32 poolId,
         address risky,
@@ -107,12 +114,14 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
         uint256 delRisky,
         uint256 delStable,
         bool fromMargin
-    ) external returns (uint256 delLiquidity);
+    ) external payable returns (uint256 delLiquidity);
 
     /// @notice              Removes liquidity from a pool
     /// @param engine        Address of the engine
     /// @param poolId        Id of the pool
     /// @param delLiquidity  Amount of liquidity to remove
+    /// @param delRisky      Amount of risky tokens removed from the pool
+    /// @param delStable     Amount of stable tokens removed from the pool
     function remove(
         address engine,
         bytes32 poolId,

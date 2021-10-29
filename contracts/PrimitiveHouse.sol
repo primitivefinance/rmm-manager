@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   Primitive House
+/// @title   PrimitiveHouse contract
 /// @author  Primitive
 /// @notice  Interacts with Primitive Engine contracts
 
@@ -21,24 +21,26 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     /// EFFECT FUNCTIONS ///
 
     /// @param factory_  Address of a PrimitiveFactory
-    /// @param WETH10_   Address of WETH10
+    /// @param WETH9_    Address of WETH9
     constructor(
         address factory_,
-        address WETH10_,
+        address WETH9_,
         address positionRenderer_
-    ) HouseBase(factory_, WETH10_, positionRenderer_) {}
+    ) HouseBase(factory_, WETH9_, positionRenderer_) {}
 
     /// @inheritdoc IPrimitiveHouse
     function create(
         address risky,
         address stable,
         uint256 strike,
-        uint64 sigma,
+        uint32 sigma,
         uint32 maturity,
+        uint32 gamma,
         uint256 riskyPerLp,
         uint256 delLiquidity
     )
         external
+        payable
         override
         lock
         returns (
@@ -49,8 +51,6 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
 
-        if (engine == address(0)) revert EngineNotDeployedError();
-
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
         CallbackData memory callbackData = CallbackData({risky: risky, stable: stable, payer: msg.sender});
@@ -59,6 +59,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
             strike,
             sigma,
             maturity,
+            gamma,
             riskyPerLp,
             delLiquidity,
             abi.encode(callbackData)
@@ -68,7 +69,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
         _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
-        emit Create(msg.sender, engine, poolId, strike, sigma, maturity);
+        emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma);
     }
 
     /// @inheritdoc IPrimitiveHouse
@@ -79,7 +80,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         uint256 delRisky,
         uint256 delStable,
         bool fromMargin
-    ) external override lock returns (uint256 delLiquidity) {
+    ) external payable override lock returns (uint256 delLiquidity) {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
@@ -131,8 +132,8 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 
     /// @inheritdoc IPrimitiveLiquidityCallback
@@ -146,7 +147,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 }
