@@ -11,6 +11,7 @@
   "files": [
     "contracts",
     "artifacts/contracts/PrimitiveHouse.sol/PrimitiveHouse.json",
+    "artifacts/contracts/PositionRenderer.sol/PositionRenderer.json",
     "artifacts/contracts/interfaces/**/*.json",
     "!artifacts/contracts/interfaces/**/*.dbg.json",
     "typechain"
