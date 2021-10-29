@@ -131,8 +131,8 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 
     /// @inheritdoc IPrimitiveLiquidityCallback
@@ -146,7 +146,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delRisky > 0) TransferHelper.safeTransferFrom(decoded.risky, decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) TransferHelper.safeTransferFrom(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 }
