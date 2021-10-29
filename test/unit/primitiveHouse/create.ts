@@ -1,10 +1,13 @@
+import { ethers } from 'hardhat'
 import { utils, constants } from 'ethers'
-import { parseWei } from 'web3-units'
+import { parseWei, Wei } from 'web3-units'
 
 import { DEFAULT_CONFIG } from '../context'
 import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
+import { PrimitiveEngine } from '@primitivefinance/v2-core/typechain'
+import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 const { strike, sigma, maturity, gamma, delta } = DEFAULT_CONFIG
 const delLiquidity = parseWei('1')
@@ -64,6 +67,70 @@ runTest('create', function () {
       )
         .to.emit(this.house, 'Create')
         .withArgs(this.deployer.address, this.engine.address, poolId, strike.raw, sigma.raw, maturity.raw, gamma.raw)
+    })
+
+    describe.only('uses weth as risky', function () {
+      let engine: PrimitiveEngine, riskyPerLp: Wei, totalRisky: Wei
+      beforeEach(async function () {
+        await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
+        await this.stable.approve(this.house.address, constants.MaxUint256)
+
+        // deploy weth<>stable pair engine
+        await this.factory.deploy(this.weth.address, this.stable.address)
+        const addr = await this.factory.getEngine(this.weth.address, this.stable.address)
+        engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as PrimitiveEngine
+        poolId = computePoolId(engine.address, maturity.raw, sigma.raw, strike.raw, gamma.raw)
+        riskyPerLp = parseWei(1).sub(parseWei(delta))
+        totalRisky = riskyPerLp.mul(delLiquidity).div(parseWei(1, 18))
+      })
+
+      it('creates a new pool using the house contract', async function () {
+        await this.house.create(
+          this.weth.address,
+          this.stable.address,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          gamma.raw,
+          riskyPerLp.raw,
+          delLiquidity.raw,
+          { value: totalRisky.add(1).raw }
+        )
+      })
+
+      it('updates the sender position', async function () {
+        await expect(
+          this.house.create(
+            this.weth.address,
+            this.stable.address,
+            strike.raw,
+            sigma.raw,
+            maturity.raw,
+            gamma.raw,
+            riskyPerLp.raw,
+            delLiquidity.raw,
+            { value: totalRisky.add(1).raw }
+          )
+        ).to.increasePositionLiquidity(this.house, this.deployer.address, poolId, parseWei('1').raw.sub('1000'))
+      })
+
+      it('emits the Created event', async function () {
+        await expect(
+          this.house.create(
+            this.weth.address,
+            this.stable.address,
+            strike.raw,
+            sigma.raw,
+            maturity.raw,
+            gamma.raw,
+            riskyPerLp.raw,
+            delLiquidity.raw,
+            { value: totalRisky.add(1).raw }
+          )
+        )
+          .to.emit(this.house, 'Create')
+          .withArgs(this.deployer.address, engine.address, poolId, strike.raw, sigma.raw, maturity.raw, gamma.raw)
+      })
     })
   })
 
