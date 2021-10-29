@@ -67,7 +67,7 @@ abstract contract CashManager is ICashManager, HouseBase {
         address recipient,
         uint256 value
     ) internal {
-        if (token == WETH9 && address(this).balance > value) {
+        if (token == WETH9 && address(this).balance >= value) {
             IWETH9(WETH9).deposit{value: value}();
             IWETH9(WETH9).transfer(recipient, value);
         } else if (payer == address(this)) {

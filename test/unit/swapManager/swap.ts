@@ -584,7 +584,7 @@ runTest('swap', function () {
       })
     })
 
-    describe.only('from wallet / to wallet for weth pair', function () {
+    describe('from wallet / to wallet for weth pair', function () {
       let engine: PrimitiveEngine
       beforeEach(async function () {
         await this.factory.deploy(this.weth.address, this.stable.address)
@@ -602,7 +602,7 @@ runTest('swap', function () {
           gamma.raw,
           riskyPerLp.raw,
           delLiquidity.raw,
-          { value: totalRisky.add(1).raw }
+          { value: totalRisky.raw }
         )
 
         const addr = await this.factory.getEngine(this.weth.address, this.stable.address)

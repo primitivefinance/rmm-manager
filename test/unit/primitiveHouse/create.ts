@@ -69,7 +69,7 @@ runTest('create', function () {
         .withArgs(this.deployer.address, this.engine.address, poolId, strike.raw, sigma.raw, maturity.raw, gamma.raw)
     })
 
-    describe.only('uses weth as risky', function () {
+    describe('uses weth as risky', function () {
       let engine: PrimitiveEngine, riskyPerLp: Wei, totalRisky: Wei
       beforeEach(async function () {
         await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
@@ -94,7 +94,7 @@ runTest('create', function () {
           gamma.raw,
           riskyPerLp.raw,
           delLiquidity.raw,
-          { value: totalRisky.add(1).raw }
+          { value: totalRisky.raw }
         )
       })
 
@@ -109,7 +109,7 @@ runTest('create', function () {
             gamma.raw,
             riskyPerLp.raw,
             delLiquidity.raw,
-            { value: totalRisky.add(1).raw }
+            { value: totalRisky.raw }
           )
         ).to.increasePositionLiquidity(this.house, this.deployer.address, poolId, parseWei('1').raw.sub('1000'))
       })
@@ -125,7 +125,7 @@ runTest('create', function () {
             gamma.raw,
             riskyPerLp.raw,
             delLiquidity.raw,
-            { value: totalRisky.add(1).raw }
+            { value: totalRisky.raw }
           )
         )
           .to.emit(this.house, 'Create')
