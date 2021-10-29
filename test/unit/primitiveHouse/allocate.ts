@@ -127,13 +127,11 @@ runTest('allocate', function () {
     describe.only('using weth as risky', function () {
       let engine: PrimitiveEngine
       beforeEach(async function () {
-        await this.factory.deploy(this.weth.address, this.stable.address)
-        const decimals = await this.weth.decimals()
-
-        //await this.weth.deposit({ value: parseWei('1000000').raw })
-        //await this.weth.approve(this.house.address, constants.MaxUint256)
         await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
         await this.stable.approve(this.house.address, constants.MaxUint256)
+
+        await this.factory.deploy(this.weth.address, this.stable.address)
+        const decimals = await this.weth.decimals()
 
         const riskyPerLp = parseWei(1, decimals).sub(parseWei(delta, decimals))
         const totalRisky = riskyPerLp.mul(delLiquidity).div(parseWei(1, 18))
@@ -160,10 +158,10 @@ runTest('allocate', function () {
         )
 
         const addr = await this.factory.getEngine(this.weth.address, this.stable.address)
+        engine = (await hre.ethers.getContractAt(PrimitiveEngineAbi, addr)) as PrimitiveEngine
 
         poolId = computePoolId(addr, maturity.raw, sigma.raw, strike.raw, gamma.raw)
 
-        engine = (await hre.ethers.getContractAt(PrimitiveEngineAbi, addr)) as PrimitiveEngine
         const res = await engine.reserves(poolId)
         delRisky = delLiquidity.mul(res.reserveRisky).div(res.liquidity)
         delStable = delLiquidity.mul(res.reserveStable).div(res.liquidity)
