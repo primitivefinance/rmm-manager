@@ -27,7 +27,7 @@ abstract contract SwapManager is ISwapManager, CashManager, MarginManager {
     /// EFFECT FUNCTIONS ///
 
     /// @inheritdoc ISwapManager
-    function swap(SwapParams memory params) external override lock checkDeadline(params.deadline) {
+    function swap(SwapParams memory params) external payable override lock checkDeadline(params.deadline) {
         CallbackData memory callbackData = CallbackData({
             payer: msg.sender,
             risky: params.risky,

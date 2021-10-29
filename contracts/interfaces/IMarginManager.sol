@@ -66,7 +66,7 @@ interface IMarginManager is IPrimitiveDepositCallback {
         address stable,
         uint256 delRisky,
         uint256 delStable
-    ) external;
+    ) external payable;
 
     /// @notice           Withdraws funds from the margin of a Primitive Engine
     /// @param recipient  Address receiving the funds in their wallet
