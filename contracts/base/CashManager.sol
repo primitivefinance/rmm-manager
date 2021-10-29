@@ -56,4 +56,25 @@ abstract contract CashManager is ICashManager, HouseBase {
     function refundETH() external payable override {
         if (address(this).balance > 0) TransferHelper.safeTransferETH(msg.sender, address(this).balance);
     }
+
+    /// @dev              Pays {value} of {token] to {recipient} from {payer} wallet
+    /// @param token      Token to transfer as payment
+    /// @param payer      Account that pays
+    /// @param recipient  Account that receives payment
+    /// @param value      Amount to pay
+    function pay(
+        address token,
+        address payer,
+        address recipient,
+        uint256 value
+    ) internal {
+        if (token == WETH9 && address(this).balance >= value) {
+            IWETH9(WETH9).deposit{value: value}();
+            IWETH9(WETH9).transfer(recipient, value);
+        } else if (payer == address(this)) {
+            TransferHelper.safeTransfer(token, recipient, value);
+        } else {
+            TransferHelper.safeTransferFrom(token, payer, recipient, value);
+        }
+    }
 }

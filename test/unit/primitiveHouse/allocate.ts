@@ -1,3 +1,4 @@
+import hre from 'hardhat'
 import { utils, constants } from 'ethers'
 import { parseWei, Wei } from 'web3-units'
 
@@ -5,6 +6,8 @@ import { DEFAULT_CONFIG } from '../context'
 import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
+import { PrimitiveEngine } from '@primitivefinance/v2-core/typechain'
+import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
 let poolId: string
@@ -118,6 +121,88 @@ runTest('allocate', function () {
         )
           .to.emit(this.house, 'Allocate')
           .withArgs(this.deployer.address, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false)
+      })
+    })
+
+    describe('using weth as risky', function () {
+      let engine: PrimitiveEngine
+      beforeEach(async function () {
+        await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
+        await this.stable.approve(this.house.address, constants.MaxUint256)
+
+        await this.factory.deploy(this.weth.address, this.stable.address)
+        const decimals = await this.weth.decimals()
+
+        const riskyPerLp = parseWei(1, decimals).sub(parseWei(delta, decimals))
+        const totalRisky = riskyPerLp.mul(delLiquidity).div(parseWei(1, 18))
+
+        await this.house.create(
+          this.weth.address,
+          this.stable.address,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          gamma.raw,
+          riskyPerLp.raw,
+          delLiquidity.raw,
+          { value: totalRisky.raw }
+        )
+
+        await this.house.deposit(
+          this.deployer.address,
+          this.weth.address,
+          this.stable.address,
+          parseWei('1000').raw,
+          parseWei('1000').raw,
+          { value: parseWei('1000').raw }
+        )
+
+        const addr = await this.factory.getEngine(this.weth.address, this.stable.address)
+        engine = (await hre.ethers.getContractAt(PrimitiveEngineAbi, addr)) as PrimitiveEngine
+
+        poolId = computePoolId(addr, maturity.raw, sigma.raw, strike.raw, gamma.raw)
+
+        const res = await engine.reserves(poolId)
+        delRisky = delLiquidity.mul(res.reserveRisky).div(res.liquidity)
+        delStable = delLiquidity.mul(res.reserveStable).div(res.liquidity)
+      })
+
+      it('allocates 1 LP shares', async function () {
+        await this.house.allocate(poolId, this.weth.address, this.stable.address, delRisky.raw, delStable.raw, false, {
+          value: delRisky.raw,
+        })
+      })
+
+      it('increases the position of the sender', async function () {
+        await expect(
+          this.house.allocate(poolId, this.weth.address, this.stable.address, delRisky.raw, delStable.raw, false, {
+            value: delRisky.raw,
+          })
+        ).to.increasePositionLiquidity(this.house, this.deployer.address, poolId, delLiquidity.raw)
+      })
+
+      it('reduces the balances of the sender', async function () {
+        const riskyBalance = await this.deployer.getBalance()
+        const stableBalance = await this.stable.balanceOf(this.deployer.address)
+        await this.house.allocate(poolId, this.weth.address, this.stable.address, delRisky.raw, delStable.raw, false, {
+          value: delRisky.raw,
+        })
+
+        /// 0.001 ether subtracted for rough gas cost
+        expect((await this.deployer.getBalance()).gte(riskyBalance.sub(delRisky.raw).sub(parseWei('0.001').raw))).to.be.eq(
+          true
+        )
+        expect(await this.stable.balanceOf(this.deployer.address)).to.equal(stableBalance.sub(delStable.raw))
+      })
+
+      it('emits the Allocate event', async function () {
+        await expect(
+          this.house.allocate(poolId, this.weth.address, this.stable.address, delRisky.raw, delStable.raw, false, {
+            value: delRisky.raw,
+          })
+        )
+          .to.emit(this.house, 'Allocate')
+          .withArgs(this.deployer.address, engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false)
       })
     })
   })
