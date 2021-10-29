@@ -1,3 +1,4 @@
+import { ethers } from 'hardhat'
 import { constants, BigNumber } from 'ethers'
 import { parseWei, Wei } from 'web3-units'
 
@@ -6,6 +7,7 @@ import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
 import { PrimitiveEngine } from '@primitivefinance/v2-core/typechain'
+import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
 let poolId: string
@@ -573,6 +575,118 @@ runTest('swap', function () {
               this.engine.address,
               poolId,
               false,
+              deltaIn,
+              deltaOut,
+              false,
+              false
+            )
+        })
+      })
+    })
+
+    describe.only('from wallet / to wallet for weth pair', function () {
+      let engine: PrimitiveEngine
+      beforeEach(async function () {
+        await this.factory.deploy(this.weth.address, this.stable.address)
+        const decimals = await this.weth.decimals()
+
+        const riskyPerLp = parseWei(1, decimals).sub(parseWei(delta, decimals))
+        const totalRisky = riskyPerLp.mul(delLiquidity).div(parseWei(1, 18))
+
+        await this.house.create(
+          this.weth.address,
+          this.stable.address,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          gamma.raw,
+          riskyPerLp.raw,
+          delLiquidity.raw,
+          { value: totalRisky.add(1).raw }
+        )
+
+        const addr = await this.factory.getEngine(this.weth.address, this.stable.address)
+        engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as PrimitiveEngine
+
+        poolId = computePoolId(addr, maturity.raw, sigma.raw, strike.raw, gamma.raw)
+        await this.house.deposit(
+          this.deployer.address,
+          this.weth.address,
+          this.stable.address,
+          parseWei('100').raw,
+          parseWei('100').raw,
+          { value: parseWei('100').raw }
+        )
+      })
+
+      describe('swaps weth for stable', function () {
+        it('withdraws weth from wallet and sends stable to wallet', async function () {
+          const { deltaIn, deltaOut } = await getDeltas(engine, true)
+
+          const preRiskyBalance = await this.deployer.getBalance()
+          const preStableBalance = await this.stable.balanceOf(this.deployer.address)
+
+          await expect(
+            this.house.swap(
+              {
+                recipient: this.deployer.address,
+                risky: this.weth.address,
+                stable: this.stable.address,
+                poolId: poolId,
+                riskyForStable: true,
+                deltaIn,
+                deltaOut,
+                fromMargin: false,
+                toMargin: false,
+                deadline: 1000000000000,
+              },
+              { value: deltaIn }
+            )
+          ).to.updateMargin(
+            this.house,
+            this.deployer.address,
+            this.engine.address,
+            parseWei('0').raw,
+            true,
+            parseWei('0').raw,
+            true
+          )
+
+          const postRiskyBalance = await this.deployer.getBalance()
+          /// 0.001 ether is overestimated gas cost
+          expect(postRiskyBalance.gte(preRiskyBalance.sub(deltaIn).sub(parseWei('0.001').raw))).to.be.equal(true)
+
+          const postStableBalance = await this.stable.balanceOf(this.deployer.address)
+          expect(postStableBalance).to.be.equal(preStableBalance.add(deltaOut))
+        })
+
+        it('emits the Swap event', async function () {
+          const { deltaIn, deltaOut } = await getDeltas(engine, true)
+
+          await expect(
+            this.house.swap(
+              {
+                recipient: this.deployer.address,
+                risky: this.weth.address,
+                stable: this.stable.address,
+                poolId: poolId,
+                riskyForStable: true,
+                deltaIn,
+                deltaOut,
+                fromMargin: false,
+                toMargin: false,
+                deadline: 1000000000000,
+              },
+              { value: deltaIn }
+            )
+          )
+            .to.emit(this.house, 'Swap')
+            .withArgs(
+              this.deployer.address,
+              this.deployer.address,
+              engine.address,
+              poolId,
+              true,
               deltaIn,
               deltaOut,
               false,
