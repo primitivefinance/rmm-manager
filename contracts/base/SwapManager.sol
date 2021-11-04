@@ -35,6 +35,7 @@ abstract contract SwapManager is ISwapManager, CashManager, MarginManager {
         });
 
         address engine = EngineAddress.computeAddress(factory, params.risky, params.stable);
+        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
 
         IPrimitiveEngineActions(engine).swap(
             params.toMargin ? address(this) : params.recipient,
