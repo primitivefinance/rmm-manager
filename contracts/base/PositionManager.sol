@@ -107,8 +107,9 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
     function getCalibration(uint256 tokenId) private view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
 
-        (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 creationTimestamp) = engine
-            .calibrations(bytes32(tokenId));
+        (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 gamma) = engine.calibrations(
+            bytes32(tokenId)
+        );
 
         return
             string(
@@ -121,8 +122,8 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
                     uint256(maturity).toString(),
                     '","lastTimestamp":"',
                     uint256(lastTimestamp).toString(),
-                    '","creationTimestamp":"',
-                    uint256(creationTimestamp).toString(),
+                    '","gamma":"',
+                    uint256(gamma).toString(),
                     '",'
                 )
             );
