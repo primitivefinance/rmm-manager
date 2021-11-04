@@ -215,7 +215,9 @@ runTest('allocate', function () {
     })
 
     it('reverts if the engine is not deployed', async function () {
-      await expect(this.house.allocate(poolId, this.stable.address, this.risky.address, '0', '0', true)).to.be.reverted
+      await expect(
+        this.house.allocate(poolId, this.stable.address, this.risky.address, '0', '0', true)
+      ).to.revertWithCustomError('EngineNotDeployedError')
     })
 
     it('fails to allocate more than margin balance', async function () {
