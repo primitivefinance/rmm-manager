@@ -40,7 +40,8 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
         uint256 amount
     ) internal {
         _mint(account, uint256(poolId), amount, _empty);
-        cache[uint256(poolId)] = engine;
+
+        if (cache[uint256(poolId)] == address(0)) cache[uint256(poolId)] = engine;
     }
 
     /// @notice         Removes {amount} of {poolId} liquidity from {account} balance
