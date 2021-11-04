@@ -5,6 +5,9 @@ pragma solidity >=0.8.6;
 /// @notice  Small library to compute the address of the engines
 
 library EngineAddress {
+    /// @notice Thrown when the target Engine is not deployed
+    error EngineNotDeployedError();
+
     /// @notice Hash of the bytecode of the PrimitiveEngine
     bytes32 internal constant ENGINE_INIT_CODE_HASH =
         0x0d62364ad54864dd6772b62036f8de0177709709fa3d2e7319eeb5c96560060d;

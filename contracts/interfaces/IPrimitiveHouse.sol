@@ -13,9 +13,6 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     /// @notice Emitted when the liquidity is zero
     error ZeroLiquidityError();
 
-    /// @notice Thrown when the target Engine is not deployed
-    error EngineNotDeployedError();
-
     /// EVENTS ///
 
     /// @notice           Emitted when a new pool is created
