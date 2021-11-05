@@ -85,7 +85,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
         return
             string(
                 abi.encodePacked(
-                    '"properties": {',
+                    '"properties":{',
                     '"risky":"',
                     uint256(uint160(engine.risky())).toHexString(),
                     '","stable":"',
@@ -95,6 +95,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
                     uint256((uint128(invariant < 0 ? ~invariant + 1 : invariant))).toString(),
                     '",',
                     getCalibration(tokenId),
+                    ",",
                     getReserve(tokenId),
                     "}}"
                 )
@@ -114,6 +115,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
         return
             string(
                 abi.encodePacked(
+                    '"calibration":{',
                     '"strike":"',
                     uint256(strike).toString(),
                     '","sigma":"',
@@ -124,7 +126,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
                     uint256(lastTimestamp).toString(),
                     '","gamma":"',
                     uint256(gamma).toString(),
-                    '",'
+                    '"}'
                 )
             );
     }
@@ -148,6 +150,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
         return
             string(
                 abi.encodePacked(
+                    '"reserve":{',
                     '"reserveRisky":"',
                     uint256(reserveRisky).toString(),
                     '","reserveStable":"',
@@ -162,7 +165,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
                     uint256(cumulativeStable).toString(),
                     '","cumulativeLiquidity":"',
                     uint256(cumulativeLiquidity).toString(),
-                    '"'
+                    '"}'
                 )
             );
     }
