@@ -120,8 +120,8 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     /// @param engine        Address of the engine
     /// @param poolId        Id of the pool
     /// @param delLiquidity  Amount of liquidity to remove
-    /// @param delRisky      Amount of risky tokens removed from the pool
-    /// @param delStable     Amount of stable tokens removed from the pool
+    /// @return delRisky     Amount of risky tokens removed from the pool
+    /// @return delStable    Amount of stable tokens removed from the pool
     function remove(
         address engine,
         bytes32 poolId,
