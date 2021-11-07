@@ -147,14 +147,14 @@ runTest('create', function () {
           parseWei(1).sub(parseWei(delta)).raw,
           delLiquidity.raw
         )
-      ).to.be.reverted
+      ).to.revertWithCustomError('EngineNotDeployedError')
     })
 
     it('reverts if the liquidity is 0', async function () {
       await expect(
         this.house.create(
-          this.stable.address,
           this.risky.address,
+          this.stable.address,
           strike.raw,
           sigma.raw,
           maturity.raw,

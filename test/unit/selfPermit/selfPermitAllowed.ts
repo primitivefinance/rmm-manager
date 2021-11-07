@@ -1,12 +1,12 @@
-import { parseWei } from 'web3-units'
+import { constants } from 'ethers'
 import expect from '../../shared/expect'
 import getPermitSignature from '../../shared/permit'
 import { runTest } from '../context'
 
-const value = parseWei('1').raw
+const value = constants.MaxUint256
 const deadline = 999999999999
 
-runTest('selfPermit', function () {
+runTest('selfPermitAllowed', function () {
   describe('success cases', function () {
     it('self approves using the signature', async function () {
       const signature = await getPermitSignature(
@@ -22,9 +22,9 @@ runTest('selfPermit', function () {
         }
       )
 
-      await this.house.selfPermit(
+      await this.house.selfPermitAllowed(
         this.risky.address,
-        value,
+        '0',
         deadline,
         signature.v,
         signature.r,
@@ -52,9 +52,9 @@ runTest('selfPermit', function () {
         }
       )
 
-      await expect(this.house.selfPermit(
+      await expect(this.house.selfPermitAllowed(
         this.risky.address,
-        value,
+        '0',
         0,
         signature.v,
         signature.r,
@@ -76,9 +76,9 @@ runTest('selfPermit', function () {
         }
       )
 
-      await expect(this.house.selfPermit(
-        this.risky.address,
-        value.mul(2),
+      await expect(this.house.selfPermitAllowed(
+        this.stable.address,
+        '0',
         deadline,
         signature.v,
         signature.r,

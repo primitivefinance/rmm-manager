@@ -698,6 +698,25 @@ runTest('swap', function () {
   })
 
   describe('fail cases', function () {
+    it('reverts if the engine is not deployed', async function () {
+      const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
+
+      await expect(
+        this.house.swap({
+          recipient: this.deployer.address,
+          risky: this.stable.address,
+          stable: this.risky.address,
+          poolId: poolId,
+          riskyForStable: true,
+          deltaIn,
+          deltaOut,
+          fromMargin: true,
+          toMargin: true,
+          deadline: 1000000000000,
+        })
+      ).to.revertWithCustomError('EngineNotDeployedError')
+    })
+
     it('reverts if the deadline is reached', async function () {
       const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 

@@ -5,6 +5,9 @@ pragma solidity >=0.8.6;
 /// @notice  Small library to compute the address of the engines
 
 library EngineAddress {
+    /// @notice Thrown when the target Engine is not deployed
+    error EngineNotDeployedError();
+
     /// @notice Hash of the bytecode of the PrimitiveEngine
     bytes32 internal constant ENGINE_INIT_CODE_HASH =
         0x0d62364ad54864dd6772b62036f8de0177709709fa3d2e7319eeb5c96560060d;
@@ -28,5 +31,21 @@ library EngineAddress {
                 )
             )
         );
+    }
+
+    /// @notice        Checks if the target address is a contract, this function is used
+    ///                to verify if a PrimitiveEngine was deployed before calling it
+    /// @param target  Address of the contract to check
+    /// @return        True if the target is a contract
+    function isContract(address target) internal view returns (bool) {
+        // This method relies on extcodesize, which returns 0 for contracts in
+        // construction, since the code is only stored at the end of the
+        // constructor execution.
+
+        uint256 size;
+        assembly {
+            size := extcodesize(target)
+        }
+        return size > 0;
     }
 }

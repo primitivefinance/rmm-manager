@@ -21,16 +21,16 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     /// @param poolId     Id of the new pool
     /// @param strike     Strike of the new pool
     /// @param sigma      Sigma of the new pool
-    /// @param gamma      Gamma of the new pool
     /// @param maturity   Maturity of the new pool
+    /// @param gamma      Gamma of the new pool
     event Create(
         address indexed payer,
         address indexed engine,
         bytes32 indexed poolId,
         uint256 strike,
         uint32 sigma,
-        uint32 gamma,
-        uint32 maturity
+        uint32 maturity,
+        uint32 gamma
     );
 
     /// @notice              Emitted when liquidity is allocated
@@ -120,8 +120,8 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     /// @param engine        Address of the engine
     /// @param poolId        Id of the pool
     /// @param delLiquidity  Amount of liquidity to remove
-    /// @param delRisky      Amount of risky tokens removed from the pool
-    /// @param delStable     Amount of stable tokens removed from the pool
+    /// @return delRisky     Amount of risky tokens removed from the pool
+    /// @return delStable    Amount of stable tokens removed from the pool
     function remove(
         address engine,
         bytes32 poolId,
