@@ -7,8 +7,15 @@ pragma solidity 0.8.6;
 import "../interfaces/external/IERC20.sol";
 
 library TransferHelper {
+    /// ERRORS ///
+
     /// @notice Thrown when a transfer reverts
     error TransferError();
+
+    /// @notice Thrown when an approval reverts
+    error ApproveError();
+
+    /// FUNCTIONS ///
 
     /// @notice       Transfers tokens from the targeted address to the given destination
     /// @param token  Contract address of the token to be transferred
@@ -51,7 +58,7 @@ library TransferHelper {
         uint256 value
     ) internal {
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(IERC20.approve.selector, to, value));
-        if (!(success && (data.length == 0 || abi.decode(data, (bool))))) revert TransferError();
+        if (!(success && (data.length == 0 || abi.decode(data, (bool))))) revert ApproveError();
     }
 
     /// @notice       Transfers ETH to the recipient address

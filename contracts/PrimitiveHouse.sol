@@ -50,6 +50,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         )
     {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
+        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
@@ -82,6 +83,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         bool fromMargin
     ) external payable override lock returns (uint256 delLiquidity) {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
+        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
 
