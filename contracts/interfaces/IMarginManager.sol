@@ -4,7 +4,7 @@ pragma solidity >=0.8.6;
 /// @title   Interface of MarginManager contract
 /// @author  Primitive
 
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
 
 interface IMarginManager is IPrimitiveDepositCallback {
     /// ERRORS ///

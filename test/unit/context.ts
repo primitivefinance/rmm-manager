@@ -3,11 +3,11 @@ import { parsePercentage } from 'web3-units'
 import hre, { ethers, waffle } from 'hardhat'
 import { deployContract, createFixtureLoader } from 'ethereum-waffle'
 import * as ContractTypes from '../../typechain'
-import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
-import FactoryArtifact from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
+import { abi as PrimitiveEngineAbi } from '@primitivefinance/rmm-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import FactoryArtifact from '@primitivefinance/rmm-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
 
 import { Calibration } from '../shared/calibration'
-import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
+import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/rmm-core/typechain'
 
 export async function deploy(contractName: string, deployer: Wallet, args: any[] = []): Promise<Contract> {
   const artifact = await hre.artifacts.readArtifact(contractName)

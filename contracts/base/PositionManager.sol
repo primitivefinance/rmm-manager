@@ -7,7 +7,7 @@ pragma solidity 0.8.6;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "../interfaces/IPositionRenderer.sol";
 import "../base/HouseBase.sol";
 
@@ -40,7 +40,8 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
         uint256 amount
     ) internal {
         _mint(account, uint256(poolId), amount, _empty);
-        cache[uint256(poolId)] = engine;
+
+        if (cache[uint256(poolId)] == address(0)) cache[uint256(poolId)] = engine;
     }
 
     /// @notice         Removes {amount} of {poolId} liquidity from {account} balance
@@ -84,7 +85,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
         return
             string(
                 abi.encodePacked(
-                    '"properties": {',
+                    '"properties":{',
                     '"risky":"',
                     uint256(uint160(engine.risky())).toHexString(),
                     '","stable":"',
@@ -94,6 +95,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
                     uint256((uint128(invariant < 0 ? ~invariant + 1 : invariant))).toString(),
                     '",',
                     getCalibration(tokenId),
+                    ",",
                     getReserve(tokenId),
                     "}}"
                 )
@@ -106,12 +108,14 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
     function getCalibration(uint256 tokenId) private view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
 
-        (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 creationTimestamp) = engine
-            .calibrations(bytes32(tokenId));
+        (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 gamma) = engine.calibrations(
+            bytes32(tokenId)
+        );
 
         return
             string(
                 abi.encodePacked(
+                    '"calibration":{',
                     '"strike":"',
                     uint256(strike).toString(),
                     '","sigma":"',
@@ -120,9 +124,9 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
                     uint256(maturity).toString(),
                     '","lastTimestamp":"',
                     uint256(lastTimestamp).toString(),
-                    '","creationTimestamp":"',
-                    uint256(creationTimestamp).toString(),
-                    '",'
+                    '","gamma":"',
+                    uint256(gamma).toString(),
+                    '"}'
                 )
             );
     }
@@ -146,6 +150,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
         return
             string(
                 abi.encodePacked(
+                    '"reserve":{',
                     '"reserveRisky":"',
                     uint256(reserveRisky).toString(),
                     '","reserveStable":"',
@@ -160,7 +165,7 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
                     uint256(cumulativeStable).toString(),
                     '","cumulativeLiquidity":"',
                     uint256(cumulativeLiquidity).toString(),
-                    '"'
+                    '"}'
                 )
             );
     }

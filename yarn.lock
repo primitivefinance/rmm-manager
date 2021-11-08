@@ -713,12 +713,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.2.tgz#ff80affd6d352dbe1bbc5b4e1833c41afd6283b6"
   integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
 
-"@primitivefinance/v2-core@^1.12.0":
-  version "1.12.0"
-  resolved "https://npm.pkg.github.com/download/@primitivefinance/v2-core/1.12.0/2d19cd63bad2fbf50d1daf8ae6412bc28ce11c48cabca76b0c6eab2f061bb1df#5f2a637e73234de0ed4b6c9670f3a63d097dd7f1"
-  integrity sha512-AzK0xt71L7e1xtlpx3GaCQttOyLpBL3dgOxnfRtacuzUMB6mtMfETPS+Bz6bPfEO6IO3z8jCBOPtu47dX8eb/w==
-  dependencies:
-    mocha "^9.0.3"
+"@primitivefinance/rmm-core@^1.13.2":
+  version "1.13.2"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/rmm-core/1.13.2/9483826fcd3dad8fafe094afc7f7f997b8cd664f2647f93ff6b79f05b190347a#101cf120ac51d4896c532496d2eac6e04816611c"
+  integrity sha512-VfOUAhgeKhOjk8dmMaKNckqz2gKIdiycHYTivlN7nbU8QGXspM8B699e/ogdtGh1LV7Yx0X70ltadOiSl3PF3g==
 
 "@primitivefinance/v2-math@^1.5.0":
   version "1.5.0"
@@ -6870,7 +6868,7 @@ mocha@^7.1.1, mocha@^7.1.2:
     yargs-parser "13.1.2"
     yargs-unparser "1.6.0"
 
-mocha@^9.0.3, mocha@^9.1.1:
+mocha@^9.1.1:
   version "9.1.2"
   resolved "https://registry.yarnpkg.com/mocha/-/mocha-9.1.2.tgz#93f53175b0f0dc4014bd2d612218fccfcf3534d3"
   integrity sha512-ta3LtJ+63RIBP03VBjMGtSqbe6cWXRejF9SyM9Zyli1CKZJZ+vfCTj3oW24V7wAphMJdpOFLoMI3hjJ1LWbs0w==

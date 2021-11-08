@@ -1,4 +1,5 @@
-import { utils, constants } from 'ethers'
+import { ethers } from 'hardhat'
+import { utils, constants, BigNumber } from 'ethers'
 import { parseWei, Wei } from 'web3-units'
 
 import { DEFAULT_CONFIG } from '../context'
@@ -8,8 +9,9 @@ import { runTest } from '../context'
 
 const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
 let poolId: string
-let delRisky: Wei, delStable: Wei
+let reserveRisky: BigNumber, reserveStable: BigNumber, liquidity: BigNumber
 const delLiquidity = parseWei('10')
+let lastTimestamp: string
 
 type Metadata = {
   name: string
@@ -21,18 +23,22 @@ type Metadata = {
     risky: string
     stable: string
     invariant: string
-    strike: string
-    sigma: string
-    maturity: string
-    lastTimestamp: string
-    creationTimestamp: string
-    reserveRisky: string
-    reserveStable: string
-    liquidity: string
-    blockTimestamp: string
-    cumulativeRisky: string
-    cumulativeStable: string
-    cumulativeLiquidity: string
+    calibration: {
+      strike: string
+      sigma: string
+      maturity: string
+      lastTimestamp: string
+      gamma: string
+    }
+    reserve: {
+      reserveRisky: string
+      reserveStable: string
+      liquidity: string
+      blockTimestamp: string
+      cumulativeRisky: string
+      cumulativeStable: string
+      cumulativeLiquidity: string
+    }
   }
 }
 
@@ -43,7 +49,7 @@ runTest('uri', function () {
     await this.risky.approve(this.house.address, constants.MaxUint256)
     await this.stable.approve(this.house.address, constants.MaxUint256)
 
-    await this.house.create(
+    const tx = await this.house.create(
       this.risky.address,
       this.stable.address,
       strike.raw,
@@ -54,11 +60,16 @@ runTest('uri', function () {
       delLiquidity.raw
     )
 
+    const receipt = await tx.wait()
+    const block = await ethers.provider.getBlock(receipt.blockNumber)
+    lastTimestamp = block.timestamp.toString()
+
     poolId = computePoolId(this.engine.address, maturity.raw, sigma.raw, strike.raw, gamma.raw)
 
     const res = await this.engine.reserves(poolId)
-    delRisky = delLiquidity.mul(res.reserveRisky).div(res.liquidity)
-    delStable = delLiquidity.mul(res.reserveStable).div(res.liquidity)
+    reserveRisky = res.reserveRisky
+    reserveStable = res.reserveStable
+    liquidity = res.liquidity
   })
 
   describe('success cases', function () {
@@ -74,6 +85,19 @@ runTest('uri', function () {
       expect(metadata.description).to.be.equal('Description goes here')
       expect(utils.getAddress(metadata.properties.risky)).to.be.equal(this.risky.address)
       expect(utils.getAddress(metadata.properties.stable)).to.be.equal(this.stable.address)
+      expect(metadata.properties.invariant).to.be.equal('0')
+      expect(metadata.properties.calibration.strike).to.be.equal(strike.raw.toString())
+      expect(metadata.properties.calibration.sigma).to.be.equal(sigma.raw.toString())
+      expect(metadata.properties.calibration.maturity).to.be.equal(maturity.raw.toString())
+      expect(metadata.properties.calibration.lastTimestamp).to.be.equal(lastTimestamp)
+      expect(metadata.properties.calibration.gamma).to.be.equal(gamma.raw.toString())
+      expect(metadata.properties.reserve.reserveRisky).to.be.equal(reserveRisky.toString())
+      expect(metadata.properties.reserve.reserveStable).to.be.equal(reserveStable.toString())
+      expect(metadata.properties.reserve.liquidity).to.be.equal(liquidity.toString())
+      expect(metadata.properties.reserve.blockTimestamp).to.be.equal(lastTimestamp)
+      expect(metadata.properties.reserve.cumulativeRisky).to.be.equal('0')
+      expect(metadata.properties.reserve.cumulativeStable).to.be.equal('0')
+      expect(metadata.properties.reserve.cumulativeLiquidity).to.be.equal('0')
     })
   })
 })

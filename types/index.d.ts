@@ -1,7 +1,7 @@
 import { Wallet, BigNumber } from 'ethers'
 import * as ContractTypes from '../typechain'
 import { Fixture } from '@ethereum-waffle/provider'
-import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/v2-core/typechain'
+import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/rmm-core/typechain'
 
 export interface Contracts {
   factory: PrimitiveFactory
@@ -33,12 +33,34 @@ declare global {
         delRisky: BigNumber,
         riskyIncrease: boolean,
         delStable: BigNumber,
-        stableIncrease: boolean,
+        stableIncrease: boolean
       ): AsyncAssertion
-      increaseMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
-      decreaseMargin(house: ContractTypes.PrimitiveHouse, account: string, engine: string, delRisky: BigNumber, delStable: BigNumber): AsyncAssertion
-      increasePositionLiquidity(house: ContractTypes.PrimitiveHouse, account: string, poolId: string, liquidity: BigNumber): AsyncAssertion
-      decreasePositionLiquidity(house: ContractTypes.PrimitiveHouse, account: string, poolId: string, liquidity: BigNumber): AsyncAssertion
+      increaseMargin(
+        house: ContractTypes.PrimitiveHouse,
+        account: string,
+        engine: string,
+        delRisky: BigNumber,
+        delStable: BigNumber
+      ): AsyncAssertion
+      decreaseMargin(
+        house: ContractTypes.PrimitiveHouse,
+        account: string,
+        engine: string,
+        delRisky: BigNumber,
+        delStable: BigNumber
+      ): AsyncAssertion
+      increasePositionLiquidity(
+        house: ContractTypes.PrimitiveHouse,
+        account: string,
+        poolId: string,
+        liquidity: BigNumber
+      ): AsyncAssertion
+      decreasePositionLiquidity(
+        house: ContractTypes.PrimitiveHouse,
+        account: string,
+        poolId: string,
+        liquidity: BigNumber
+      ): AsyncAssertion
     }
   }
 }

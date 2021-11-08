@@ -6,8 +6,8 @@ import { DEFAULT_CONFIG } from '../context'
 import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
-import { PrimitiveEngine } from '@primitivefinance/v2-core/typechain'
-import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import { PrimitiveEngine } from '@primitivefinance/rmm-core/typechain'
+import { abi as PrimitiveEngineAbi } from '@primitivefinance/rmm-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
 let poolId: string
@@ -698,6 +698,25 @@ runTest('swap', function () {
   })
 
   describe('fail cases', function () {
+    it('reverts if the engine is not deployed', async function () {
+      const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
+
+      await expect(
+        this.house.swap({
+          recipient: this.deployer.address,
+          risky: this.stable.address,
+          stable: this.risky.address,
+          poolId: poolId,
+          riskyForStable: true,
+          deltaIn,
+          deltaOut,
+          fromMargin: true,
+          toMargin: true,
+          deadline: 1000000000000,
+        })
+      ).to.revertWithCustomError('EngineNotDeployedError')
+    })
+
     it('reverts if the deadline is reached', async function () {
       const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
