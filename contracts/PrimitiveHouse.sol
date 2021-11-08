@@ -5,7 +5,7 @@ pragma solidity 0.8.6;
 /// @author  Primitive
 /// @notice  Interacts with Primitive Engine contracts
 
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "./interfaces/IPrimitiveHouse.sol";
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
@@ -32,7 +32,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     function create(
         address risky,
         address stable,
-        uint256 strike,
+        uint128 strike,
         uint32 sigma,
         uint32 maturity,
         uint32 gamma,
@@ -50,6 +50,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         )
     {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
+        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
@@ -82,6 +83,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         bool fromMargin
     ) external payable override lock returns (uint256 delLiquidity) {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
+        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
 

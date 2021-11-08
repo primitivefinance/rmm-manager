@@ -4,7 +4,7 @@ pragma solidity >=0.8.6;
 /// @title   Interface of SwapManager contract
 /// @author  Primitive
 
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
 
 interface ISwapManager is IPrimitiveSwapCallback {
     /// @notice                Parameters for the swap function

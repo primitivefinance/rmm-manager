@@ -211,6 +211,18 @@ runTest('deposit', function () {
       ).to.be.reverted
     })
 
+    it('reverts if the enigne is not deployed', async function () {
+      await expect(
+        this.house.deposit(
+          this.deployer.address,
+          this.stable.address,
+          this.risky.address,
+          parseWei('1000').raw,
+          parseWei('1000').raw
+        )
+      ).to.revertWithCustomError('EngineNotDeployedError')
+    })
+
     it('reverts if trying to deposit 0 risky and stable', async function () {
       await expect(
         this.house.deposit(this.deployer.address, this.risky.address, this.stable.address, '0', '0')

@@ -6,8 +6,8 @@ import { DEFAULT_CONFIG } from '../context'
 import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
-import { PrimitiveEngine } from '@primitivefinance/v2-core/typechain'
-import { abi as PrimitiveEngineAbi } from '@primitivefinance/v2-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import { PrimitiveEngine } from '@primitivefinance/rmm-core/typechain'
+import { abi as PrimitiveEngineAbi } from '@primitivefinance/rmm-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
 let poolId: string
@@ -215,7 +215,9 @@ runTest('allocate', function () {
     })
 
     it('reverts if the engine is not deployed', async function () {
-      await expect(this.house.allocate(poolId, this.stable.address, this.risky.address, '0', '0', true)).to.be.reverted
+      await expect(
+        this.house.allocate(poolId, this.stable.address, this.risky.address, '0', '0', true)
+      ).to.revertWithCustomError('EngineNotDeployedError')
     })
 
     it('fails to allocate more than margin balance', async function () {
