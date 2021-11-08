@@ -4,8 +4,8 @@ pragma solidity >=0.8.6;
 /// @title   Interface of PrimitiveHouse contract
 /// @author  Primitive
 
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
-import "@primitivefinance/v2-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
 interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallback {
     /// ERRORS ///
@@ -27,7 +27,7 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
         address indexed payer,
         address indexed engine,
         bytes32 indexed poolId,
-        uint256 strike,
+        uint128 strike,
         uint32 sigma,
         uint32 maturity,
         uint32 gamma
@@ -84,7 +84,7 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     function create(
         address risky,
         address stable,
-        uint256 strike,
+        uint128 strike,
         uint32 sigma,
         uint32 maturity,
         uint32 gamma,

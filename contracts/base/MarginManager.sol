@@ -5,8 +5,8 @@ pragma solidity 0.8.6;
 /// @author  Primitive
 /// @notice  Manages the margins
 
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "../interfaces/IMarginManager.sol";
 import "./CashManager.sol";
 import "../libraries/TransferHelper.sol";
