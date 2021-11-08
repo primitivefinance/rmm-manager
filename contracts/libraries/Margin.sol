@@ -5,7 +5,7 @@ pragma solidity >=0.8.6;
 /// @notice  Utils functions to manage margins
 /// @dev     Uses a data struct with two uint128s to optimize for one storage slot
 
-import "@primitivefinance/v2-core/contracts/libraries/SafeCast.sol";
+import "@primitivefinance/rmm-core/contracts/libraries/SafeCast.sol";
 
 library Margin {
     using SafeCast for uint256;

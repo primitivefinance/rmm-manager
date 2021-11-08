@@ -5,9 +5,9 @@ pragma solidity 0.8.6;
 /// @author  Primitive
 /// @dev     Manages the swaps
 
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-import "@primitivefinance/v2-core/contracts/libraries/ReplicationMath.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefinance/rmm-core/contracts/libraries/ReplicationMath.sol";
 
 import "../interfaces/ISwapManager.sol";
 import "../interfaces/external/IERC20.sol";

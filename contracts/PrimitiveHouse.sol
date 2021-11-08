@@ -5,7 +5,7 @@ pragma solidity 0.8.6;
 /// @author  Primitive
 /// @notice  Interacts with Primitive Engine contracts
 
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "./interfaces/IPrimitiveHouse.sol";
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
@@ -32,7 +32,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
     function create(
         address risky,
         address stable,
-        uint256 strike,
+        uint128 strike,
         uint32 sigma,
         uint32 maturity,
         uint32 gamma,

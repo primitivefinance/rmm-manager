@@ -5,7 +5,7 @@ pragma solidity 0.8.6;
 /// @author  Primitive
 /// @notice  Renders the visual of the position tokens
 
-import "@primitivefinance/v2-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "./interfaces/IPositionRenderer.sol";
 import "./interfaces/external/IERC20WithMetadata.sol";
 import "./libraries/HexStrings.sol";
