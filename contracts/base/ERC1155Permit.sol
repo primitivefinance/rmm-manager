@@ -14,7 +14,7 @@ contract ERC1155Permit is ERC1155, IERC1155Permit, EIP712 {
     mapping(address => uint256) public override nonces;
 
     bytes32 private immutable _PERMIT_TYPEHASH =
-        keccak256("Permit(address owner,address spender,uint256 id,uint256 amount,bytes memory data,uint256 deadline,uint8 v,bytes32 r,bytes32 s");
+        keccak256("Permit(address owner,address operator,bool approved,uint256 nonce,uint256 deadline)");
 
     /// @param name Name of the contract
     constructor(string memory name) ERC1155("") EIP712(name, "1") { }
