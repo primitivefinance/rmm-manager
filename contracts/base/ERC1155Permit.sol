@@ -29,7 +29,7 @@ contract ERC1155Permit is ERC1155, IERC1155Permit, EIP712 {
         bytes32 r,
         bytes32 s
     ) external override {
-        if (block.timestamp > deadline) revert DeadlineReachedError();
+        if (block.timestamp > deadline) revert SigExpiredError();
 
         bytes32 structHash = keccak256(abi.encode(
             _PERMIT_TYPEHASH,
