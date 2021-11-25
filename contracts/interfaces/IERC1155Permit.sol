@@ -7,8 +7,8 @@ pragma solidity >=0.8.6;
 interface IERC1155Permit {
     /// ERRORS ///
 
-    /// @notice Thrown when the deadline was reached
-    error DeadlineReachedError();
+    /// @notice Thrown when the signature has expired
+    error SigExpiredError();
 
     /// @notice Thrown when the signature is invalid
     error InvalidSigError();
