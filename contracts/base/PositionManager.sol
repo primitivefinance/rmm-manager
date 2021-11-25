@@ -5,13 +5,13 @@ pragma solidity 0.8.6;
 /// @author  Primitive
 /// @notice  Wraps the positions into ERC1155 tokens
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "./ERC1155Permit.sol";
 import "../interfaces/IPositionRenderer.sol";
 import "../base/HouseBase.sol";
 
-abstract contract PositionManager is HouseBase, ERC1155("") {
+abstract contract PositionManager is HouseBase, ERC1155Permit {
     using Strings for uint256;
 
     /// @dev  Ties together pool ids with engine addresses, this is necessary because
@@ -20,6 +20,8 @@ abstract contract PositionManager is HouseBase, ERC1155("") {
 
     /// @dev  Empty variable to pass to the _mint function
     bytes private _empty;
+
+    constructor() ERC1155Permit("") { }
 
     /// @notice         Returns the metadata of a token
     /// @param tokenId  Token id to look for (same as pool id)
