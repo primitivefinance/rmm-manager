@@ -13,6 +13,7 @@ contract ERC1155Permit is ERC1155, IERC1155Permit, EIP712 {
     /// @inheritdoc IERC1155Permit
     mapping(address => uint256) public override nonces;
 
+    /// @dev Typehash of the permit function
     bytes32 private immutable _PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address operator,bool approved,uint256 nonce,uint256 deadline)");
 
