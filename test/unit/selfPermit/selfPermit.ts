@@ -1,6 +1,6 @@
 import { parseWei } from 'web3-units'
 import expect from '../../shared/expect'
-import getPermitSignature from '../../shared/permit'
+import { getERC20PermitSignature } from '../../shared/permit'
 import { runTest } from '../context'
 
 const value = parseWei('1').raw
@@ -9,7 +9,7 @@ const deadline = 999999999999
 runTest('selfPermit', function () {
   describe('success cases', function () {
     it('self approves using the signature', async function () {
-      const signature = await getPermitSignature(
+      const signature = await getERC20PermitSignature(
         this.deployer,
         this.risky.address,
         this.house.address,
@@ -39,7 +39,7 @@ runTest('selfPermit', function () {
 
   describe('fail cases', function () {
     it('reverts if the deadline is reached', async function () {
-      const signature = await getPermitSignature(
+      const signature = await getERC20PermitSignature(
         this.deployer,
         this.risky.address,
         this.house.address,
@@ -63,7 +63,7 @@ runTest('selfPermit', function () {
     })
 
     it('reverts if the signature is invalid', async function () {
-      const signature = await getPermitSignature(
+      const signature = await getERC20PermitSignature(
         this.deployer,
         this.risky.address,
         this.house.address,
