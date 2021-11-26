@@ -16,8 +16,7 @@ contract ERC1155Permit is ERC1155, IERC1155Permit, EIP712 {
     bytes32 private immutable _PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address operator,bool approved,uint256 nonce,uint256 deadline)");
 
-    /// @param name Name of the contract
-    constructor(string memory name) ERC1155("") EIP712(name, "1") { }
+    constructor() ERC1155("") EIP712("PrimitiveHouse", "1") { }
 
     /// @inheritdoc IERC1155Permit
     function permit(
@@ -41,12 +40,12 @@ contract ERC1155Permit is ERC1155, IERC1155Permit, EIP712 {
         ));
 
         bytes32 hash = _hashTypedDataV4(structHash);
-
         address signer = ECDSA.recover(hash, v, r, s);
 
         if (signer != owner) revert InvalidSigError();
 
         _setApprovalForAll(owner, operator, approved);
+        nonces[owner] += 1;
     }
 
     /// @inheritdoc IERC1155Permit
