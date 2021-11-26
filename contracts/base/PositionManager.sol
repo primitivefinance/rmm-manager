@@ -21,8 +21,6 @@ abstract contract PositionManager is HouseBase, ERC1155Permit {
     /// @dev  Empty variable to pass to the _mint function
     bytes private _empty;
 
-    constructor() ERC1155Permit("") { }
-
     /// @notice         Returns the metadata of a token
     /// @param tokenId  Token id to look for (same as pool id)
     /// @return         Metadata of the token as a string
