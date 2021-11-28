@@ -73,7 +73,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma);
     }
 
-    address _engine;
+    address private _engine;
 
     /// @inheritdoc IPrimitiveHouse
     function allocate(
