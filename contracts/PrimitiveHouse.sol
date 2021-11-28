@@ -73,6 +73,8 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma);
     }
 
+    address _engine;
+
     /// @inheritdoc IPrimitiveHouse
     function allocate(
         bytes32 poolId,
@@ -80,14 +82,15 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address stable,
         uint256 delRisky,
         uint256 delStable,
-        bool fromMargin
+        bool fromMargin,
+        uint256 minLiquidityOut
     ) external payable override lock returns (uint256 delLiquidity) {
-        address engine = EngineAddress.computeAddress(factory, risky, stable);
-        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
+        _engine = EngineAddress.computeAddress(factory, risky, stable);
+        if (EngineAddress.isContract(_engine) == false) revert EngineAddress.EngineNotDeployedError();
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
 
-        (delLiquidity) = IPrimitiveEngineActions(engine).allocate(
+        (delLiquidity) = IPrimitiveEngineActions(_engine).allocate(
             poolId,
             address(this),
             delRisky,
@@ -96,23 +99,31 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
             abi.encode(CallbackData({risky: risky, stable: stable, payer: msg.sender}))
         );
 
-        if (fromMargin) margins[msg.sender][engine].withdraw(delRisky, delStable);
+        if (delLiquidity < minLiquidityOut) revert MinLiquidityOutError();
+
+        if (fromMargin) margins[msg.sender][_engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, engine, poolId, delLiquidity);
+        _allocate(msg.sender, _engine, poolId, delLiquidity);
 
-        emit Allocate(msg.sender, engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
+        emit Allocate(msg.sender, _engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
+
+        _engine = address(0);
     }
 
     /// @inheritdoc IPrimitiveHouse
     function remove(
         address engine,
         bytes32 poolId,
-        uint256 delLiquidity
+        uint256 delLiquidity,
+        uint256 minRiskyOut,
+        uint256 minStableOut
     ) external override lock returns (uint256 delRisky, uint256 delStable) {
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
         (delRisky, delStable) = IPrimitiveEngineActions(engine).remove(poolId, delLiquidity);
+        if (delRisky < minRiskyOut || delStable < minStableOut) revert MinRemoveOutError();
+
         _remove(msg.sender, poolId, delLiquidity);
 
         Margin.Data storage mar = margins[msg.sender][engine];
