@@ -88,7 +88,7 @@ runTest('remove', function () {
       )
     })
 
-    it('emits the Rmove event', async function () {
+    it('emits the Remove event', async function () {
       const reserve = await this.engine.reserves(poolId)
       const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
@@ -97,6 +97,16 @@ runTest('remove', function () {
         this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw
       )).to.emit(this.house, 'Remove')
         .withArgs(this.deployer.address, this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw)
+    })
+
+    it('removes entire liquidity balance', async function () {
+      await this.house.remove(
+        this.engine.address,
+        poolId,
+        await this.house.balanceOf(this.deployer.address, poolId),
+        '0',
+        '0',
+      )
     })
   })
 
