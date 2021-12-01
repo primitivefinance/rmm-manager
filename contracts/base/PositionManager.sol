@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "./ERC1155Permit.sol";
 import "../interfaces/IPositionRenderer.sol";
+import "../interfaces/external/IERC20WithMetadata.sol";
 import "../base/HouseBase.sol";
 
 abstract contract PositionManager is HouseBase, ERC1155Permit {
@@ -79,18 +80,19 @@ abstract contract PositionManager is HouseBase, ERC1155Permit {
     /// @return         Properties of the token formatted as JSON
     function getProperties(uint256 tokenId) private view returns (string memory) {
         IPrimitiveEngineView engine = IPrimitiveEngineView(cache[tokenId]);
-
         int128 invariant = engine.invariantOf(bytes32(tokenId));
 
         return
             string(
                 abi.encodePacked(
                     '"properties":{',
-                    '"risky":"',
-                    uint256(uint160(engine.risky())).toHexString(),
-                    '","stable":"',
-                    uint256(uint160(engine.stable())).toHexString(),
-                    '","invariant":"',
+                    '"factory":"',
+                    uint256(uint160(engine.factory())).toHexString(),
+                    '","risky":',
+                    getTokenMetadata(engine.risky()),
+                    ',"stable":',
+                    getTokenMetadata(engine.stable()),
+                    ',"invariant":"',
                     invariant < 0 ? "-" : "",
                     uint256((uint128(invariant < 0 ? ~invariant + 1 : invariant))).toString(),
                     '",',
@@ -100,6 +102,24 @@ abstract contract PositionManager is HouseBase, ERC1155Permit {
                     "}}"
                 )
             );
+    }
+
+    function getTokenMetadata(address token) private view returns (string memory) {
+        string memory name = IERC20WithMetadata(token).name();
+        string memory symbol = IERC20WithMetadata(token).symbol();
+        uint8 decimals = IERC20WithMetadata(token).decimals();
+
+        return string(abi.encodePacked(
+            '{"name":"',
+            name,
+            '","symbol":"',
+            symbol,
+            '","decimals":"',
+            uint256(decimals).toString(),
+            '","address":"',
+            uint256(uint160(token)).toHexString(),
+            '"}'
+        ));
     }
 
     /// @notice         Returns the calibration of a pool as JSON
