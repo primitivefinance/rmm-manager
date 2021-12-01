@@ -20,8 +20,19 @@ type Metadata = {
   creator: string
   description: string
   properties: {
-    risky: string
-    stable: string
+    factory: string
+    risky: {
+      address: string
+      name: string
+      symbol: string
+      decimals: number
+    }
+    stable: {
+      address: string
+      name: string
+      symbol: string
+      decimals: number
+    }
     invariant: string
     calibration: {
       strike: string
@@ -83,8 +94,19 @@ runTest('uri', function () {
       expect(metadata.license).to.be.equal('License goes here')
       expect(metadata.creator).to.be.equal('creator goes here')
       expect(metadata.description).to.be.equal('Description goes here')
-      expect(utils.getAddress(metadata.properties.risky)).to.be.equal(this.risky.address)
-      expect(utils.getAddress(metadata.properties.stable)).to.be.equal(this.stable.address)
+
+      expect(utils.getAddress(metadata.properties.factory)).to.be.equal(this.factory.address)
+
+      expect(utils.getAddress(metadata.properties.risky.address)).to.be.equal(this.risky.address)
+      expect(metadata.properties.risky.name).to.be.equal(await this.risky.name())
+      expect(metadata.properties.risky.symbol).to.be.equal(await this.risky.symbol())
+      expect(metadata.properties.risky.decimals).to.be.equal((await this.risky.decimals()).toString())
+
+      expect(utils.getAddress(metadata.properties.stable.address)).to.be.equal(this.stable.address)
+      expect(metadata.properties.stable.name).to.be.equal(await this.stable.name())
+      expect(metadata.properties.stable.symbol).to.be.equal(await this.stable.symbol())
+      expect(metadata.properties.stable.decimals).to.be.equal((await this.stable.decimals()).toString())
+
       expect(metadata.properties.invariant).to.be.equal('0')
       expect(metadata.properties.calibration.strike).to.be.equal(strike.raw.toString())
       expect(metadata.properties.calibration.sigma).to.be.equal(sigma.raw.toString())
