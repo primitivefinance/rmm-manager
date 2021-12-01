@@ -10,8 +10,14 @@ import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveLiqui
 interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallback {
     /// ERRORS ///
 
-    /// @notice Emitted when the liquidity is zero
+    /// @notice  Thrown when trying to add or remove zero liquidity
     error ZeroLiquidityError();
+
+    /// @notice  Thrown when the received liquidity is lower than the expected
+    error MinLiquidityOutError();
+
+    /// @notice  Thrown when the received risky / stable amounts are lower than the expected
+    error MinRemoveOutError();
 
     /// EVENTS ///
 
@@ -113,7 +119,8 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
         address stable,
         uint256 delRisky,
         uint256 delStable,
-        bool fromMargin
+        bool fromMargin,
+        uint256 minLiquidityOut
     ) external payable returns (uint256 delLiquidity);
 
     /// @notice              Removes liquidity from a pool
@@ -125,6 +132,8 @@ interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallba
     function remove(
         address engine,
         bytes32 poolId,
-        uint256 delLiquidity
+        uint256 delLiquidity,
+        uint256 minRiskyOut,
+        uint256 minStableOut
     ) external returns (uint256 delRisky, uint256 delStable);
 }
