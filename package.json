@@ -1,6 +1,6 @@
 {
   "name": "@primitivefinance/rmm-periphery",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Primitive Replicating Market Maker periphery smart contracts.",
   "main": "index.js",
   "keywords": [
