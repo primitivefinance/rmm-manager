@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
-/// @title   Interface of PrimitiveHouse contract
+/// @title   Interface of PrimitiveManager contract
 /// @author  Primitive
 
 import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
 import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
-interface IPrimitiveHouse is IPrimitiveCreateCallback, IPrimitiveLiquidityCallback {
+interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCallback {
     /// ERRORS ///
 
     /// @notice  Thrown when trying to add or remove zero liquidity
