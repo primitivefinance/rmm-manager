@@ -58,10 +58,10 @@ runTest('uri', function () {
   beforeEach(async function () {
     await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
     await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
-    await this.risky.approve(this.house.address, constants.MaxUint256)
-    await this.stable.approve(this.house.address, constants.MaxUint256)
+    await this.risky.approve(this.manager.address, constants.MaxUint256)
+    await this.stable.approve(this.manager.address, constants.MaxUint256)
 
-    const tx = await this.house.create(
+    const tx = await this.manager.create(
       this.risky.address,
       this.stable.address,
       strike.raw,
@@ -86,7 +86,7 @@ runTest('uri', function () {
 
   describe('success cases', function () {
     it('returns the URI', async function () {
-      const uri = await this.house.uri(poolId)
+      const uri = await this.manager.uri(poolId)
       const [metadataFormat, encodedMetadata] = uri.split(',');
 
       expect(metadataFormat).to.be.equal('data:application/json;base64')

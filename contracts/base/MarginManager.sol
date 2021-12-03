@@ -59,7 +59,7 @@ abstract contract MarginManager is IMarginManager, CashManager {
         margins[msg.sender][engine].withdraw(delRisky, delStable);
 
         // Setting address(0) as the recipient will result in the tokens
-        // being sent into the House, useful to unwrap WETH for example
+        // being sent into the contract itself, useful to unwrap WETH for example
         IPrimitiveEngineActions(engine).withdraw(
             recipient == address(0) ? address(this) : recipient,
             delRisky,

@@ -17,7 +17,7 @@ contract ERC1155Permit is ERC1155, IERC1155Permit, EIP712 {
     bytes32 private immutable _PERMIT_TYPEHASH =
         keccak256("Permit(address owner,address operator,bool approved,uint256 nonce,uint256 deadline)");
 
-    constructor() ERC1155("") EIP712("PrimitiveHouse", "1") { }
+    constructor() ERC1155("") EIP712("PrimitiveManager", "1") { }
 
     /// @inheritdoc IERC1155Permit
     function permit(
