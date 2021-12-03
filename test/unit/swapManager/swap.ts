@@ -46,10 +46,10 @@ runTest('swap', function () {
   beforeEach(async function () {
     await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
     await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
-    await this.risky.approve(this.house.address, constants.MaxUint256)
-    await this.stable.approve(this.house.address, constants.MaxUint256)
+    await this.risky.approve(this.manager.address, constants.MaxUint256)
+    await this.stable.approve(this.manager.address, constants.MaxUint256)
 
-    await this.house.create(
+    await this.manager.create(
       this.risky.address,
       this.stable.address,
       strike.raw,
@@ -67,13 +67,21 @@ runTest('swap', function () {
     delRisky = amount.mul(res.reserveRisky).div(res.liquidity)
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
 
-    await this.house.allocate(poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false)
+    await this.manager.allocate(
+      poolId,
+      this.risky.address,
+      this.stable.address,
+      delRisky.raw,
+      delStable.raw,
+      false,
+      amount.raw,
+    )
   })
 
   describe('success cases', function () {
     describe('from margin / to margin', function () {
       beforeEach(async function () {
-        await this.house.deposit(
+        await this.manager.deposit(
           this.deployer.address,
           this.risky.address,
           this.stable.address,
@@ -87,7 +95,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -99,14 +107,14 @@ runTest('swap', function () {
               toMargin: true,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.house, this.deployer.address, this.engine.address, deltaIn, false, deltaOut, true)
+          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, deltaIn, false, deltaOut, true)
         })
 
         it('emits the Swap event', async function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -119,7 +127,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -139,7 +147,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, false)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -151,14 +159,14 @@ runTest('swap', function () {
               toMargin: true,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.house, this.deployer.address, this.engine.address, deltaOut, true, deltaIn, false)
+          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, deltaOut, true, deltaIn, false)
         })
 
         it('emits the Swap event', async function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, false)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -171,7 +179,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -189,7 +197,7 @@ runTest('swap', function () {
 
     describe('from margin / to wallet', function () {
       beforeEach(async function () {
-        await this.house.deposit(
+        await this.manager.deposit(
           this.deployer.address,
           this.risky.address,
           this.stable.address,
@@ -205,7 +213,7 @@ runTest('swap', function () {
           const preStableBalance = await this.stable.balanceOf(this.deployer.address)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -217,7 +225,7 @@ runTest('swap', function () {
               toMargin: false,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.house, this.deployer.address, this.engine.address, deltaIn, false, parseWei('0').raw, true)
+          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, deltaIn, false, parseWei('0').raw, true)
 
           const postStableBalance = await this.stable.balanceOf(this.deployer.address)
           expect(postStableBalance).to.be.equal(preStableBalance.add(deltaOut))
@@ -227,7 +235,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -240,7 +248,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -260,7 +268,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, false)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -272,14 +280,14 @@ runTest('swap', function () {
               toMargin: false,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.house, this.deployer.address, this.engine.address, parseWei('0').raw, true, deltaIn, false)
+          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, parseWei('0').raw, true, deltaIn, false)
         })
 
         it('emits the Swap event', async function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, false)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -292,7 +300,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -310,7 +318,7 @@ runTest('swap', function () {
 
     describe('from wallet / to margin', function () {
       beforeEach(async function () {
-        await this.house.deposit(
+        await this.manager.deposit(
           this.deployer.address,
           this.risky.address,
           this.stable.address,
@@ -326,7 +334,7 @@ runTest('swap', function () {
           const preRiskyBalance = await this.risky.balanceOf(this.deployer.address)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -338,7 +346,7 @@ runTest('swap', function () {
               toMargin: true,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.house, this.deployer.address, this.engine.address, parseWei('0').raw, false, deltaOut, true)
+          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, parseWei('0').raw, false, deltaOut, true)
 
           const postRiskyBalance = await this.risky.balanceOf(this.deployer.address)
           expect(postRiskyBalance).to.be.equal(preRiskyBalance.sub(deltaIn))
@@ -348,7 +356,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -361,7 +369,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -383,7 +391,7 @@ runTest('swap', function () {
           const preStableBalance = await this.stable.balanceOf(this.deployer.address)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -395,7 +403,7 @@ runTest('swap', function () {
               toMargin: true,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.house, this.deployer.address, this.engine.address, deltaOut, true, parseWei('0').raw, false)
+          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, deltaOut, true, parseWei('0').raw, false)
 
           const postStableBalance = await this.stable.balanceOf(this.deployer.address)
           expect(postStableBalance).to.be.equal(preStableBalance.sub(deltaIn))
@@ -405,7 +413,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, false)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -418,7 +426,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -436,7 +444,7 @@ runTest('swap', function () {
 
     describe('from wallet / to wallet', function () {
       beforeEach(async function () {
-        await this.house.deposit(
+        await this.manager.deposit(
           this.deployer.address,
           this.risky.address,
           this.stable.address,
@@ -453,7 +461,7 @@ runTest('swap', function () {
           const preStableBalance = await this.stable.balanceOf(this.deployer.address)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -466,7 +474,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           ).to.updateMargin(
-            this.house,
+            this.manager,
             this.deployer.address,
             this.engine.address,
             parseWei('0').raw,
@@ -486,7 +494,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -499,7 +507,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -522,7 +530,7 @@ runTest('swap', function () {
           const preStableBalance = await this.stable.balanceOf(this.deployer.address)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -535,7 +543,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           ).to.updateMargin(
-            this.house,
+            this.manager,
             this.deployer.address,
             this.engine.address,
             parseWei('0').raw,
@@ -555,7 +563,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(this.engine, false)
 
           await expect(
-            this.house.swap({
+            this.manager.swap({
               recipient: this.deployer.address,
               risky: this.risky.address,
               stable: this.stable.address,
@@ -568,7 +576,7 @@ runTest('swap', function () {
               deadline: 1000000000000,
             })
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -593,7 +601,7 @@ runTest('swap', function () {
         const riskyPerLp = parseWei(1, decimals).sub(parseWei(delta, decimals))
         const totalRisky = riskyPerLp.mul(delLiquidity).div(parseWei(1, 18))
 
-        await this.house.create(
+        await this.manager.create(
           this.weth.address,
           this.stable.address,
           strike.raw,
@@ -609,7 +617,7 @@ runTest('swap', function () {
         engine = (await ethers.getContractAt(PrimitiveEngineAbi, addr)) as PrimitiveEngine
 
         poolId = computePoolId(addr, maturity.raw, sigma.raw, strike.raw, gamma.raw)
-        await this.house.deposit(
+        await this.manager.deposit(
           this.deployer.address,
           this.weth.address,
           this.stable.address,
@@ -627,7 +635,7 @@ runTest('swap', function () {
           const preStableBalance = await this.stable.balanceOf(this.deployer.address)
 
           await expect(
-            this.house.swap(
+            this.manager.swap(
               {
                 recipient: this.deployer.address,
                 risky: this.weth.address,
@@ -643,7 +651,7 @@ runTest('swap', function () {
               { value: deltaIn }
             )
           ).to.updateMargin(
-            this.house,
+            this.manager,
             this.deployer.address,
             this.engine.address,
             parseWei('0').raw,
@@ -664,7 +672,7 @@ runTest('swap', function () {
           const { deltaIn, deltaOut } = await getDeltas(engine, true)
 
           await expect(
-            this.house.swap(
+            this.manager.swap(
               {
                 recipient: this.deployer.address,
                 risky: this.weth.address,
@@ -680,7 +688,7 @@ runTest('swap', function () {
               { value: deltaIn }
             )
           )
-            .to.emit(this.house, 'Swap')
+            .to.emit(this.manager, 'Swap')
             .withArgs(
               this.deployer.address,
               this.deployer.address,
@@ -702,7 +710,7 @@ runTest('swap', function () {
       const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
       await expect(
-        this.house.swap({
+        this.manager.swap({
           recipient: this.deployer.address,
           risky: this.stable.address,
           stable: this.risky.address,
@@ -721,7 +729,7 @@ runTest('swap', function () {
       const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
       await expect(
-        this.house.swap({
+        this.manager.swap({
           recipient: this.deployer.address,
           risky: this.risky.address,
           stable: this.stable.address,
@@ -740,7 +748,7 @@ runTest('swap', function () {
       const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
       await expect(
-        this.house.connect(this.alice).swap({
+        this.manager.connect(this.alice).swap({
           recipient: this.deployer.address,
           risky: this.risky.address,
           stable: this.stable.address,
@@ -759,7 +767,7 @@ runTest('swap', function () {
       const { deltaIn, deltaOut } = await getDeltas(this.engine, true)
 
       await expect(
-        this.house.connect(this.alice).swap({
+        this.manager.connect(this.alice).swap({
           recipient: this.deployer.address,
           risky: this.risky.address,
           stable: this.stable.address,

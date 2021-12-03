@@ -11,9 +11,9 @@ import "base64-sol/base64.sol";
 import "./ERC1155Permit.sol";
 import "../interfaces/IPositionRenderer.sol";
 import "../interfaces/external/IERC20WithMetadata.sol";
-import "../base/HouseBase.sol";
+import "../base/ManagerBase.sol";
 
-abstract contract PositionManager is HouseBase, ERC1155Permit {
+abstract contract PositionManager is ManagerBase, ERC1155Permit {
     using Strings for uint256;
 
     /// @dev  Ties together pool ids with engine addresses, this is necessary because

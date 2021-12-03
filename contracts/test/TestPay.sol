@@ -8,7 +8,7 @@ contract TestPay is CashManager {
         address factory_,
         address WETH9_,
         address positionRenderer_
-    ) HouseBase(factory_, WETH9_, positionRenderer_) {}
+    ) ManagerBase(factory_, WETH9_, positionRenderer_) {}
 
     function testPay(
         address token,

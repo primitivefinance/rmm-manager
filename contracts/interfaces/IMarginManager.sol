@@ -53,7 +53,7 @@ interface IMarginManager is IPrimitiveDepositCallback {
     /// EFFECT FUNCTIONS ///
 
     /// @notice           Deposits funds into the margin of a Primitive Engine
-    /// @dev              Since the Primitive House contract keeps track of the margins, it
+    /// @dev              Since the PrimitiveManager contract keeps track of the margins, it
     ///                   will deposit the funds into the Primitive Engine using its own address
     /// @param recipient  Address receiving the funds in their margin
     /// @param risky      Address of the risky token

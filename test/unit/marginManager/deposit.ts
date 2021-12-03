@@ -9,15 +9,15 @@ runTest('deposit', function () {
   beforeEach(async function () {
     await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
     await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
-    await this.risky.approve(this.house.address, constants.MaxUint256)
-    await this.stable.approve(this.house.address, constants.MaxUint256)
+    await this.risky.approve(this.manager.address, constants.MaxUint256)
+    await this.stable.approve(this.manager.address, constants.MaxUint256)
     /* await this.factory.deploy(this.weth.address, this.stable.address)
     wethEngine = await this.factory.getEngine(this.weth.address, this.stable.address) */
   })
 
   describe('success cases', function () {
     it('deposits risky and stable to margin', async function () {
-      await this.house.deposit(
+      await this.manager.deposit(
         this.deployer.address,
         this.risky.address,
         this.stable.address,
@@ -28,7 +28,7 @@ runTest('deposit', function () {
 
     it('increases the margin of the recipient', async function () {
       await expect(
-        this.house.deposit(
+        this.manager.deposit(
           this.alice.address,
           this.risky.address,
           this.stable.address,
@@ -36,7 +36,7 @@ runTest('deposit', function () {
           parseWei('1000').raw
         )
       ).to.updateMargin(
-        this.house,
+        this.manager,
         this.alice.address,
         this.engine.address,
         parseWei('1000').raw,
@@ -50,7 +50,7 @@ runTest('deposit', function () {
       const stableBalance = await this.stable.balanceOf(this.deployer.address)
       const riskyBalance = await this.risky.balanceOf(this.deployer.address)
 
-      await this.house.deposit(
+      await this.manager.deposit(
         this.deployer.address,
         this.risky.address,
         this.stable.address,
@@ -67,7 +67,7 @@ runTest('deposit', function () {
       const stableBalance = await this.stable.balanceOf(this.engine.address)
       const riskyBalance = await this.risky.balanceOf(this.engine.address)
 
-      await this.house.deposit(
+      await this.manager.deposit(
         this.deployer.address,
         this.risky.address,
         this.stable.address,
@@ -82,7 +82,7 @@ runTest('deposit', function () {
 
     it('emits the Deposited event', async function () {
       await expect(
-        this.house.deposit(
+        this.manager.deposit(
           this.deployer.address,
           this.risky.address,
           this.stable.address,
@@ -90,7 +90,7 @@ runTest('deposit', function () {
           parseWei('1000').raw
         )
       )
-        .to.emit(this.house, 'Deposit')
+        .to.emit(this.manager, 'Deposit')
         .withArgs(
           this.deployer.address,
           this.deployer.address,
@@ -110,7 +110,7 @@ runTest('deposit', function () {
       })
 
       it('deposits weth and stable to margin', async function () {
-        await this.house.deposit(
+        await this.manager.deposit(
           this.deployer.address,
           this.weth.address,
           this.stable.address,
@@ -122,7 +122,7 @@ runTest('deposit', function () {
 
       it('increases the margin of the recipient', async function () {
         await expect(
-          this.house.deposit(
+          this.manager.deposit(
             this.alice.address,
             this.weth.address,
             this.stable.address,
@@ -130,14 +130,14 @@ runTest('deposit', function () {
             parseWei('100').raw,
             { value: parseWei('100').raw }
           )
-        ).to.updateMargin(this.house, this.alice.address, wethEngine, parseWei('100').raw, true, parseWei('100').raw, true)
+        ).to.updateMargin(this.manager, this.alice.address, wethEngine, parseWei('100').raw, true, parseWei('100').raw, true)
       })
 
       it('reduces the balances of the sender', async function () {
         const stableBalance = await this.stable.balanceOf(this.deployer.address)
         const riskyBalance = await this.deployer.getBalance()
 
-        await this.house.deposit(
+        await this.manager.deposit(
           this.deployer.address,
           this.weth.address,
           this.stable.address,
@@ -157,7 +157,7 @@ runTest('deposit', function () {
         const stableBalance = await this.stable.balanceOf(wethEngine)
         const riskyBalance = await this.weth.balanceOf(wethEngine)
 
-        await this.house.deposit(
+        await this.manager.deposit(
           this.deployer.address,
           this.weth.address,
           this.stable.address,
@@ -173,7 +173,7 @@ runTest('deposit', function () {
 
       it('emits the Deposited event', async function () {
         await expect(
-          this.house.deposit(
+          this.manager.deposit(
             this.deployer.address,
             this.weth.address,
             this.stable.address,
@@ -182,7 +182,7 @@ runTest('deposit', function () {
             { value: parseWei('100').raw }
           )
         )
-          .to.emit(this.house, 'Deposit')
+          .to.emit(this.manager, 'Deposit')
           .withArgs(
             this.deployer.address,
             this.deployer.address,
@@ -199,7 +199,7 @@ runTest('deposit', function () {
   describe('fail cases', function () {
     it('reverts if the owner does not have enough tokens', async function () {
       await expect(
-        this.house
+        this.manager
           .connect(this.bob)
           .deposit(
             this.deployer.address,
@@ -213,7 +213,7 @@ runTest('deposit', function () {
 
     it('reverts if the enigne is not deployed', async function () {
       await expect(
-        this.house.deposit(
+        this.manager.deposit(
           this.deployer.address,
           this.stable.address,
           this.risky.address,
@@ -225,17 +225,17 @@ runTest('deposit', function () {
 
     it('reverts if trying to deposit 0 risky and stable', async function () {
       await expect(
-        this.house.deposit(this.deployer.address, this.risky.address, this.stable.address, '0', '0')
+        this.manager.deposit(this.deployer.address, this.risky.address, this.stable.address, '0', '0')
       ).to.revertWithCustomError('ZeroDelError')
     })
 
     it('reverts if the callback function is called directly', async function () {
       const data = utils.defaultAbiCoder.encode(
         ['address', 'address', 'address', 'uint256', 'uint256'],
-        [this.house.address, this.risky.address, this.stable.address, '0', '0']
+        [this.manager.address, this.risky.address, this.stable.address, '0', '0']
       )
 
-      await expect(this.house.depositCallback(0, 0, data)).to.revertWithCustomError('NotEngineError')
+      await expect(this.manager.depositCallback(0, 0, data)).to.revertWithCustomError('NotEngineError')
     })
   })
 })
