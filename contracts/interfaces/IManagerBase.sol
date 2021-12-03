@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
-/// @title   Interface of HouseBase contract
+/// @title   Interface of ManagerBase contract
 /// @author  Primitive
 
-interface IHouseBase {
+interface IManagerBase {
     /// ERRORS ///
 
     /// @notice Thrown when the sender is not a Primitive Engine contract

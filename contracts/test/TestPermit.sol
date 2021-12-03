@@ -5,7 +5,7 @@ import "../interfaces/IERC1155Permit.sol";
 
 contract TestPermit {
     function testPermit(
-        address house,
+        address manager,
         address owner,
         address operator,
         bool approved,
@@ -14,6 +14,6 @@ contract TestPermit {
         bytes32 r,
         bytes32 s
     ) external {
-        IERC1155Permit(house).permit(owner, operator, approved, deadline, v, r, s);
+        IERC1155Permit(manager).permit(owner, operator, approved, deadline, v, r, s);
     }
 }

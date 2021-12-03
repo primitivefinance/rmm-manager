@@ -12,7 +12,7 @@ runTest('selfPermitAllowed', function () {
       const signature = await getERC20PermitSignature(
         this.deployer,
         this.risky.address,
-        this.house.address,
+        this.manager.address,
         value,
         deadline, {
           name: 'TestToken',
@@ -22,7 +22,7 @@ runTest('selfPermitAllowed', function () {
         }
       )
 
-      await this.house.selfPermitAllowed(
+      await this.manager.selfPermitAllowed(
         this.risky.address,
         '0',
         deadline,
@@ -32,7 +32,7 @@ runTest('selfPermitAllowed', function () {
       )
 
       expect(
-        await this.risky.allowance(this.deployer.address, this.house.address)
+        await this.risky.allowance(this.deployer.address, this.manager.address)
       ).to.be.equal(value)
     })
   })
@@ -42,7 +42,7 @@ runTest('selfPermitAllowed', function () {
       const signature = await getERC20PermitSignature(
         this.deployer,
         this.risky.address,
-        this.house.address,
+        this.manager.address,
         value,
         0, {
           name: 'TestToken',
@@ -52,7 +52,7 @@ runTest('selfPermitAllowed', function () {
         }
       )
 
-      await expect(this.house.selfPermitAllowed(
+      await expect(this.manager.selfPermitAllowed(
         this.risky.address,
         '0',
         0,
@@ -66,7 +66,7 @@ runTest('selfPermitAllowed', function () {
       const signature = await getERC20PermitSignature(
         this.deployer,
         this.risky.address,
-        this.house.address,
+        this.manager.address,
         value,
         deadline, {
           name: 'TestToken',
@@ -76,7 +76,7 @@ runTest('selfPermitAllowed', function () {
         }
       )
 
-      await expect(this.house.selfPermitAllowed(
+      await expect(this.manager.selfPermitAllowed(
         this.stable.address,
         '0',
         deadline,

@@ -5,7 +5,7 @@ import { PrimitiveEngine, PrimitiveFactory } from '@primitivefinance/rmm-core/ty
 
 export interface Contracts {
   factory: PrimitiveFactory
-  house: ContractTypes.PrimitiveHouse
+  manager: ContractTypes.PrimitiveManager
   risky: ContractTypes.TestToken
   stable: ContractTypes.TestToken
   engine: PrimitiveEngine
@@ -27,7 +27,7 @@ declare global {
     interface Assertion {
       revertWithCustomError(errorName: string, params?: any[]): AsyncAssertion
       updateMargin(
-        house: ContractTypes.PrimitiveHouse,
+        manager: ContractTypes.PrimitiveManager,
         account: string,
         engine: string,
         delRisky: BigNumber,
@@ -36,27 +36,27 @@ declare global {
         stableIncrease: boolean
       ): AsyncAssertion
       increaseMargin(
-        house: ContractTypes.PrimitiveHouse,
+        manager: ContractTypes.PrimitiveManager,
         account: string,
         engine: string,
         delRisky: BigNumber,
         delStable: BigNumber
       ): AsyncAssertion
       decreaseMargin(
-        house: ContractTypes.PrimitiveHouse,
+        manager: ContractTypes.PrimitiveManager,
         account: string,
         engine: string,
         delRisky: BigNumber,
         delStable: BigNumber
       ): AsyncAssertion
       increasePositionLiquidity(
-        house: ContractTypes.PrimitiveHouse,
+        manager: ContractTypes.PrimitiveManager,
         account: string,
         poolId: string,
         liquidity: BigNumber
       ): AsyncAssertion
       decreasePositionLiquidity(
-        house: ContractTypes.PrimitiveHouse,
+        manager: ContractTypes.PrimitiveManager,
         account: string,
         poolId: string,
         liquidity: BigNumber
