@@ -39,6 +39,8 @@
     "@primitivefinance/rmm-core": "^1.13.2",
     "@uniswap/v3-core": "^1.0.0",
     "@uniswap/v3-periphery": "^1.0.0",
+    "base64-sol": "^1.1.0",
+    "js-base64": "^3.7.2",
     "mocha": "^9.1.1"
   },
   "devDependencies": {
