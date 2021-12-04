@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   PrimitiveHouse contract
+/// @title   PrimitiveManager contract
 /// @author  Primitive
 /// @notice  Interacts with Primitive Engine contracts
 
 import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-import "./interfaces/IPrimitiveHouse.sol";
+import "./interfaces/IPrimitiveManager.sol";
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
 import "./base/SelfPermit.sol";
@@ -14,7 +14,7 @@ import "./base/PositionManager.sol";
 import "./base/SwapManager.sol";
 import "./libraries/TransferHelper.sol";
 
-contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, PositionManager, SwapManager {
+contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPermit, PositionManager, SwapManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
 
@@ -26,9 +26,9 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         address factory_,
         address WETH9_,
         address positionRenderer_
-    ) HouseBase(factory_, WETH9_, positionRenderer_) {}
+    ) ManagerBase(factory_, WETH9_, positionRenderer_) {}
 
-    /// @inheritdoc IPrimitiveHouse
+    /// @inheritdoc IPrimitiveManager
     function create(
         address risky,
         address stable,
@@ -75,7 +75,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
 
     address private _engine;
 
-    /// @inheritdoc IPrimitiveHouse
+    /// @inheritdoc IPrimitiveManager
     function allocate(
         bytes32 poolId,
         address risky,
@@ -111,7 +111,7 @@ contract PrimitiveHouse is IPrimitiveHouse, Multicall, CashManager, SelfPermit, 
         _engine = address(0);
     }
 
-    /// @inheritdoc IPrimitiveHouse
+    /// @inheritdoc IPrimitiveManager
     function remove(
         address engine,
         bytes32 poolId,

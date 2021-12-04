@@ -15,10 +15,10 @@ runTest('remove', function () {
   beforeEach(async function () {
     await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
     await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
-    await this.risky.approve(this.house.address, constants.MaxUint256)
-    await this.stable.approve(this.house.address, constants.MaxUint256)
+    await this.risky.approve(this.manager.address, constants.MaxUint256)
+    await this.stable.approve(this.manager.address, constants.MaxUint256)
 
-    await this.house.create(
+    await this.manager.create(
       this.risky.address,
       this.stable.address,
       strike.raw,
@@ -29,7 +29,7 @@ runTest('remove', function () {
       delLiquidity.raw
     )
 
-    await this.house.deposit(
+    await this.manager.deposit(
       this.deployer.address,
       this.risky.address,
       this.stable.address,
@@ -43,7 +43,7 @@ runTest('remove', function () {
     delRisky = delLiquidity.mul(res.reserveRisky).div(res.liquidity)
     delStable = delLiquidity.mul(res.reserveStable).div(res.liquidity)
 
-    await this.house.allocate(poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, true, delLiquidity.raw)
+    await this.manager.allocate(poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, true, delLiquidity.raw)
   })
 
   describe('success cases', function () {
@@ -52,7 +52,7 @@ runTest('remove', function () {
       const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
 
-      await this.house.remove(this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw)
+      await this.manager.remove(this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw)
     })
 
     it('decreases the position of the sender', async function () {
@@ -61,9 +61,9 @@ runTest('remove', function () {
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
 
       await expect(
-        this.house.remove(this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw)
+        this.manager.remove(this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw)
       ).to.decreasePositionLiquidity(
-        this.house,
+        this.manager,
         this.deployer.address,
         poolId,
         parseWei('1').raw
@@ -75,10 +75,10 @@ runTest('remove', function () {
       const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
 
-      await expect(this.house.remove(
+      await expect(this.manager.remove(
         this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw
       )).to.updateMargin(
-        this.house,
+        this.manager,
         this.deployer.address,
         this.engine.address,
         deltaRisky.raw,
@@ -93,17 +93,17 @@ runTest('remove', function () {
       const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
 
-      await expect(this.house.remove(
+      await expect(this.manager.remove(
         this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw
-      )).to.emit(this.house, 'Remove')
+      )).to.emit(this.manager, 'Remove')
         .withArgs(this.deployer.address, this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.raw)
     })
 
     it('removes entire liquidity balance', async function () {
-      await this.house.remove(
+      await this.manager.remove(
         this.engine.address,
         poolId,
-        await this.house.balanceOf(this.deployer.address, poolId),
+        await this.manager.balanceOf(this.deployer.address, poolId),
         '0',
         '0',
       )
@@ -117,7 +117,7 @@ runTest('remove', function () {
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
 
       await expect(
-        this.house.remove(this.engine.address, poolId, parseWei('1').raw, deltaRisky.add(1).raw, deltaStable.raw)
+        this.manager.remove(this.engine.address, poolId, parseWei('1').raw, deltaRisky.add(1).raw, deltaStable.raw)
       ).to.revertWithCustomError('MinRemoveOutError')
     })
 
@@ -127,7 +127,7 @@ runTest('remove', function () {
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
 
       await expect(
-        this.house.remove(this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.add(1).raw)
+        this.manager.remove(this.engine.address, poolId, parseWei('1').raw, deltaRisky.raw, deltaStable.add(1).raw)
       ).to.revertWithCustomError('MinRemoveOutError')
     })
 
@@ -136,7 +136,7 @@ runTest('remove', function () {
       const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
 
-      await expect(this.house.remove(
+      await expect(this.manager.remove(
         this.engine.address, poolId, parseWei('10000').raw, deltaRisky.raw, deltaStable.raw
       )).to.be.reverted
     })
@@ -146,7 +146,7 @@ runTest('remove', function () {
       const deltaRisky = parseWei('1').mul(reserve.reserveRisky).div(reserve.liquidity)
       const deltaStable = parseWei('1').mul(reserve.reserveStable).div(reserve.liquidity)
 
-      await expect(this.house.remove(
+      await expect(this.manager.remove(
         this.engine.address, poolId, parseWei('0').raw, deltaRisky.raw, deltaStable.raw
       )).to.revertWithCustomError('ZeroLiquidityError')
     })

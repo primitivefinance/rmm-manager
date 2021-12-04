@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   HouseBase contract
+/// @title   ManagerBase contract
 /// @author  Primitive
-/// @notice  Base contract of the House
+/// @notice  Base contract of the Manager
 
-import "../interfaces/IHouseBase.sol";
-import "../interfaces/IPrimitiveHouse.sol";
+import "../interfaces/IManagerBase.sol";
+import "../interfaces/IPrimitiveManager.sol";
 import "./Reentrancy.sol";
 import "../libraries/EngineAddress.sol";
 
-abstract contract HouseBase is IHouseBase, Reentrancy {
+abstract contract ManagerBase is IManagerBase, Reentrancy {
     /// @notice Data struct reused by callbacks
     struct CallbackData {
         address payer;
@@ -18,13 +18,13 @@ abstract contract HouseBase is IHouseBase, Reentrancy {
         address stable;
     }
 
-    /// @inheritdoc IHouseBase
+    /// @inheritdoc IManagerBase
     address public immutable override factory;
 
-    /// @inheritdoc IHouseBase
+    /// @inheritdoc IManagerBase
     address public immutable override WETH9;
 
-    /// @inheritdoc IHouseBase
+    /// @inheritdoc IManagerBase
     address public immutable override positionRenderer;
 
     /// @param factory_  Address of a PrimitiveFactory

@@ -17,15 +17,15 @@ runTest('create', function () {
   beforeEach(async function () {
     await this.risky.mint(this.deployer.address, parseWei('1000000').raw)
     await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
-    await this.risky.approve(this.house.address, constants.MaxUint256)
-    await this.stable.approve(this.house.address, constants.MaxUint256)
+    await this.risky.approve(this.manager.address, constants.MaxUint256)
+    await this.stable.approve(this.manager.address, constants.MaxUint256)
 
     poolId = computePoolId(this.engine.address, maturity.raw, sigma.raw, strike.raw, gamma.raw)
   })
 
   describe('success cases', function () {
-    it('creates a new pool using the house contract', async function () {
-      await this.house.create(
+    it('creates a new pool using the manager contract', async function () {
+      await this.manager.create(
         this.risky.address,
         this.stable.address,
         strike.raw,
@@ -39,7 +39,7 @@ runTest('create', function () {
 
     it('updates the sender position', async function () {
       await expect(
-        this.house.create(
+        this.manager.create(
           this.risky.address,
           this.stable.address,
           strike.raw,
@@ -49,12 +49,12 @@ runTest('create', function () {
           parseWei(1).sub(parseWei(delta)).raw,
           delLiquidity.raw
         )
-      ).to.increasePositionLiquidity(this.house, this.deployer.address, poolId, parseWei('1').raw.sub('1000'))
+      ).to.increasePositionLiquidity(this.manager, this.deployer.address, poolId, parseWei('1').raw.sub('1000'))
     })
 
     it('emits the Created event', async function () {
       await expect(
-        this.house.create(
+        this.manager.create(
           this.risky.address,
           this.stable.address,
           strike.raw,
@@ -65,7 +65,7 @@ runTest('create', function () {
           delLiquidity.raw
         )
       )
-        .to.emit(this.house, 'Create')
+        .to.emit(this.manager, 'Create')
         .withArgs(this.deployer.address, this.engine.address, poolId, strike.raw, sigma.raw, maturity.raw, gamma.raw)
     })
 
@@ -73,7 +73,7 @@ runTest('create', function () {
       let engine: PrimitiveEngine, riskyPerLp: Wei, totalRisky: Wei
       beforeEach(async function () {
         await this.stable.mint(this.deployer.address, parseWei('1000000').raw)
-        await this.stable.approve(this.house.address, constants.MaxUint256)
+        await this.stable.approve(this.manager.address, constants.MaxUint256)
 
         // deploy weth<>stable pair engine
         await this.factory.deploy(this.weth.address, this.stable.address)
@@ -84,8 +84,8 @@ runTest('create', function () {
         totalRisky = riskyPerLp.mul(delLiquidity).div(parseWei(1, 18))
       })
 
-      it('creates a new pool using the house contract', async function () {
-        await this.house.create(
+      it('creates a new pool using the manager contract', async function () {
+        await this.manager.create(
           this.weth.address,
           this.stable.address,
           strike.raw,
@@ -100,7 +100,7 @@ runTest('create', function () {
 
       it('updates the sender position', async function () {
         await expect(
-          this.house.create(
+          this.manager.create(
             this.weth.address,
             this.stable.address,
             strike.raw,
@@ -111,12 +111,12 @@ runTest('create', function () {
             delLiquidity.raw,
             { value: totalRisky.raw }
           )
-        ).to.increasePositionLiquidity(this.house, this.deployer.address, poolId, parseWei('1').raw.sub('1000'))
+        ).to.increasePositionLiquidity(this.manager, this.deployer.address, poolId, parseWei('1').raw.sub('1000'))
       })
 
       it('emits the Created event', async function () {
         await expect(
-          this.house.create(
+          this.manager.create(
             this.weth.address,
             this.stable.address,
             strike.raw,
@@ -128,7 +128,7 @@ runTest('create', function () {
             { value: totalRisky.raw }
           )
         )
-          .to.emit(this.house, 'Create')
+          .to.emit(this.manager, 'Create')
           .withArgs(this.deployer.address, engine.address, poolId, strike.raw, sigma.raw, maturity.raw, gamma.raw)
       })
     })
@@ -137,7 +137,7 @@ runTest('create', function () {
   describe('fail cases', function () {
     it('reverts if the engine is not deployed', async function () {
       await expect(
-        this.house.create(
+        this.manager.create(
           this.stable.address,
           this.risky.address,
           strike.raw,
@@ -152,7 +152,7 @@ runTest('create', function () {
 
     it('reverts if the liquidity is 0', async function () {
       await expect(
-        this.house.create(
+        this.manager.create(
           this.risky.address,
           this.stable.address,
           strike.raw,
@@ -166,7 +166,7 @@ runTest('create', function () {
     })
 
     it('reverts if the curve is already created', async function () {
-      await this.house.create(
+      await this.manager.create(
         this.risky.address,
         this.stable.address,
         strike.raw,
@@ -177,7 +177,7 @@ runTest('create', function () {
         delLiquidity.raw
       )
       await expect(
-        this.house.create(
+        this.manager.create(
           this.risky.address,
           this.stable.address,
           strike.raw,
@@ -192,7 +192,7 @@ runTest('create', function () {
 
     it('reverts if the sender has insufficient funds', async function () {
       await expect(
-        this.house
+        this.manager
           .connect(this.alice)
           .create(
             this.risky.address,
@@ -210,10 +210,10 @@ runTest('create', function () {
     it('reverts if the callback function is called directly', async function () {
       const data = utils.defaultAbiCoder.encode(
         ['address', 'address', 'address', 'uint256', 'uint256'],
-        [this.house.address, this.risky.address, this.stable.address, '0', '0']
+        [this.manager.address, this.risky.address, this.stable.address, '0', '0']
       )
 
-      await expect(this.house.createCallback(0, 0, data)).to.revertWithCustomError('NotEngineError')
+      await expect(this.manager.createCallback(0, 0, data)).to.revertWithCustomError('NotEngineError')
     })
   })
 })

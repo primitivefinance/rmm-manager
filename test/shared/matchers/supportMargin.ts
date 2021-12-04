@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers'
-import { PrimitiveHouse } from '../../../typechain'
+import { PrimitiveManager
+} from '../../../typechain'
 
 // Chai matchers for the margins of the PrimitiveEngine
 
@@ -8,7 +9,7 @@ export default function supportMargin(Assertion: Chai.AssertionStatic) {
     'updateMargin',
     async function (
       this: any,
-      house: PrimitiveHouse,
+      manager: PrimitiveManager,
       account: string,
       engine: string,
       delRisky: BigNumber,
@@ -16,9 +17,9 @@ export default function supportMargin(Assertion: Chai.AssertionStatic) {
       delStable: BigNumber,
       stableIncrease: boolean
     ) {
-      const oldMargin = await house.margins(account, engine)
+      const oldMargin = await manager.margins(account, engine)
       await this._obj
-      const newMargin = await house.margins(account, engine)
+      const newMargin = await manager.margins(account, engine)
 
       const expectedRisky = riskyIncrease ? oldMargin.balanceRisky.add(delRisky): oldMargin.balanceRisky.sub(delRisky)
       const expectedStable = stableIncrease ? oldMargin.balanceStable.add(delStable) : oldMargin.balanceStable.sub(delStable)

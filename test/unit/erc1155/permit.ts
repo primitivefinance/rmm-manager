@@ -15,19 +15,19 @@ runTest('permit', function () {
     it('permits using a correct signature', async function () {
       const signature = await getERC1155PermitSignature(
         this.deployer,
-        this.house.address,
+        this.manager.address,
         testPermit.address,
         true,
         9999999999999, {
           nonce: 0,
-          name: 'PrimitiveHouse',
+          name: 'PrimitiveManager',
           version: '1',
           chainId: await this.deployer.getChainId(),
         }
       )
 
       await testPermit.testPermit(
-        this.house.address,
+        this.manager.address,
         this.deployer.address,
         testPermit.address,
         true,
@@ -37,7 +37,7 @@ runTest('permit', function () {
         signature.s,
       )
 
-      expect(await this.house.isApprovedForAll(
+      expect(await this.manager.isApprovedForAll(
         this.deployer.address,
         testPermit.address
       )).to.be.equal(true)
@@ -46,19 +46,19 @@ runTest('permit', function () {
     it('increases the nonce when the permit was successful', async function () {
       const signature = await getERC1155PermitSignature(
         this.deployer,
-        this.house.address,
+        this.manager.address,
         testPermit.address,
         true,
         9999999999999, {
           nonce: 0,
-          name: 'PrimitiveHouse',
+          name: 'PrimitiveManager',
           version: '1',
           chainId: await this.deployer.getChainId(),
         }
       )
 
       await testPermit.testPermit(
-        this.house.address,
+        this.manager.address,
         this.deployer.address,
         testPermit.address,
         true,
@@ -68,7 +68,7 @@ runTest('permit', function () {
         signature.s,
       )
 
-      expect(await this.house.nonces(
+      expect(await this.manager.nonces(
         this.deployer.address,
       )).to.be.equal(1)
     })
@@ -78,19 +78,19 @@ runTest('permit', function () {
     it('does not permit if the signature is invalid', async function () {
       const signature = await getERC1155PermitSignature(
         this.deployer,
-        this.house.address,
+        this.manager.address,
         testPermit.address,
         true,
         9999999999999, {
           nonce: 0,
-          name: 'PrimitiveHouse',
+          name: 'PrimitiveManager',
           version: '1',
           chainId: await this.deployer.getChainId(),
         }
       )
 
       await expect(testPermit.testPermit(
-        this.house.address,
+        this.manager.address,
         this.alice.address,
         testPermit.address,
         true,
@@ -104,19 +104,19 @@ runTest('permit', function () {
     it('does not permit if the signature has expired', async function () {
       const signature = await getERC1155PermitSignature(
         this.deployer,
-        this.house.address,
+        this.manager.address,
         testPermit.address,
         true,
         0, {
           nonce: 0,
-          name: 'PrimitiveHouse',
+          name: 'PrimitiveManager',
           version: '1',
           chainId: await this.deployer.getChainId(),
         }
       )
 
       await expect(testPermit.testPermit(
-        this.house.address,
+        this.manager.address,
         this.deployer.address,
         testPermit.address,
         true,
