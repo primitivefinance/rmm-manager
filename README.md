@@ -1,6 +1,6 @@
-# Primitive V2 Periphery
+# RMM Manager
 
-This repository is for the periphery contracts of the Primitive V2 protocol. These are high-level contracts which are designed to interact with Primitive V2 core contracts.
+This repository is for the manager and routing contracts of the Primitive RMM. These are high-level contracts which are designed to interact with Primitive RMm core contracts.
 
 # Bug Bounty
 
@@ -12,15 +12,15 @@ The contract documentation is hosted here: [Primitive Docs](https://docs.primiti
 
 ## Overview
 
-This repository has the high level contracts to interact with the Primitive V2 core. The "House" contract is split into several small pieces, that are all inherited by the `PrimitiveHouse` contract.
+This repository has the high level contracts to interact with the Primitive V2 core. The "Manager" contract is split into several small pieces, that are all inherited by the `PrimitiveManager` contract.
 
-### HouseBase
+### ManagerBase
 
 Stores "general" variables that are meant to be reused by the child contracts. This contract is inherited by several child contracts.
 
 ### CashManager
 
-Contains several functions to unwrap WETH or sweep tokens / ETH from the house.
+Contains several functions to unwrap WETH or sweep tokens / ETH from the manager.
 
 ### MarginManager
 
@@ -48,7 +48,7 @@ Provides an ensemble of functions to swap tokens from different engines.
 
 ### PositionRenderer
 
-Manages the visual rendering of the position tokens. This contract is external (not inherited by the House), and will be deployed as a standalone upgradeable contract.
+Manages the visual rendering of the position tokens. This contract is external (not inherited by the Manager), and will be deployed as a standalone upgradeable contract.
 
 # Testing
 

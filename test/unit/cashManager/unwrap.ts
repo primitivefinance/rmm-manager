@@ -9,15 +9,15 @@ const value = parseWei('1').raw
 runTest('unwrap', function () {
   describe('success cases', function () {
     it('unwraps WETH into ETH', async function () {
-      await this.house.wrap(value, { value })
-      await this.weth.transfer(this.house.address, value)
+      await this.manager.wrap(value, { value })
+      await this.weth.transfer(this.manager.address, value)
 
       const recipient = '0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0'
       const previousBalance = await hre.ethers.provider.getBalance(recipient)
-      await this.house.unwrap(value, recipient)
+      await this.manager.unwrap(value, recipient)
 
-      expect(await this.weth.balanceOf(this.house.address)).to.be.equal(0)
-      expect(await hre.ethers.provider.getBalance(this.house.address)).to.be.equal(0)
+      expect(await this.weth.balanceOf(this.manager.address)).to.be.equal(0)
+      expect(await hre.ethers.provider.getBalance(this.manager.address)).to.be.equal(0)
 
       const newBalance = await hre.ethers.provider.getBalance(recipient)
       expect(newBalance).to.equal(previousBalance.add(value))
@@ -25,8 +25,8 @@ runTest('unwrap', function () {
   })
 
   describe('fail cases', function () {
-    it('fails to unwrap if not enough value is in the House', async function () {
-      await expect(this.house.unwrap(value, this.deployer.address)).to.revertWithCustomError('BalanceTooLowError', [
+    it('fails to unwrap if not enough value is in the Manager', async function () {
+      await expect(this.manager.unwrap(value, this.deployer.address)).to.revertWithCustomError('BalanceTooLowError', [
         '0',
         value.toString(),
       ])

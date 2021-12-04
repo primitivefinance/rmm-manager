@@ -45,19 +45,19 @@ export function runTest(description: string, runTests: Function): void {
         // WETH
         const weth = (await deploy('WETH9', deployer)) as ContractTypes.WETH9
 
-        // Periphery
-        const house = (await deploy('PrimitiveHouse', deployer, [
+        // Manager
+        const manager = (await deploy('PrimitiveManager', deployer, [
           factory.address,
           weth.address,
           positionRenderer.address,
-        ])) as ContractTypes.PrimitiveHouse
+        ])) as ContractTypes.PrimitiveManager
 
         return {
           risky,
           stable,
           factory,
           engine,
-          house,
+          manager,
           positionRenderer,
           weth,
         }
@@ -67,7 +67,7 @@ export function runTest(description: string, runTests: Function): void {
       this.stable = loadedFixture.stable
       this.factory = loadedFixture.factory
       this.engine = loadedFixture.engine
-      this.house = loadedFixture.house
+      this.manager = loadedFixture.manager
       this.positionRenderer = loadedFixture.positionRenderer
       this.weth = loadedFixture.weth
 
