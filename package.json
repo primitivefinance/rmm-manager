@@ -1,5 +1,5 @@
 {
-  "name": "@primitivefinance/rmm-manager",
+  "name": "@primitivefi/rmm-manager",
   "version": "1.0.0-beta.0",
   "description": "Manager and Routing smart contracts for Primitive RMM.",
   "main": "index.js",
