@@ -708,10 +708,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.3.2.tgz#ff80affd6d352dbe1bbc5b4e1833c41afd6283b6"
   integrity sha512-AybF1cesONZStg5kWf6ao9OlqTZuPqddvprc0ky7lrUVOjXeKpmQ2Y9FK+6ygxasb+4aic4O5pneFBfwVsRRRg==
 
-"@primitivefinance/rmm-core@^1.13.2":
-  version "1.13.2"
-  resolved "https://npm.pkg.github.com/download/@primitivefinance/rmm-core/1.13.2/9483826fcd3dad8fafe094afc7f7f997b8cd664f2647f93ff6b79f05b190347a#101cf120ac51d4896c532496d2eac6e04816611c"
-  integrity sha512-VfOUAhgeKhOjk8dmMaKNckqz2gKIdiycHYTivlN7nbU8QGXspM8B699e/ogdtGh1LV7Yx0X70ltadOiSl3PF3g==
+"@primitivefinance/rmm-core@^2.0.0-beta.1":
+  version "2.0.0-beta.1"
+  resolved "https://npm.pkg.github.com/download/@primitivefinance/rmm-core/2.0.0-beta.1/023e74f768f9c1409f8fd310a1ed39b6733642e888e8dba6ff51b87c6bea8170#36b7aa25d2c2151a51ffc63ebf7bf2d740160e5f"
+  integrity sha512-ijz3cznjJAHJja0kJo0mI9mej0QLv+ixbIFIVymo3zLDwTzUSG0KgFnN7e4WQ30RNoFEWbgGJlwayUJis57tuA==
 
 "@primitivefinance/v2-math@^1.5.0":
   version "1.5.0"

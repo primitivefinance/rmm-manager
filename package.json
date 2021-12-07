@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
-    "@primitivefinance/rmm-core": "^1.13.2",
+    "@primitivefinance/rmm-core": "^2.0.0-beta.1",
     "base64-sol": "^1.1.0"
   },
   "devDependencies": {
