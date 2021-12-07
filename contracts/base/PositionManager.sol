@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   PositionManager contract
-/// @author  Primitive
-/// @notice  Wraps the positions into ERC1155 tokens
-
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "base64-sol/base64.sol";
@@ -13,6 +9,9 @@ import "../interfaces/IPositionRenderer.sol";
 import "../interfaces/external/IERC20WithMetadata.sol";
 import "../base/ManagerBase.sol";
 
+/// @title   PositionManager contract
+/// @author  Primitive
+/// @notice  Wraps the positions into ERC1155 tokens
 abstract contract PositionManager is ManagerBase, ERC1155Permit {
     using Strings for uint256;
 

@@ -3,7 +3,6 @@ pragma solidity >=0.8.6;
 
 /// @title   Interface of Multicall contract
 /// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/IMulticall.sol
-
 interface IMulticall {
     /// @notice          Call multiple functions in the current contract and return the data from all of them if they all succeed
     /// @dev             `msg.value` should not be trusted for any method callable from Multicall

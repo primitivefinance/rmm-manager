@@ -3,7 +3,6 @@ pragma solidity >=0.8.6;
 
 /// @title   Interface of SelfPermit contract
 /// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/ISelfPermit.sol
-
 interface ISelfPermit {
     /// @notice          Permits this contract to spend a given token from `msg.sender`
     /// @dev             `owner` is always msg.sender and the `spender` is always address(this)
