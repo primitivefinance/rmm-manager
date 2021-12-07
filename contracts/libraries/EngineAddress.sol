@@ -3,7 +3,6 @@ pragma solidity >=0.8.6;
 
 /// @author  Primitive
 /// @notice  Small library to compute the address of the engines
-
 library EngineAddress {
     /// @notice Thrown when the target Engine is not deployed
     error EngineNotDeployedError();

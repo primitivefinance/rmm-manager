@@ -3,7 +3,6 @@ pragma solidity >=0.8.6;
 
 /// @title   Interface of CashManager contract
 /// @author  Primitive
-
 interface ICashManager {
     /// ERRORS ///
 

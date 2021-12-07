@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
-/// @title   Interface of ERC1155Permit contract
-/// @author  Primitive
-
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
+/// @title   Interface of ERC1155Permit contract
+/// @author  Primitive
 interface IERC1155Permit is IERC1155 {
     /// ERRORS ///
 

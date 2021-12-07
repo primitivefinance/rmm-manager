@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   ERC1155Permit contract
-/// @author  Primitive
-/// @notice  ERC1155 contract with permit extension allowing approvals to be made via signatures
-
 import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
 import "./ERC1155.sol";
 import "../interfaces/IERC1155Permit.sol";
 
+/// @title   ERC1155Permit contract
+/// @author  Primitive
+/// @notice  ERC1155 contract with permit extension allowing approvals to be made via signatures
 contract ERC1155Permit is ERC1155, IERC1155Permit, EIP712 {
     /// @inheritdoc IERC1155Permit
     mapping(address => uint256) public override nonces;

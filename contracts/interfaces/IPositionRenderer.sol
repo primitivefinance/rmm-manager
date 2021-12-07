@@ -3,7 +3,6 @@ pragma solidity >=0.8.6;
 
 /// @title   Interface of PositionRenderer contract
 /// @author  Primitive
-
 interface IPositionRenderer {
     /// @notice         Returns a SVG representation of the token
     /// @param engine   Address of the engine
