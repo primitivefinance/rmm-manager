@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
-import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
-import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/callback/IPrimitiveCreateCallback.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/callback/IPrimitiveLiquidityCallback.sol";
 
 /// @title   Interface of PrimitiveManager contract
 /// @author  Primitive

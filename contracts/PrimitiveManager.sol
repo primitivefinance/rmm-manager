@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "./interfaces/IPrimitiveManager.sol";
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";

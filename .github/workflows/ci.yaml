@@ -1,0 +1,33 @@
+name: CI
+
+on: [push]
+
+jobs:
+  lint-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out Git Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up Node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14.x'
+
+      - run: yarn install --ignore-scripts
+
+      - name: Lint
+        uses: wearerequired/lint-action@v1
+        with:
+          github_token: ${{ secrets.github_token }}
+          prettier: true
+          auto_fix: true
+          prettier_extensions: 'css,html,js,json,jsx,md,sass,scss,ts,tsx,vue,yaml,yml,sol'
+
+      - name: Typechain
+        run: yarn typechain
+
+      - name: Test
+        run: yarn test
