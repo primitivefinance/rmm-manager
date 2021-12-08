@@ -1,18 +1,17 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   PositionManager contract
-/// @author  Primitive
-/// @notice  Wraps the positions into ERC1155 tokens
-
 import "@openzeppelin/contracts/utils/Strings.sol";
-import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "base64-sol/base64.sol";
 import "./ERC1155Permit.sol";
 import "../interfaces/IPositionRenderer.sol";
 import "../interfaces/external/IERC20WithMetadata.sol";
 import "../base/ManagerBase.sol";
 
+/// @title   PositionManager contract
+/// @author  Primitive
+/// @notice  Wraps the positions into ERC1155 tokens
 abstract contract PositionManager is ManagerBase, ERC1155Permit {
     using Strings for uint256;
 
@@ -62,18 +61,25 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
     /// @param tokenId  Id of the token (same as pool id)
     /// @return         JSON metadata of the token
     function getMetadata(uint256 tokenId) private view returns (string memory) {
-        return string(abi.encodePacked(
-            'data:application/json;base64,',
-            Base64.encode(bytes(abi.encodePacked(
-                '{"name":"',
-                getName(tokenId),
-                '","image":"',
-                IPositionRenderer(positionRenderer).render(cache[tokenId], tokenId),
-                '","license":"MIT","creator":"primitive.eth",',
-                '"description":"Concentrated liquidity tokens of a two-token AMM",',
-                getProperties(tokenId)
-            )))
-        ));
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(
+                        bytes(
+                            abi.encodePacked(
+                                '{"name":"',
+                                getName(tokenId),
+                                '","image":"',
+                                IPositionRenderer(positionRenderer).render(cache[tokenId], tokenId),
+                                '","license":"MIT","creator":"primitive.eth",',
+                                '"description":"Concentrated liquidity tokens of a two-token AMM",',
+                                getProperties(tokenId)
+                            )
+                        )
+                    )
+                )
+            );
     }
 
     function getName(uint256 tokenId) private view returns (string memory) {
@@ -81,12 +87,15 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
         address risky = engine.risky();
         address stable = engine.stable();
 
-        return string(abi.encodePacked(
-            "Primitive RMM-01 LP ",
-            IERC20WithMetadata(risky).name(),
-            "-",
-            IERC20WithMetadata(stable).name()
-        ));
+        return
+            string(
+                abi.encodePacked(
+                    "Primitive RMM-01 LP ",
+                    IERC20WithMetadata(risky).name(),
+                    "-",
+                    IERC20WithMetadata(stable).name()
+                )
+            );
     }
 
     /// @notice         Returns the properties of a token
@@ -123,17 +132,20 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
         string memory symbol = IERC20WithMetadata(token).symbol();
         uint8 decimals = IERC20WithMetadata(token).decimals();
 
-        return string(abi.encodePacked(
-            '{"name":"',
-            name,
-            '","symbol":"',
-            symbol,
-            '","decimals":"',
-            uint256(decimals).toString(),
-            '","address":"',
-            uint256(uint160(token)).toHexString(),
-            '"}'
-        ));
+        return
+            string(
+                abi.encodePacked(
+                    '{"name":"',
+                    name,
+                    '","symbol":"',
+                    symbol,
+                    '","decimals":"',
+                    uint256(decimals).toString(),
+                    '","address":"',
+                    uint256(uint160(token)).toHexString(),
+                    '"}'
+                )
+            );
     }
 
     /// @notice         Returns the calibration of a pool as JSON

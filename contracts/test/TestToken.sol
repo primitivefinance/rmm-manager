@@ -4,11 +4,7 @@ pragma solidity 0.8.6;
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "../interfaces/external/IERC20PermitAllowed.sol";
 
-contract TestToken is
-    ERC20("TestToken", "TEST"),
-    ERC20Permit("TestToken"),
-    IERC20PermitAllowed
-{
+contract TestToken is ERC20("TestToken", "TEST"), ERC20Permit("TestToken"), IERC20PermitAllowed {
     function mint(address to, uint256 wad) public {
         _mint(to, wad);
     }

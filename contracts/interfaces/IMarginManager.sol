@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
+import "@primitivefi/rmm-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
+
 /// @title   Interface of MarginManager contract
 /// @author  Primitive
-
-import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveDepositCallback.sol";
-
 interface IMarginManager is IPrimitiveDepositCallback {
     /// ERRORS ///
 
