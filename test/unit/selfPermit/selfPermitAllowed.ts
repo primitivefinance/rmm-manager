@@ -14,7 +14,8 @@ runTest('selfPermitAllowed', function () {
         this.risky.address,
         this.manager.address,
         value,
-        deadline, {
+        deadline,
+        {
           name: 'TestToken',
           nonce: '0',
           version: '1',
@@ -22,44 +23,24 @@ runTest('selfPermitAllowed', function () {
         }
       )
 
-      await this.manager.selfPermitAllowed(
-        this.risky.address,
-        '0',
-        deadline,
-        signature.v,
-        signature.r,
-        signature.s,
-      )
+      await this.manager.selfPermitAllowed(this.risky.address, '0', deadline, signature.v, signature.r, signature.s)
 
-      expect(
-        await this.risky.allowance(this.deployer.address, this.manager.address)
-      ).to.be.equal(value)
+      expect(await this.risky.allowance(this.deployer.address, this.manager.address)).to.be.equal(value)
     })
   })
 
   describe('fail cases', function () {
     it('reverts if the deadline is reached', async function () {
-      const signature = await getERC20PermitSignature(
-        this.deployer,
-        this.risky.address,
-        this.manager.address,
-        value,
-        0, {
-          name: 'TestToken',
-          nonce: '0',
-          version: '1',
-          chainId: await this.deployer.getChainId(),
-        }
-      )
+      const signature = await getERC20PermitSignature(this.deployer, this.risky.address, this.manager.address, value, 0, {
+        name: 'TestToken',
+        nonce: '0',
+        version: '1',
+        chainId: await this.deployer.getChainId(),
+      })
 
-      await expect(this.manager.selfPermitAllowed(
-        this.risky.address,
-        '0',
-        0,
-        signature.v,
-        signature.r,
-        signature.s,
-      )).to.be.revertedWith('ERC20Permit: expired deadline')
+      await expect(
+        this.manager.selfPermitAllowed(this.risky.address, '0', 0, signature.v, signature.r, signature.s)
+      ).to.be.revertedWith('ERC20Permit: expired deadline')
     })
 
     it('reverts if the signature is invalid', async function () {
@@ -68,7 +49,8 @@ runTest('selfPermitAllowed', function () {
         this.risky.address,
         this.manager.address,
         value,
-        deadline, {
+        deadline,
+        {
           name: 'TestToken',
           nonce: '0',
           version: '1',
@@ -76,14 +58,9 @@ runTest('selfPermitAllowed', function () {
         }
       )
 
-      await expect(this.manager.selfPermitAllowed(
-        this.stable.address,
-        '0',
-        deadline,
-        signature.v,
-        signature.r,
-        signature.s,
-      )).to.be.revertedWith('ERC20Permit: invalid signature')
+      await expect(
+        this.manager.selfPermitAllowed(this.stable.address, '0', deadline, signature.v, signature.r, signature.s)
+      ).to.be.revertedWith('ERC20Permit: invalid signature')
     })
   })
 })

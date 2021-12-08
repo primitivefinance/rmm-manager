@@ -8,7 +8,7 @@ let testPermit: TestPermit
 
 runTest('permit', function () {
   beforeEach(async function () {
-    testPermit = await deploy('TestPermit', this.deployer, []) as TestPermit
+    testPermit = (await deploy('TestPermit', this.deployer, [])) as TestPermit
   })
 
   describe('success cases', function () {
@@ -18,7 +18,8 @@ runTest('permit', function () {
         this.manager.address,
         testPermit.address,
         true,
-        9999999999999, {
+        9999999999999,
+        {
           nonce: 0,
           name: 'PrimitiveManager',
           version: '1',
@@ -34,13 +35,10 @@ runTest('permit', function () {
         9999999999999,
         signature.v,
         signature.r,
-        signature.s,
+        signature.s
       )
 
-      expect(await this.manager.isApprovedForAll(
-        this.deployer.address,
-        testPermit.address
-      )).to.be.equal(true)
+      expect(await this.manager.isApprovedForAll(this.deployer.address, testPermit.address)).to.be.equal(true)
     })
 
     it('increases the nonce when the permit was successful', async function () {
@@ -49,7 +47,8 @@ runTest('permit', function () {
         this.manager.address,
         testPermit.address,
         true,
-        9999999999999, {
+        9999999999999,
+        {
           nonce: 0,
           name: 'PrimitiveManager',
           version: '1',
@@ -65,12 +64,10 @@ runTest('permit', function () {
         9999999999999,
         signature.v,
         signature.r,
-        signature.s,
+        signature.s
       )
 
-      expect(await this.manager.nonces(
-        this.deployer.address,
-      )).to.be.equal(1)
+      expect(await this.manager.nonces(this.deployer.address)).to.be.equal(1)
     })
   })
 
@@ -81,7 +78,8 @@ runTest('permit', function () {
         this.manager.address,
         testPermit.address,
         true,
-        9999999999999, {
+        9999999999999,
+        {
           nonce: 0,
           name: 'PrimitiveManager',
           version: '1',
@@ -89,42 +87,40 @@ runTest('permit', function () {
         }
       )
 
-      await expect(testPermit.testPermit(
-        this.manager.address,
-        this.alice.address,
-        testPermit.address,
-        true,
-        9999999999999,
-        signature.v,
-        signature.r,
-        signature.s,
-      )).to.revertWithCustomError('InvalidSigError')
+      await expect(
+        testPermit.testPermit(
+          this.manager.address,
+          this.alice.address,
+          testPermit.address,
+          true,
+          9999999999999,
+          signature.v,
+          signature.r,
+          signature.s
+        )
+      ).to.revertWithCustomError('InvalidSigError')
     })
 
     it('does not permit if the signature has expired', async function () {
-      const signature = await getERC1155PermitSignature(
-        this.deployer,
-        this.manager.address,
-        testPermit.address,
-        true,
-        0, {
-          nonce: 0,
-          name: 'PrimitiveManager',
-          version: '1',
-          chainId: await this.deployer.getChainId(),
-        }
-      )
+      const signature = await getERC1155PermitSignature(this.deployer, this.manager.address, testPermit.address, true, 0, {
+        nonce: 0,
+        name: 'PrimitiveManager',
+        version: '1',
+        chainId: await this.deployer.getChainId(),
+      })
 
-      await expect(testPermit.testPermit(
-        this.manager.address,
-        this.deployer.address,
-        testPermit.address,
-        true,
-        0,
-        signature.v,
-        signature.r,
-        signature.s,
-      )).to.revertWithCustomError('SigExpiredError')
+      await expect(
+        testPermit.testPermit(
+          this.manager.address,
+          this.deployer.address,
+          testPermit.address,
+          true,
+          0,
+          signature.v,
+          signature.r,
+          signature.s
+        )
+      ).to.revertWithCustomError('SigExpiredError')
     })
   })
 })
