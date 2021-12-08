@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   MarginManager contract
-/// @author  Primitive
-/// @notice  Manages the margins
-
-import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
-import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "../interfaces/IMarginManager.sol";
 import "./CashManager.sol";
 import "../libraries/TransferHelper.sol";
 import "../libraries/Margin.sol";
 
+/// @title   MarginManager contract
+/// @author  Primitive
+/// @notice  Manages the margins
 abstract contract MarginManager is IMarginManager, CashManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;

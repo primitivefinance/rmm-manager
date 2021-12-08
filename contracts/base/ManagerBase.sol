@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   ManagerBase contract
-/// @author  Primitive
-/// @notice  Base contract of the Manager
-
 import "../interfaces/IManagerBase.sol";
 import "../interfaces/IPrimitiveManager.sol";
 import "./Reentrancy.sol";
 import "../libraries/EngineAddress.sol";
 
+/// @title   ManagerBase contract
+/// @author  Primitive
+/// @notice  Base contract of the Manager
 abstract contract ManagerBase is IManagerBase, Reentrancy {
     /// @notice Data struct reused by callbacks
     struct CallbackData {
@@ -29,7 +28,7 @@ abstract contract ManagerBase is IManagerBase, Reentrancy {
 
     /// @param factory_  Address of a PrimitiveFactory
     /// @param WETH9_    Address of WETH9
-    /// @param WETH9_    Address of the position renderer
+    /// @param positionRenderer_    Address of the position renderer
     constructor(
         address factory_,
         address WETH9_,

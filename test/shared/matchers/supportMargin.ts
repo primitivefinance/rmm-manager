@@ -1,6 +1,5 @@
 import { BigNumber } from 'ethers'
-import { PrimitiveManager
-} from '../../../typechain'
+import { PrimitiveManager } from '../../../typechain'
 
 // Chai matchers for the margins of the PrimitiveEngine
 
@@ -21,7 +20,7 @@ export default function supportMargin(Assertion: Chai.AssertionStatic) {
       await this._obj
       const newMargin = await manager.margins(account, engine)
 
-      const expectedRisky = riskyIncrease ? oldMargin.balanceRisky.add(delRisky): oldMargin.balanceRisky.sub(delRisky)
+      const expectedRisky = riskyIncrease ? oldMargin.balanceRisky.add(delRisky) : oldMargin.balanceRisky.sub(delRisky)
       const expectedStable = stableIncrease ? oldMargin.balanceStable.add(delStable) : oldMargin.balanceStable.sub(delStable)
 
       this.assert(

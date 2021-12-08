@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   PrimitiveManager contract
-/// @author  Primitive
-/// @notice  Interacts with Primitive Engine contracts
-
-import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "./interfaces/IPrimitiveManager.sol";
 import "./base/Multicall.sol";
 import "./base/CashManager.sol";
@@ -14,14 +10,18 @@ import "./base/PositionManager.sol";
 import "./base/SwapManager.sol";
 import "./libraries/TransferHelper.sol";
 
+/// @title   PrimitiveManager contract
+/// @author  Primitive
+/// @notice  Interacts with Primitive Engine contracts
 contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPermit, PositionManager, SwapManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;
 
     /// EFFECT FUNCTIONS ///
 
-    /// @param factory_  Address of a PrimitiveFactory
-    /// @param WETH9_    Address of WETH9
+    /// @param factory_           Address of a PrimitiveFactory
+    /// @param WETH9_             Address of WETH9
+    /// @param positionRenderer_  Address of PositionRenderer
     constructor(
         address factory_,
         address WETH9_,

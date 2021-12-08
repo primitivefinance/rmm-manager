@@ -3,7 +3,6 @@ pragma solidity >=0.8.6;
 
 /// @title   Interface of ManagerBase contract
 /// @author  Primitive
-
 interface IManagerBase {
     /// ERRORS ///
 

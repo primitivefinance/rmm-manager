@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.6;
 
+import "../interfaces/IMulticall.sol";
+
 /// @title   Multicall contract
 /// @author  https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/Multicall.sol
 /// @notice  Enables calling multiple methods in a single call to the contract
-
-import "../interfaces/IMulticall.sol";
-
 abstract contract Multicall is IMulticall {
     /// @inheritdoc IMulticall
     function multicall(bytes[] calldata data) external payable override returns (bytes[] memory results) {

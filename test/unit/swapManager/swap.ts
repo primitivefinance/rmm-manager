@@ -6,8 +6,8 @@ import { DEFAULT_CONFIG } from '../context'
 import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
-import { PrimitiveEngine } from '@primitivefinance/rmm-core/typechain'
-import { abi as PrimitiveEngineAbi } from '@primitivefinance/rmm-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import { PrimitiveEngine } from '@primitivefi/rmm-core/typechain'
+import { abi as PrimitiveEngineAbi } from '@primitivefi/rmm-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
 let poolId: string
@@ -74,7 +74,7 @@ runTest('swap', function () {
       delRisky.raw,
       delStable.raw,
       false,
-      amount.raw,
+      amount.raw
     )
   })
 
@@ -225,7 +225,15 @@ runTest('swap', function () {
               toMargin: false,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, deltaIn, false, parseWei('0').raw, true)
+          ).to.updateMargin(
+            this.manager,
+            this.deployer.address,
+            this.engine.address,
+            deltaIn,
+            false,
+            parseWei('0').raw,
+            true
+          )
 
           const postStableBalance = await this.stable.balanceOf(this.deployer.address)
           expect(postStableBalance).to.be.equal(preStableBalance.add(deltaOut))
@@ -280,7 +288,15 @@ runTest('swap', function () {
               toMargin: false,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, parseWei('0').raw, true, deltaIn, false)
+          ).to.updateMargin(
+            this.manager,
+            this.deployer.address,
+            this.engine.address,
+            parseWei('0').raw,
+            true,
+            deltaIn,
+            false
+          )
         })
 
         it('emits the Swap event', async function () {
@@ -346,7 +362,15 @@ runTest('swap', function () {
               toMargin: true,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, parseWei('0').raw, false, deltaOut, true)
+          ).to.updateMargin(
+            this.manager,
+            this.deployer.address,
+            this.engine.address,
+            parseWei('0').raw,
+            false,
+            deltaOut,
+            true
+          )
 
           const postRiskyBalance = await this.risky.balanceOf(this.deployer.address)
           expect(postRiskyBalance).to.be.equal(preRiskyBalance.sub(deltaIn))
@@ -403,7 +427,15 @@ runTest('swap', function () {
               toMargin: true,
               deadline: 1000000000000,
             })
-          ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, deltaOut, true, parseWei('0').raw, false)
+          ).to.updateMargin(
+            this.manager,
+            this.deployer.address,
+            this.engine.address,
+            deltaOut,
+            true,
+            parseWei('0').raw,
+            false
+          )
 
           const postStableBalance = await this.stable.balanceOf(this.deployer.address)
           expect(postStableBalance).to.be.equal(preStableBalance.sub(deltaIn))

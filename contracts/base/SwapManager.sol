@@ -1,19 +1,18 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-/// @title   SwapManager contract
-/// @author  Primitive
-/// @dev     Manages the swaps
-
-import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
-import "@primitivefinance/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
-import "@primitivefinance/rmm-core/contracts/libraries/ReplicationMath.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/engine/IPrimitiveEngineActions.sol";
+import "@primitivefi/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
+import "@primitivefi/rmm-core/contracts/libraries/ReplicationMath.sol";
 
 import "../interfaces/ISwapManager.sol";
 import "../interfaces/external/IERC20.sol";
 import "./MarginManager.sol";
 import "./CashManager.sol";
 
+/// @title   SwapManager contract
+/// @author  Primitive
+/// @dev     Manages the swaps
 abstract contract SwapManager is ISwapManager, CashManager, MarginManager {
     using TransferHelper for IERC20;
     using Margin for Margin.Data;

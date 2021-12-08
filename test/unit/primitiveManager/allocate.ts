@@ -6,8 +6,8 @@ import { DEFAULT_CONFIG } from '../context'
 import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
-import { PrimitiveEngine } from '@primitivefinance/rmm-core/typechain'
-import { abi as PrimitiveEngineAbi } from '@primitivefinance/rmm-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
+import { PrimitiveEngine } from '@primitivefi/rmm-core/typechain'
+import { abi as PrimitiveEngineAbi } from '@primitivefi/rmm-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
 let poolId: string
@@ -57,7 +57,7 @@ runTest('allocate', function () {
           delRisky.raw,
           delStable.raw,
           true,
-          delLiquidity.raw,
+          delLiquidity.raw
         )
       })
 
@@ -70,7 +70,7 @@ runTest('allocate', function () {
             delRisky.raw,
             delStable.raw,
             true,
-            delLiquidity.raw,
+            delLiquidity.raw
           )
         ).to.increasePositionLiquidity(this.manager, this.deployer.address, poolId, delLiquidity.raw)
       })
@@ -84,30 +84,46 @@ runTest('allocate', function () {
             delRisky.raw,
             delStable.raw,
             true,
-            delLiquidity.raw,
+            delLiquidity.raw
           )
-        ).to.updateMargin(this.manager, this.deployer.address, this.engine.address, delRisky.raw, false, delStable.raw, false)
+        ).to.updateMargin(
+          this.manager,
+          this.deployer.address,
+          this.engine.address,
+          delRisky.raw,
+          false,
+          delStable.raw,
+          false
+        )
       })
 
       it('emits the Allocate event', async function () {
-        await expect(this.manager.allocate(
-          poolId,
-          this.risky.address,
-          this.stable.address,
-          delRisky.raw,
-          delStable.raw,
-          true,
-          delLiquidity.raw,
-        )).to.emit(this.manager, 'Allocate').withArgs(
-          this.deployer.address, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, true
+        await expect(
+          this.manager.allocate(
+            poolId,
+            this.risky.address,
+            this.stable.address,
+            delRisky.raw,
+            delStable.raw,
+            true,
+            delLiquidity.raw
+          )
         )
+          .to.emit(this.manager, 'Allocate')
+          .withArgs(this.deployer.address, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, true)
       })
 
       it('does not reduces the balances of the sender', async function () {
         const riskyBalance = await this.risky.balanceOf(this.deployer.address)
         const stableBalance = await this.stable.balanceOf(this.deployer.address)
         await this.manager.allocate(
-          poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, true, delLiquidity.raw,
+          poolId,
+          this.risky.address,
+          this.stable.address,
+          delRisky.raw,
+          delStable.raw,
+          true,
+          delLiquidity.raw
         )
 
         expect(await this.risky.balanceOf(this.deployer.address)).to.equal(riskyBalance)
@@ -118,21 +134,41 @@ runTest('allocate', function () {
     describe('when allocating from external', async function () {
       it('allocates 1 LP shares', async function () {
         await this.manager.allocate(
-          poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw,
+          poolId,
+          this.risky.address,
+          this.stable.address,
+          delRisky.raw,
+          delStable.raw,
+          false,
+          delLiquidity.raw
         )
       })
 
       it('increases the position of the sender', async function () {
-        await expect(this.manager.allocate(
-          poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw,
-        )).to.increasePositionLiquidity(this.manager, this.deployer.address, poolId, delLiquidity.raw)
+        await expect(
+          this.manager.allocate(
+            poolId,
+            this.risky.address,
+            this.stable.address,
+            delRisky.raw,
+            delStable.raw,
+            false,
+            delLiquidity.raw
+          )
+        ).to.increasePositionLiquidity(this.manager, this.deployer.address, poolId, delLiquidity.raw)
       })
 
       it('reduces the balances of the sender', async function () {
         const riskyBalance = await this.risky.balanceOf(this.deployer.address)
         const stableBalance = await this.stable.balanceOf(this.deployer.address)
         await this.manager.allocate(
-          poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw,
+          poolId,
+          this.risky.address,
+          this.stable.address,
+          delRisky.raw,
+          delStable.raw,
+          false,
+          delLiquidity.raw
         )
 
         expect(await this.risky.balanceOf(this.deployer.address)).to.equal(riskyBalance.sub(delRisky.raw))
@@ -140,9 +176,17 @@ runTest('allocate', function () {
       })
 
       it('does not reduces the margin', async function () {
-        await expect(this.manager.allocate(
-          poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw
-        )).to.updateMargin(
+        await expect(
+          this.manager.allocate(
+            poolId,
+            this.risky.address,
+            this.stable.address,
+            delRisky.raw,
+            delStable.raw,
+            false,
+            delLiquidity.raw
+          )
+        ).to.updateMargin(
           this.manager,
           this.deployer.address,
           this.engine.address,
@@ -154,11 +198,19 @@ runTest('allocate', function () {
       })
 
       it('emits the Allocate event', async function () {
-        await expect(this.manager.allocate(
-          poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw
-        )).to.emit(this.manager, 'Allocate').withArgs(
-          this.deployer.address, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false
+        await expect(
+          this.manager.allocate(
+            poolId,
+            this.risky.address,
+            this.stable.address,
+            delRisky.raw,
+            delStable.raw,
+            false,
+            delLiquidity.raw
+          )
         )
+          .to.emit(this.manager, 'Allocate')
+          .withArgs(this.deployer.address, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false)
       })
     })
 
@@ -206,25 +258,52 @@ runTest('allocate', function () {
       })
 
       it('allocates 1 LP shares', async function () {
-        await this.manager.allocate(poolId, this.weth.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw, {
-          value: delRisky.raw,
-        })
+        await this.manager.allocate(
+          poolId,
+          this.weth.address,
+          this.stable.address,
+          delRisky.raw,
+          delStable.raw,
+          false,
+          delLiquidity.raw,
+          {
+            value: delRisky.raw,
+          }
+        )
       })
 
       it('increases the position of the sender', async function () {
         await expect(
-          this.manager.allocate(poolId, this.weth.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw, {
-            value: delRisky.raw,
-          })
+          this.manager.allocate(
+            poolId,
+            this.weth.address,
+            this.stable.address,
+            delRisky.raw,
+            delStable.raw,
+            false,
+            delLiquidity.raw,
+            {
+              value: delRisky.raw,
+            }
+          )
         ).to.increasePositionLiquidity(this.manager, this.deployer.address, poolId, delLiquidity.raw)
       })
 
       it('reduces the balances of the sender', async function () {
         const riskyBalance = await this.deployer.getBalance()
         const stableBalance = await this.stable.balanceOf(this.deployer.address)
-        await this.manager.allocate(poolId, this.weth.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw, {
-          value: delRisky.raw,
-        })
+        await this.manager.allocate(
+          poolId,
+          this.weth.address,
+          this.stable.address,
+          delRisky.raw,
+          delStable.raw,
+          false,
+          delLiquidity.raw,
+          {
+            value: delRisky.raw,
+          }
+        )
 
         /// 0.001 ether subtracted for rough gas cost
         expect((await this.deployer.getBalance()).gte(riskyBalance.sub(delRisky.raw).sub(parseWei('0.001').raw))).to.be.eq(
@@ -235,9 +314,18 @@ runTest('allocate', function () {
 
       it('emits the Allocate event', async function () {
         await expect(
-          this.manager.allocate(poolId, this.weth.address, this.stable.address, delRisky.raw, delStable.raw, false, delLiquidity.raw, {
-            value: delRisky.raw,
-          })
+          this.manager.allocate(
+            poolId,
+            this.weth.address,
+            this.stable.address,
+            delRisky.raw,
+            delStable.raw,
+            false,
+            delLiquidity.raw,
+            {
+              value: delRisky.raw,
+            }
+          )
         )
           .to.emit(this.manager, 'Allocate')
           .withArgs(this.deployer.address, engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false)
@@ -259,9 +347,17 @@ runTest('allocate', function () {
     })
 
     it('reverts if the liquidity out is lower than the expected amount', async function () {
-      await expect(this.manager.allocate(
-        poolId, this.risky.address, this.stable.address, delRisky.raw, delStable.raw, true, delLiquidity.add(1).raw
-      )).to.revertWithCustomError('MinLiquidityOutError')
+      await expect(
+        this.manager.allocate(
+          poolId,
+          this.risky.address,
+          this.stable.address,
+          delRisky.raw,
+          delStable.raw,
+          true,
+          delLiquidity.add(1).raw
+        )
+      ).to.revertWithCustomError('MinLiquidityOutError')
     })
 
     it('fails to allocate more than margin balance', async function () {

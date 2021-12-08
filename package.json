@@ -1,6 +1,6 @@
 {
-  "name": "@primitivefinance/rmm-manager",
-  "version": "1.0.0-beta.0",
+  "name": "@primitivefi/rmm-manager",
+  "version": "2.0.0-beta.1",
   "description": "Manager and Routing smart contracts for Primitive RMM.",
   "main": "index.js",
   "keywords": [
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
-    "@primitivefinance/rmm-core": "^1.13.2",
+    "@primitivefi/rmm-core": "^2.0.0-beta.1",
     "base64-sol": "^1.1.0"
   },
   "devDependencies": {
@@ -45,7 +45,7 @@
     "@commitlint/config-conventional": "^12.1.4",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@primitivefinance/v2-math": "^1.5.0",
+    "@primitivefi/rmm-math": "^2.0.0-beta.1",
     "@typechain/ethers-v5": "^7.1.0",
     "@typechain/hardhat": "^2.2.0",
     "@types/chai": "^4.2.21",
@@ -79,9 +79,6 @@
   "postinstall": "typechain",
   "lint-staged": {
     "*.{js,ts,sol,md}": "prettier --write"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "release": {
     "branches": [

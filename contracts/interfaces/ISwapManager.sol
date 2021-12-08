@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity >=0.8.6;
 
+import "@primitivefi/rmm-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
+
 /// @title   Interface of SwapManager contract
 /// @author  Primitive
-
-import "@primitivefinance/rmm-core/contracts/interfaces/callback/IPrimitiveSwapCallback.sol";
-
 interface ISwapManager is IPrimitiveSwapCallback {
     /// @notice                Parameters for the swap function
     /// @param recipient       Address of the recipient

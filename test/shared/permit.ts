@@ -1,9 +1,4 @@
-import {
-  Wallet,
-  BigNumberish,
-  Signature,
-  utils
-} from 'ethers'
+import { Wallet, BigNumberish, Signature, utils } from 'ethers'
 
 export async function getERC20PermitSignature(
   wallet: Wallet,
@@ -12,9 +7,9 @@ export async function getERC20PermitSignature(
   value: BigNumberish,
   deadline: BigNumberish,
   permitConfig: {
-    nonce: BigNumberish,
-    name: string,
-    chainId: number,
+    nonce: BigNumberish
+    name: string
+    chainId: number
     version: string
   }
 ): Promise<Signature> {
@@ -24,7 +19,7 @@ export async function getERC20PermitSignature(
         name: permitConfig.name,
         version: permitConfig.version,
         chainId: permitConfig.chainId,
-        verifyingContract: token
+        verifyingContract: token,
       },
       {
         Permit: [
@@ -68,9 +63,9 @@ export async function getERC1155PermitSignature(
   approved: boolean,
   deadline: BigNumberish,
   permitConfig: {
-    nonce: BigNumberish,
-    name: string,
-    chainId: number,
+    nonce: BigNumberish
+    name: string
+    chainId: number
     version: string
   }
 ): Promise<Signature> {
@@ -80,7 +75,7 @@ export async function getERC1155PermitSignature(
         name: permitConfig.name,
         version: permitConfig.version,
         chainId: permitConfig.chainId,
-        verifyingContract: token
+        verifyingContract: token,
       },
       {
         Permit: [

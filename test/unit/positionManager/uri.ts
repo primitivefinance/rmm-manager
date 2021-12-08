@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat'
 import { utils, constants, BigNumber } from 'ethers'
 import { parseWei } from 'web3-units'
-import { Base64 } from 'js-base64';
+import { Base64 } from 'js-base64'
 
 import { DEFAULT_CONFIG } from '../context'
 import { computePoolId } from '../../shared/utilities'
@@ -87,7 +87,7 @@ runTest('uri', function () {
   describe('success cases', function () {
     it('returns the URI', async function () {
       const uri = await this.manager.uri(poolId)
-      const [metadataFormat, encodedMetadata] = uri.split(',');
+      const [metadataFormat, encodedMetadata] = uri.split(',')
 
       expect(metadataFormat).to.be.equal('data:application/json;base64')
 
@@ -99,7 +99,9 @@ runTest('uri', function () {
 
       const [imageFormat, encodedImage] = metadata.image.split(',')
       expect(imageFormat).to.be.equal('data:image/svg+xml;base64')
-      expect(Base64.decode(encodedImage)).to.be.equal('<svg width="512" height="512" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#000" d="M0 0h512v512H0z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M339.976 134.664h41.048L256 340.586 130.976 134.664h41.047V98H64.143L256 414 447.857 98H339.976v36.664Zm-38.759 0V98h-90.436v36.664h90.436Z" fill="#fff"/></svg>')
+      expect(Base64.decode(encodedImage)).to.be.equal(
+        '<svg width="512" height="512" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#000" d="M0 0h512v512H0z"/><path fill-rule="evenodd" clip-rule="evenodd" d="M339.976 134.664h41.048L256 340.586 130.976 134.664h41.047V98H64.143L256 414 447.857 98H339.976v36.664Zm-38.759 0V98h-90.436v36.664h90.436Z" fill="#fff"/></svg>'
+      )
 
       expect(metadata.license).to.be.equal('MIT')
       expect(metadata.creator).to.be.equal('primitive.eth')
