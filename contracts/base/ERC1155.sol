@@ -369,7 +369,11 @@ contract ERC1155 is Context, ERC165, IERC1155, IERC1155MetadataURI {
         emit TransferBatch(operator, account, address(0), ids, amounts);
     }
 
-    function _setApprovalForAll(address owner, address operator, bool approved) internal {
+    function _setApprovalForAll(
+        address owner,
+        address operator,
+        bool approved
+    ) internal {
         _operatorApprovals[owner][operator] = approved;
         emit ApprovalForAll(owner, operator, approved);
     }
