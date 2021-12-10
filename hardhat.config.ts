@@ -11,6 +11,7 @@ import '@primitivefi/hardhat-dodoc'
 
 const config: HardhatUserConfig = {
   dodoc: {
+    runOnCompile: false,
     include: [
       'PositionRenderer',
       'PrimitiveManager',
