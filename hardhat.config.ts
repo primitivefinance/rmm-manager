@@ -36,7 +36,7 @@ const config: HardhatUserConfig = {
       'EngineAddress',
       'HexStrings',
       'Margin',
-      'TransferHelper'
+      'TransferHelper',
     ],
     templatePath: './docusaurus.sqrl',
   },
