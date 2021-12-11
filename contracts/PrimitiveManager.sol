@@ -145,8 +145,8 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky != 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable != 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 
     /// @inheritdoc IPrimitiveLiquidityCallback
@@ -160,7 +160,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky != 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable != 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 }
