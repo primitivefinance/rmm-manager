@@ -50,7 +50,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         )
     {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
-        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
+        if (engine.code.length == 0) revert EngineAddress.EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
@@ -86,7 +86,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         uint256 minLiquidityOut
     ) external payable override lock returns (uint256 delLiquidity) {
         _engine = EngineAddress.computeAddress(factory, risky, stable);
-        if (EngineAddress.isContract(_engine) == false) revert EngineAddress.EngineNotDeployedError();
+        if (_engine.code.length == 0) revert EngineAddress.EngineNotDeployedError();
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
 

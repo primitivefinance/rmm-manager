@@ -31,20 +31,4 @@ library EngineAddress {
             )
         );
     }
-
-    /// @notice        Checks if the target address is a contract, this function is used
-    ///                to verify if a PrimitiveEngine was deployed before calling it
-    /// @param target  Address of the contract to check
-    /// @return        True if the target is a contract
-    function isContract(address target) internal view returns (bool) {
-        // This method relies on extcodesize, which returns 0 for contracts in
-        // construction, since the code is only stored at the end of the
-        // constructor execution.
-
-        uint256 size;
-        assembly {
-            size := extcodesize(target)
-        }
-        return size > 0;
-    }
 }
