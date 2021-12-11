@@ -23,8 +23,8 @@ library Margin {
         uint256 delRisky,
         uint256 delStable
     ) internal {
-        if (delRisky != 00) margin.balanceRisky += delRisky.toUint128();
-        if (delStable != 00) margin.balanceStable += delStable.toUint128();
+        if (delRisky != 0) margin.balanceRisky += delRisky.toUint128();
+        if (delStable != 0) margin.balanceStable += delStable.toUint128();
     }
 
     /// @notice             Removes risky and stable token balance from an internal margin account
@@ -36,7 +36,7 @@ library Margin {
         uint256 delRisky,
         uint256 delStable
     ) internal {
-        if (delRisky != 00) margin.balanceRisky -= delRisky.toUint128();
-        if (delStable != 00) margin.balanceStable -= delStable.toUint128();
+        if (delRisky != 0) margin.balanceRisky -= delRisky.toUint128();
+        if (delStable != 0) margin.balanceStable -= delStable.toUint128();
     }
 }
