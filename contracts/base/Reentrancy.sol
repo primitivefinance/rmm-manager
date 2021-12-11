@@ -13,7 +13,7 @@ contract Reentrancy {
 
     /// @notice  Locks the contract to prevent reentrancy
     modifier lock() {
-        if (locked == 1) revert LockedError();
+        if (locked != 1) revert LockedError();
 
         locked = 2;
         _;
