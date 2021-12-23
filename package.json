@@ -1,6 +1,6 @@
 {
   "name": "@primitivefi/rmm-manager",
-  "version": "2.0.0-beta.1",
+  "version": "2.0.0-beta.2",
   "description": "Manager and Routing smart contracts for Primitive RMM.",
   "main": "index.js",
   "keywords": [
@@ -15,7 +15,7 @@
   ],
   "files": [
     "contracts",
-    "artifacts/contracts/PrimitiveHouse.sol/PrimitiveManager.json",
+    "artifacts/contracts/PrimitiveManager.sol/PrimitiveManager.json",
     "artifacts/contracts/PositionRenderer.sol/PositionRenderer.json",
     "artifacts/contracts/interfaces/**/*.json",
     "!artifacts/contracts/interfaces/**/*.dbg.json",
