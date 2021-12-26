@@ -14,15 +14,18 @@ import "./interfaces/IPositionDescriptor.sol";
 contract PositionDescriptor is IPositionDescriptor {
     using Strings for uint256;
 
+    /// STATE VARIABLES ///
+
+    /// @inheritdoc IPositionDescriptor
     address public override positionRenderer;
+
+    /// VIEW FUNCTIONS ///
 
     constructor(address positionRenderer_) {
         positionRenderer = positionRenderer_;
     }
 
-    /// @notice         Returns the metadata of a token
-    /// @param tokenId  Id of the token (same as pool id)
-    /// @return         JSON metadata of the token
+    /// @inheritdoc IPositionDescriptor
     function getMetadata(address engine, uint256 tokenId) external view override returns (string memory) {
         return
             string(
