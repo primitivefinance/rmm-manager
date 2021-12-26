@@ -114,7 +114,7 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
                     uint256(uint160(engine.factory())).toHexString(),
                     '",',
                     getTokenMetadata(engine.risky(), true),
-                    ',',
+                    ",",
                     getTokenMetadata(engine.stable(), false),
                     ',"invariant":"',
                     invariant < 0 ? "-" : "",
@@ -132,34 +132,27 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
         string memory metadata;
 
         {
-            metadata = string(abi.encodePacked(
-                '"',
-                prefix,
-                'Name":"',
-                IERC20WithMetadata(token).name(),
-                '","',
-                prefix,
-                'Symbol":"',
-                IERC20WithMetadata(token).symbol(),
-                '","',
-                prefix,
-                'Decimals":"',
-                uint256(IERC20WithMetadata(token).decimals()).toString(),
-                '"'
-            ));
-        }
-
-        return
-            string(
+            metadata = string(
                 abi.encodePacked(
-                    metadata,
-                    ',"',
+                    '"',
                     prefix,
-                    'Address":"',
-                    uint256(uint160(token)).toHexString(),
+                    'Name":"',
+                    IERC20WithMetadata(token).name(),
+                    '","',
+                    prefix,
+                    'Symbol":"',
+                    IERC20WithMetadata(token).symbol(),
+                    '","',
+                    prefix,
+                    'Decimals":"',
+                    uint256(IERC20WithMetadata(token).decimals()).toString(),
                     '"'
                 )
             );
+        }
+
+        return
+            string(abi.encodePacked(metadata, ',"', prefix, 'Address":"', uint256(uint160(token)).toHexString(), '"'));
     }
 
     /// @notice         Returns the calibration of a pool as JSON
