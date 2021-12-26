@@ -20,6 +20,6 @@ interface IManagerBase {
     /// @notice Returns the address of WETH9
     function WETH9() external view returns (address);
 
-    /// @notice Returns the address of the PositionRenderer
-    function positionRenderer() external view returns (address);
+    /// @notice Returns the address of the PositionDescriptor
+    function positionDescriptor() external view returns (address);
 }
