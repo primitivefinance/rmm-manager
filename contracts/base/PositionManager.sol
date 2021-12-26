@@ -74,7 +74,9 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
                                 IPositionRenderer(positionRenderer).render(cache[tokenId], tokenId),
                                 '","license":"MIT","creator":"primitive.eth",',
                                 '"description":"Concentrated liquidity tokens of a two-token AMM",',
-                                getProperties(tokenId)
+                                '"properties":{',
+                                getProperties(tokenId),
+                                "}}"
                             )
                         )
                     )
@@ -108,42 +110,54 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
         return
             string(
                 abi.encodePacked(
-                    '"properties":{',
                     '"factory":"',
                     uint256(uint160(engine.factory())).toHexString(),
-                    '","risky":',
-                    getTokenMetadata(engine.risky()),
-                    ',"stable":',
-                    getTokenMetadata(engine.stable()),
+                    '",',
+                    getTokenMetadata(engine.risky(), true),
+                    ',',
+                    getTokenMetadata(engine.stable(), false),
                     ',"invariant":"',
                     invariant < 0 ? "-" : "",
                     uint256((uint128(invariant < 0 ? ~invariant + 1 : invariant))).toString(),
                     '",',
                     getCalibration(tokenId),
                     ",",
-                    getReserve(tokenId),
-                    "}}"
+                    getReserve(tokenId)
                 )
             );
     }
 
-    function getTokenMetadata(address token) private view returns (string memory) {
-        string memory name = IERC20WithMetadata(token).name();
-        string memory symbol = IERC20WithMetadata(token).symbol();
-        uint8 decimals = IERC20WithMetadata(token).decimals();
+    function getTokenMetadata(address token, bool isRisky) private view returns (string memory) {
+        string memory prefix = isRisky ? "risky" : "stable";
+        string memory metadata;
+
+        {
+            metadata = string(abi.encodePacked(
+                '"',
+                prefix,
+                'Name":"',
+                IERC20WithMetadata(token).name(),
+                '","',
+                prefix,
+                'Symbol":"',
+                IERC20WithMetadata(token).symbol(),
+                '","',
+                prefix,
+                'Decimals":"',
+                uint256(IERC20WithMetadata(token).decimals()).toString(),
+                '"'
+            ));
+        }
 
         return
             string(
                 abi.encodePacked(
-                    '{"name":"',
-                    name,
-                    '","symbol":"',
-                    symbol,
-                    '","decimals":"',
-                    uint256(decimals).toString(),
-                    '","address":"',
+                    metadata,
+                    ',"',
+                    prefix,
+                    'Address":"',
                     uint256(uint160(token)).toHexString(),
-                    '"}'
+                    '"'
                 )
             );
     }
@@ -161,7 +175,6 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
         return
             string(
                 abi.encodePacked(
-                    '"calibration":{',
                     '"strike":"',
                     uint256(strike).toString(),
                     '","sigma":"',
@@ -172,7 +185,7 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
                     uint256(lastTimestamp).toString(),
                     '","gamma":"',
                     uint256(gamma).toString(),
-                    '"}'
+                    '"'
                 )
             );
     }
@@ -196,7 +209,6 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
         return
             string(
                 abi.encodePacked(
-                    '"reserve":{',
                     '"reserveRisky":"',
                     uint256(reserveRisky).toString(),
                     '","reserveStable":"',
@@ -211,7 +223,7 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
                     uint256(cumulativeStable).toString(),
                     '","cumulativeLiquidity":"',
                     uint256(cumulativeLiquidity).toString(),
-                    '"}'
+                    '"'
                 )
             );
     }
