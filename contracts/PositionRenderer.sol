@@ -9,7 +9,7 @@ import "./interfaces/IPositionRenderer.sol";
 /// @notice  Renders the visual of the position tokens
 contract PositionRenderer is IPositionRenderer {
     /// @inheritdoc IPositionRenderer
-    function render(address engine, uint256 tokenId) external view override returns (string memory) {
+    function render(address engine, uint256 tokenId) external pure override returns (string memory) {
         return
             string(
                 abi.encodePacked(
