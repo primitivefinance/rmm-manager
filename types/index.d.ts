@@ -10,6 +10,7 @@ export interface Contracts {
   stable: ContractTypes.TestToken
   engine: PrimitiveEngine
   positionRenderer: ContractTypes.PositionRenderer
+  positionDescriptor: ContractTypes.PositionDescriptor
   weth: ContractTypes.WETH9
 }
 
