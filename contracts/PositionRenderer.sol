@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-only
 pragma solidity 0.8.6;
 
-import "@primitivefi/rmm-core/contracts/interfaces/engine/IPrimitiveEngineView.sol";
 import "base64-sol/base64.sol";
 import "./interfaces/IPositionRenderer.sol";
-import "./interfaces/external/IERC20WithMetadata.sol";
-import "./libraries/HexStrings.sol";
 
 /// @title   PositionRenderer contract
 /// @author  Primitive
