@@ -22,35 +22,28 @@ type Metadata = {
   description: string
   properties: {
     factory: string
-    risky: {
-      address: string
-      name: string
-      symbol: string
-      decimals: number
-    }
-    stable: {
-      address: string
-      name: string
-      symbol: string
-      decimals: number
-    }
+    riskyName: string
+    riskyAddress: string
+    riskName: string
+    riskySymbol: string
+    riskyDecimals: number
+    stableAddress: string
+    stableName: string
+    stableSymbol: string
+    stableDecimals: number
     invariant: string
-    calibration: {
-      strike: string
-      sigma: string
-      maturity: string
-      lastTimestamp: string
-      gamma: string
-    }
-    reserve: {
-      reserveRisky: string
-      reserveStable: string
-      liquidity: string
-      blockTimestamp: string
-      cumulativeRisky: string
-      cumulativeStable: string
-      cumulativeLiquidity: string
-    }
+    strike: string
+    sigma: string
+    maturity: string
+    lastTimestamp: string
+    gamma: string
+    reserveRisky: string
+    reserveStable: string
+    liquidity: string
+    blockTimestamp: string
+    cumulativeRisky: string
+    cumulativeStable: string
+    cumulativeLiquidity: string
   }
 }
 
@@ -88,10 +81,9 @@ runTest('uri', function () {
     it('returns the URI', async function () {
       const uri = await this.manager.uri(poolId)
       const [metadataFormat, encodedMetadata] = uri.split(',')
-
       expect(metadataFormat).to.be.equal('data:application/json;base64')
-
       const metadata: Metadata = JSON.parse(Base64.decode(encodedMetadata))
+      console.log(Base64.decode(encodedMetadata));
 
       const riskyName = await this.risky.name()
       const stableName = await this.stable.name()
@@ -109,29 +101,29 @@ runTest('uri', function () {
 
       expect(utils.getAddress(metadata.properties.factory)).to.be.equal(this.factory.address)
 
-      expect(utils.getAddress(metadata.properties.risky.address)).to.be.equal(this.risky.address)
-      expect(metadata.properties.risky.name).to.be.equal(await this.risky.name())
-      expect(metadata.properties.risky.symbol).to.be.equal(await this.risky.symbol())
-      expect(metadata.properties.risky.decimals).to.be.equal((await this.risky.decimals()).toString())
+      expect(utils.getAddress(metadata.properties.riskyAddress)).to.be.equal(this.risky.address)
+      expect(metadata.properties.riskyName).to.be.equal(await this.risky.name())
+      expect(metadata.properties.riskySymbol).to.be.equal(await this.risky.symbol())
+      expect(metadata.properties.riskyDecimals).to.be.equal((await this.risky.decimals()).toString())
 
-      expect(utils.getAddress(metadata.properties.stable.address)).to.be.equal(this.stable.address)
-      expect(metadata.properties.stable.name).to.be.equal(await this.stable.name())
-      expect(metadata.properties.stable.symbol).to.be.equal(await this.stable.symbol())
-      expect(metadata.properties.stable.decimals).to.be.equal((await this.stable.decimals()).toString())
+      expect(utils.getAddress(metadata.properties.stableAddress)).to.be.equal(this.stable.address)
+      expect(metadata.properties.stableName).to.be.equal(await this.stable.name())
+      expect(metadata.properties.stableSymbol).to.be.equal(await this.stable.symbol())
+      expect(metadata.properties.stableDecimals).to.be.equal((await this.stable.decimals()).toString())
 
       expect(metadata.properties.invariant).to.be.equal('0')
-      expect(metadata.properties.calibration.strike).to.be.equal(strike.raw.toString())
-      expect(metadata.properties.calibration.sigma).to.be.equal(sigma.raw.toString())
-      expect(metadata.properties.calibration.maturity).to.be.equal(maturity.raw.toString())
-      expect(metadata.properties.calibration.lastTimestamp).to.be.equal(lastTimestamp)
-      expect(metadata.properties.calibration.gamma).to.be.equal(gamma.raw.toString())
-      expect(metadata.properties.reserve.reserveRisky).to.be.equal(reserveRisky.toString())
-      expect(metadata.properties.reserve.reserveStable).to.be.equal(reserveStable.toString())
-      expect(metadata.properties.reserve.liquidity).to.be.equal(liquidity.toString())
-      expect(metadata.properties.reserve.blockTimestamp).to.be.equal(lastTimestamp)
-      expect(metadata.properties.reserve.cumulativeRisky).to.be.equal('0')
-      expect(metadata.properties.reserve.cumulativeStable).to.be.equal('0')
-      expect(metadata.properties.reserve.cumulativeLiquidity).to.be.equal('0')
+      expect(metadata.properties.strike).to.be.equal(strike.raw.toString())
+      expect(metadata.properties.sigma).to.be.equal(sigma.raw.toString())
+      expect(metadata.properties.maturity).to.be.equal(maturity.raw.toString())
+      expect(metadata.properties.lastTimestamp).to.be.equal(lastTimestamp)
+      expect(metadata.properties.gamma).to.be.equal(gamma.raw.toString())
+      expect(metadata.properties.reserveRisky).to.be.equal(reserveRisky.toString())
+      expect(metadata.properties.reserveStable).to.be.equal(reserveStable.toString())
+      expect(metadata.properties.liquidity).to.be.equal(liquidity.toString())
+      expect(metadata.properties.blockTimestamp).to.be.equal(lastTimestamp)
+      expect(metadata.properties.cumulativeRisky).to.be.equal('0')
+      expect(metadata.properties.cumulativeStable).to.be.equal('0')
+      expect(metadata.properties.cumulativeLiquidity).to.be.equal('0')
     })
   })
 })
