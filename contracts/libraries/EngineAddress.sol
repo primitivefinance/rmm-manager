@@ -9,7 +9,7 @@ library EngineAddress {
 
     /// @notice Hash of the bytecode of the PrimitiveEngine
     bytes32 internal constant ENGINE_INIT_CODE_HASH =
-        0x3187e25cd8f65ad9c44cb7d8c3f78847a93d5e150d0efbd41bca66a6efb16e10;
+        0x119fdc99474b26a5c0738ff86abfdc6fe8177f9d6b7e20c2da41dc57103b9762;
 
     /// @notice         Computes the address of an engine
     /// @param factory  Address of the factory
