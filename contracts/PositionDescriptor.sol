@@ -93,7 +93,10 @@ contract PositionDescriptor is IPositionDescriptor {
                     '",',
                     getCalibration(engine, tokenId),
                     ",",
-                    getReserve(engine, tokenId)
+                    getReserve(engine, tokenId),
+                    ',"chainId":',
+                    block.chainid.toString(),
+                    ''
                 )
             );
     }
