@@ -15,7 +15,7 @@
   ],
   "files": [
     "contracts",
-    "artifacts/contracts/PrimitiveHouse.sol/PrimitiveManager.json",
+    "artifacts/contracts/PrimitiveManager.sol/PrimitiveManager.json",
     "artifacts/contracts/PositionRenderer.sol/PositionRenderer.json",
     "artifacts/contracts/PositionRenderer.sol/PositionDescriptor.json",
     "artifacts/contracts/interfaces/**/*.json",
