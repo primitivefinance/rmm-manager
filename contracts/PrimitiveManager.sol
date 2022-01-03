@@ -125,9 +125,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         if (delRisky < minRiskyOut || delStable < minStableOut) revert MinRemoveOutError();
 
         _remove(msg.sender, poolId, delLiquidity);
-
-        Margin.Data storage mar = margins[msg.sender][engine];
-        mar.deposit(delRisky, delStable);
+        margins[msg.sender][engine].deposit(delRisky, delStable);
 
         emit Remove(msg.sender, engine, poolId, delLiquidity, delRisky, delStable);
     }
