@@ -19,14 +19,14 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
 
     /// EFFECT FUNCTIONS ///
 
-    /// @param factory_           Address of a PrimitiveFactory
-    /// @param WETH9_             Address of WETH9
-    /// @param positionRenderer_  Address of PositionRenderer
+    /// @param factory_             Address of a PrimitiveFactory
+    /// @param WETH9_               Address of WETH9
+    /// @param positionDescriptor_  Address of PositionDescriptor
     constructor(
         address factory_,
         address WETH9_,
-        address positionRenderer_
-    ) ManagerBase(factory_, WETH9_, positionRenderer_) {}
+        address positionDescriptor_
+    ) ManagerBase(factory_, WETH9_, positionDescriptor_) {}
 
     /// @inheritdoc IPrimitiveManager
     function create(
