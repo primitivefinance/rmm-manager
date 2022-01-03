@@ -10,7 +10,7 @@ import "./interfaces/IPositionDescriptor.sol";
 
 /// @title   PositionDescriptor contract
 /// @author  Primitive
-/// @notice  Manages the metadata of the NFT positions
+/// @notice  Manages the metadata of the Primitive protocol position tokens
 contract PositionDescriptor is IPositionDescriptor {
     using Strings for uint256;
 
@@ -19,11 +19,14 @@ contract PositionDescriptor is IPositionDescriptor {
     /// @inheritdoc IPositionDescriptor
     address public override positionRenderer;
 
-    /// VIEW FUNCTIONS ///
+    /// EFFECT FUNCTIONS ///
 
+    /// @param positionRenderer_  Address of the PositionRenderer contract
     constructor(address positionRenderer_) {
         positionRenderer = positionRenderer_;
     }
+
+    /// VIEW FUNCTIONS ///
 
     /// @inheritdoc IPositionDescriptor
     function getMetadata(address engine, uint256 tokenId) external view override returns (string memory) {
@@ -50,6 +53,9 @@ contract PositionDescriptor is IPositionDescriptor {
             );
     }
 
+    /// @dev           Returns the name of a position token
+    /// @param engine  Address of the PrimitiveEngine contract
+    /// @return        Name of the position token as a string
     function getName(IPrimitiveEngineView engine) private view returns (string memory) {
         address risky = engine.risky();
         address stable = engine.stable();
@@ -65,9 +71,10 @@ contract PositionDescriptor is IPositionDescriptor {
             );
     }
 
-    /// @notice         Returns the properties of a token
-    /// @param tokenId  Id of the token (same as pool id)
-    /// @return         Properties of the token formatted as JSON
+    /// @dev            Returns the properties of a position token
+    /// @param engine   Address of the PrimitiveEngine contract
+    /// @param tokenId  Id of the position token (pool id)
+    /// @return         Properties of the position token as a JSON object
     function getProperties(IPrimitiveEngineView engine, uint256 tokenId) private view returns (string memory) {
         int128 invariant = engine.invariantOf(bytes32(tokenId));
 
@@ -91,6 +98,10 @@ contract PositionDescriptor is IPositionDescriptor {
             );
     }
 
+    /// @dev            Returns the metadata of an ERC20 token
+    /// @param token    Address of the ERC20 token
+    /// @param isRisky  True if the token is the risky
+    /// @return         Metadata of the ERC20 token as a JSON object
     function getTokenMetadata(address token, bool isRisky) private view returns (string memory) {
         string memory prefix = isRisky ? "risky" : "stable";
         string memory metadata;
@@ -119,9 +130,10 @@ contract PositionDescriptor is IPositionDescriptor {
             string(abi.encodePacked(metadata, ',"', prefix, 'Address":"', uint256(uint160(token)).toHexString(), '"'));
     }
 
-    /// @notice         Returns the calibration of a pool as JSON
-    /// @param tokenId  Id of the token (same as pool id)
-    /// @return         Calibration of the pool formatted as JSON
+    /// @dev            Returns the calibration of a pool
+    /// @param engine   Address of the PrimitiveEngine contract
+    /// @param tokenId  Id of the position token (pool id)
+    /// @return         Calibration of the pool as a JSON object
     function getCalibration(IPrimitiveEngineView engine, uint256 tokenId) private view returns (string memory) {
         (uint128 strike, uint64 sigma, uint32 maturity, uint32 lastTimestamp, uint32 gamma) = engine.calibrations(
             bytes32(tokenId)
@@ -145,9 +157,10 @@ contract PositionDescriptor is IPositionDescriptor {
             );
     }
 
-    /// @notice         Returns the reserves of a pool as JSON
-    /// @param tokenId  Id of the token (same as pool id)
-    /// @return         Reserves of the pool formatted as JSON
+    /// @notice         Returns the reserves of a pool
+    /// @param engine   Address of the PrimitiveEngine contract
+    /// @param tokenId  Id of the position token (pool id)
+    /// @return         Reserves of the pool as a JSON object
     function getReserve(IPrimitiveEngineView engine, uint256 tokenId) private view returns (string memory) {
         (
             uint128 reserveRisky,
