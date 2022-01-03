@@ -44,6 +44,7 @@ type Metadata = {
     cumulativeRisky: string
     cumulativeStable: string
     cumulativeLiquidity: string
+    chainId: number
   }
 }
 
@@ -124,6 +125,8 @@ runTest('uri', function () {
       expect(metadata.properties.cumulativeRisky).to.be.equal('0')
       expect(metadata.properties.cumulativeStable).to.be.equal('0')
       expect(metadata.properties.cumulativeLiquidity).to.be.equal('0')
+
+      expect(metadata.properties.chainId).to.be.equal(31337)
     })
   })
 })
