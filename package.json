@@ -1,6 +1,6 @@
 {
   "name": "@primitivefi/rmm-manager",
-  "version": "2.0.0-beta.2",
+  "version": "2.0.0-beta.3",
   "description": "Manager and Routing smart contracts for Primitive RMM.",
   "main": "index.js",
   "keywords": [
@@ -17,6 +17,7 @@
     "contracts",
     "artifacts/contracts/PrimitiveManager.sol/PrimitiveManager.json",
     "artifacts/contracts/PositionRenderer.sol/PositionRenderer.json",
+    "artifacts/contracts/PositionRenderer.sol/PositionDescriptor.json",
     "artifacts/contracts/interfaces/**/*.json",
     "!artifacts/contracts/interfaces/**/*.dbg.json",
     "typechain"
@@ -37,7 +38,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
-    "@primitivefi/rmm-core": "^2.0.0-beta.1",
+    "@primitivefi/rmm-core": "2.0.0-beta.5",
     "base64-sol": "^1.1.0"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "@commitlint/config-conventional": "^12.1.4",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@primitivefi/hardhat-dodoc": "^0.1.3",
     "@primitivefi/rmm-math": "^2.0.0-beta.1",
     "@typechain/ethers-v5": "^7.1.0",
     "@typechain/hardhat": "^2.2.0",

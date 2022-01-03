@@ -7,8 +7,39 @@ import 'hardhat-gas-reporter'
 import 'solidity-coverage'
 import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-contract-sizer'
+import '@primitivefi/hardhat-dodoc'
 
 const config: HardhatUserConfig = {
+  dodoc: {
+    runOnCompile: false,
+    include: [
+      'PositionRenderer',
+      'PrimitiveManager',
+      'CashManager',
+      'ERC1155Permit',
+      'ManagerBase',
+      'MarginManager',
+      'Multicall',
+      'PositionManager',
+      'Reentrancy',
+      'SelfPermit',
+      'SwapManager',
+      'ICashManager',
+      'IERC1155Permit',
+      'IManagerBase',
+      'IMarginManager',
+      'IMulticall',
+      'IPositionRenderer',
+      'IPrimitiveManager',
+      'ISelfPermit',
+      'ISwapManager',
+      'EngineAddress',
+      'HexStrings',
+      'Margin',
+      'TransferHelper',
+    ],
+    templatePath: './docusaurus.sqrl',
+  },
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
