@@ -42,6 +42,9 @@ export function runTest(description: string, runTests: Function): void {
         // PositionRenderer
         const positionRenderer = (await deploy('PositionRenderer', deployer)) as ContractTypes.PositionRenderer
 
+        // PositionDescriptor
+        const positionDescriptor = (await deploy('PositionDescriptor', deployer, [positionRenderer.address])) as ContractTypes.PositionDescriptor
+
         // WETH
         const weth = (await deploy('WETH9', deployer)) as ContractTypes.WETH9
 
@@ -49,7 +52,7 @@ export function runTest(description: string, runTests: Function): void {
         const manager = (await deploy('PrimitiveManager', deployer, [
           factory.address,
           weth.address,
-          positionRenderer.address,
+          positionDescriptor.address,
         ])) as ContractTypes.PrimitiveManager
 
         return {
@@ -59,6 +62,7 @@ export function runTest(description: string, runTests: Function): void {
           engine,
           manager,
           positionRenderer,
+          positionDescriptor,
           weth,
         }
       })
@@ -69,6 +73,7 @@ export function runTest(description: string, runTests: Function): void {
       this.engine = loadedFixture.engine
       this.manager = loadedFixture.manager
       this.positionRenderer = loadedFixture.positionRenderer
+      this.positionDescriptor = loadedFixture.positionDescriptor
       this.weth = loadedFixture.weth
 
       this.deployer = deployer
