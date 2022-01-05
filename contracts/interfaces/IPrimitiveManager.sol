@@ -127,7 +127,7 @@ interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCall
     /// @param poolId        Id of the pool
     /// @param delLiquidity  Amount of liquidity to remove
     /// @param minRiskyOut   Minimum amount of risky tokens expected to be received
-    /// @param minStableOut   Minimum amount of stable tokens expected to be received
+    /// @param minStableOut  Minimum amount of stable tokens expected to be received
     /// @return delRisky     Amount of risky tokens removed from the pool
     /// @return delStable    Amount of stable tokens removed from the pool
     function remove(
