@@ -56,7 +56,7 @@ abstract contract CashManager is ICashManager, ManagerBase {
         if (address(this).balance > 0) TransferHelper.safeTransferETH(msg.sender, address(this).balance);
     }
 
-    /// @dev              Pays {value} of {token] to {recipient} from {payer} wallet
+    /// @dev              Pays `value` of `token` to `recipient` from `payer` wallet
     /// @param token      Token to transfer as payment
     /// @param payer      Account that pays
     /// @param recipient  Account that receives payment
