@@ -64,9 +64,9 @@ contract PositionDescriptor is IPositionDescriptor {
             string(
                 abi.encodePacked(
                     "Primitive RMM-01 LP ",
-                    IERC20WithMetadata(risky).name(),
+                    IERC20WithMetadata(risky).symbol(),
                     "-",
-                    IERC20WithMetadata(stable).name()
+                    IERC20WithMetadata(stable).symbol()
                 )
             );
     }
