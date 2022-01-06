@@ -20,14 +20,15 @@ interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCall
 
     /// EVENTS ///
 
-    /// @notice           Emitted when a new pool is created
-    /// @param payer      Payer sending liquidity
-    /// @param engine     Primitive Engine where the pool is created
-    /// @param poolId     Id of the new pool
-    /// @param strike     Strike of the new pool
-    /// @param sigma      Sigma of the new pool
-    /// @param maturity   Maturity of the new pool
-    /// @param gamma      Gamma of the new pool
+    /// @notice               Emitted when a new pool is created
+    /// @param payer          Payer sending liquidity
+    /// @param engine         Primitive Engine where the pool is created
+    /// @param poolId         Id of the new pool
+    /// @param strike         Strike of the new pool
+    /// @param sigma          Sigma of the new pool
+    /// @param maturity       Maturity of the new pool
+    /// @param gamma          Gamma of the new pool
+    /// @param delLiquidity   Amount of liquidity added
     event Create(
         address indexed payer,
         address indexed engine,
@@ -35,7 +36,8 @@ interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCall
         uint128 strike,
         uint32 sigma,
         uint32 maturity,
-        uint32 gamma
+        uint32 gamma,
+        uint256 delLiquidity
     );
 
     /// @notice              Emitted when liquidity is allocated
