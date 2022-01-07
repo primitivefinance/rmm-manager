@@ -12,6 +12,8 @@ import { abi as PrimitiveEngineAbi } from '@primitivefi/rmm-core/artifacts/contr
 const { strike, sigma, maturity, gamma, delta } = DEFAULT_CONFIG
 const delLiquidity = parseWei('1')
 let poolId: string
+let minLiquidity: Wei
+let expectedLiquidity: Wei
 
 runTest('create', function () {
   beforeEach(async function () {
@@ -21,6 +23,8 @@ runTest('create', function () {
     await this.stable.approve(this.manager.address, constants.MaxUint256)
 
     poolId = computePoolId(this.engine.address, maturity.raw, sigma.raw, strike.raw, gamma.raw)
+    minLiquidity = parseWei(await this.engine.MIN_LIQUIDITY(), 0)
+    expectedLiquidity = parseWei('1').sub(minLiquidity)
   })
 
   describe('success cases', function () {
@@ -66,7 +70,16 @@ runTest('create', function () {
         )
       )
         .to.emit(this.manager, 'Create')
-        .withArgs(this.deployer.address, this.engine.address, poolId, strike.raw, sigma.raw, maturity.raw, gamma.raw)
+        .withArgs(
+          this.deployer.address,
+          this.engine.address,
+          poolId,
+          strike.raw,
+          sigma.raw,
+          maturity.raw,
+          gamma.raw,
+          expectedLiquidity.raw
+        )
     })
 
     describe('uses weth as risky', function () {
@@ -129,7 +142,16 @@ runTest('create', function () {
           )
         )
           .to.emit(this.manager, 'Create')
-          .withArgs(this.deployer.address, engine.address, poolId, strike.raw, sigma.raw, maturity.raw, gamma.raw)
+          .withArgs(
+            this.deployer.address,
+            engine.address,
+            poolId,
+            strike.raw,
+            sigma.raw,
+            maturity.raw,
+            gamma.raw,
+            expectedLiquidity.raw
+          )
       })
     })
   })
