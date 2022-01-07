@@ -70,7 +70,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
         _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
-        emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma, delLiquidity);
+        emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma, delLiquidity - MIN_LIQUIDITY);
     }
 
     address private _engine;
