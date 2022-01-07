@@ -28,7 +28,7 @@ interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCall
     /// @param sigma          Sigma of the new pool
     /// @param maturity       Maturity of the new pool
     /// @param gamma          Gamma of the new pool
-    /// @param delLiquidity   Amount of liquidity allocated
+    /// @param delLiquidity   Amount of liquidity allocated (minus the minimum liquidity)
     event Create(
         address indexed payer,
         address indexed engine,
