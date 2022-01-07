@@ -9,14 +9,14 @@ contract Reentrancy {
     error LockedError();
 
     /// @dev Reentrancy guard initialized to state
-    uint256 private locked = 1;
+    uint256 private _locked = 1;
 
     /// @notice  Locks the contract to prevent reentrancy
     modifier lock() {
-        if (locked != 1) revert LockedError();
+        if (_locked != 1) revert LockedError();
 
-        locked = 2;
+        _locked = 2;
         _;
-        locked = 1;
-    
+        _locked = 1;
+    }
 }
