@@ -715,10 +715,10 @@
   dependencies:
     squirrelly "^8.0.8"
 
-"@primitivefi/rmm-core@2.0.0-beta.5":
-  version "2.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@primitivefi/rmm-core/-/rmm-core-2.0.0-beta.5.tgz#c03426e880f5dff9f8aacd5ffb378f18182f756a"
-  integrity sha512-fqtN89L4/gxA+M2heUkGlY9/907oJfBwWaWgE5XfhMP5KE+YeE0yKWgo4HNpkx1VPqpoDJU84LmDnCd+8xhVvg==
+"@primitivefi/rmm-core@^1.0.0-rc.1":
+  version "1.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@primitivefi/rmm-core/-/rmm-core-1.0.0-rc.1.tgz#42e378e38d2f8655507c7e790de71c0a10622ff9"
+  integrity sha512-q9Syd9nSWv3xpfMIkPikmUDfDILubtWg8U1xHdlxOwxgQ/f33ZxnA0zje8XoAoce6utwTOn3MAbGpvxe4MIN6g==
 
 "@primitivefi/rmm-math@^2.0.0-beta.1":
   version "2.0.0-beta.1"
