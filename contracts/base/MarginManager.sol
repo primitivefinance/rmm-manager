@@ -31,7 +31,7 @@ abstract contract MarginManager is IMarginManager, CashManager {
         if (delRisky == 0 && delStable == 0) revert ZeroDelError();
 
         address engine = EngineAddress.computeAddress(factory, risky, stable);
-        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
+        if (engine.code.length == 0) revert EngineAddress.EngineNotDeployedError();
 
         IPrimitiveEngineActions(engine).deposit(
             address(this),
@@ -89,7 +89,7 @@ abstract contract MarginManager is IMarginManager, CashManager {
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
-        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable != 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky != 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
     }
 }

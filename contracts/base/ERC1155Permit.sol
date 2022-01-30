@@ -30,17 +30,18 @@ contract ERC1155Permit is ERC1155, IERC1155Permit, EIP712 {
     ) external override {
         if (block.timestamp > deadline) revert SigExpiredError();
 
-        bytes32 structHash = keccak256(
-            abi.encode(_PERMIT_TYPEHASH, owner, operator, approved, nonces[owner], deadline)
-        );
+        unchecked {
+            bytes32 structHash = keccak256(
+                abi.encode(_PERMIT_TYPEHASH, owner, operator, approved, nonces[owner]++, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        address signer = ECDSA.recover(hash, v, r, s);
+            bytes32 hash = _hashTypedDataV4(structHash);
+            address signer = ECDSA.recover(hash, v, r, s);
 
-        if (signer != owner) revert InvalidSigError();
+            if (signer != owner) revert InvalidSigError();
+        }
 
         _setApprovalForAll(owner, operator, approved);
-        nonces[owner] += 1;
     }
 
     /// @inheritdoc IERC1155Permit
