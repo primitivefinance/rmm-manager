@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
-    "@primitivefi/rmm-core": "2.0.0-beta.5",
+    "@primitivefi/rmm-core": "^1.0.0-rc.1",
     "base64-sol": "^1.1.0"
   },
   "devDependencies": {
