@@ -44,6 +44,12 @@ const config: HardhatUserConfig = {
     hardhat: {
       allowUnlimitedContractSize: true,
     },
+    dev: {
+      chainId: 1337,
+      url: 'http://127.0.0.1:8545',
+      blockGasLimit: 12e6,
+      gas: 12e6,
+    },
   },
   solidity: {
     version: '0.8.6',
