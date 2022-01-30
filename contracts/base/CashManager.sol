@@ -31,7 +31,7 @@ abstract contract CashManager is ICashManager, ManagerBase {
 
         if (balance < amountMin) revert BalanceTooLowError(balance, amountMin);
 
-        if (balance > 0) {
+        if (balance != 0) {
             IWETH9(WETH9).withdraw(balance);
             TransferHelper.safeTransferETH(recipient, balance);
         }
@@ -46,17 +46,17 @@ abstract contract CashManager is ICashManager, ManagerBase {
         uint256 balance = IERC20(token).balanceOf(address(this));
         if (balance < amountMin) revert BalanceTooLowError(balance, amountMin);
 
-        if (balance > 0) {
+        if (balance != 0) {
             TransferHelper.safeTransfer(token, recipient, balance);
         }
     }
 
     /// @inheritdoc ICashManager
     function refundETH() external payable override {
-        if (address(this).balance > 0) TransferHelper.safeTransferETH(msg.sender, address(this).balance);
+        if (address(this).balance != 0) TransferHelper.safeTransferETH(msg.sender, address(this).balance);
     }
 
-    /// @dev              Pays {value} of {token] to {recipient} from {payer} wallet
+    /// @dev              Pays `value` of `token` to `recipient` from `payer` wallet
     /// @param token      Token to transfer as payment
     /// @param payer      Account that pays
     /// @param recipient  Account that receives payment

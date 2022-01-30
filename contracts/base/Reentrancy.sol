@@ -8,14 +8,15 @@ contract Reentrancy {
     /// @notice  Thrown when a call to the contract is made during a locked state
     error LockedError();
 
-    uint256 private _unlocked = 1;
+    /// @dev Reentrancy guard initialized to state
+    uint256 private _locked = 1;
 
     /// @notice  Locks the contract to prevent reentrancy
     modifier lock() {
-        if (_unlocked != 1) revert LockedError();
+        if (_locked != 1) revert LockedError();
 
-        _unlocked = 0;
+        _locked = 2;
         _;
-        _unlocked = 1;
+        _locked = 1;
     }
 }
