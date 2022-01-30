@@ -1,7 +1,8 @@
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 import { Wallet, BigNumberish, Signature, utils } from 'ethers'
 
 export async function getERC20PermitSignature(
-  wallet: Wallet,
+  wallet: Wallet | SignerWithAddress,
   token: string,
   spender: string,
   value: BigNumberish,
@@ -57,7 +58,7 @@ export async function getERC20PermitSignature(
 }
 
 export async function getERC1155PermitSignature(
-  wallet: Wallet,
+  wallet: Wallet | SignerWithAddress,
   token: string,
   operator: string,
   approved: boolean,
