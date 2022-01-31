@@ -1,7 +1,7 @@
 {
   "name": "@primitivefi/rmm-manager",
-  "version": "2.0.0-beta.5",
-  "description": "Manager and Routing smart contracts for Primitive RMM protocol.",
+  "version": "1.0.0-rc.1",
+  "description": "∇ Manager and Routing smart contracts for Primitive RMM protocol.",
   "main": "index.js",
   "keywords": [
     "primitive",
