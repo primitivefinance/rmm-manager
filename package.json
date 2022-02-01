@@ -1,6 +1,6 @@
 {
   "name": "@primitivefi/rmm-manager",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "∇ Manager and Routing smart contracts for Primitive RMM protocol.",
   "main": "index.js",
   "keywords": [
@@ -13,13 +13,13 @@
     "ethereum"
   ],
   "files": [
-    "contracts",
-    "artifacts/contracts/PrimitiveManager.sol/PrimitiveManager.json",
-    "artifacts/contracts/PositionRenderer.sol/PositionRenderer.json",
-    "artifacts/contracts/PositionDescriptor.sol/PositionDescriptor.json",
-    "artifacts/contracts/interfaces/**/*.json",
-    "!artifacts/contracts/interfaces/**/*.dbg.json",
-    "typechain"
+    "contracts/base",
+    "contracts/interfaces",
+    "contracts/libraries",
+    "artifacts/contracts/**/*.json",
+    "!artifacts/contracts/**/*.dbg.json",
+    "!artifacts/contracts/test/**/*",
+    "!artifacts/contracts/base/**/*"
   ],
   "repository": {
     "type": "git",
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
-    "@primitivefi/rmm-core": "^1.0.0-rc.1",
+    "@primitivefi/rmm-core": "^1.0.0-rc.2",
     "base64-sol": "^1.1.0"
   },
   "devDependencies": {

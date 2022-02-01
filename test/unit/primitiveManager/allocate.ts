@@ -6,7 +6,7 @@ import { DEFAULT_CONFIG } from '../context'
 import { computePoolId } from '../../shared/utilities'
 import expect from '../../shared/expect'
 import { runTest } from '../context'
-import { PrimitiveEngine } from '@primitivefi/rmm-core/typechain'
+import { PrimitiveEngine } from '../../../typechain'
 import { abi as PrimitiveEngineAbi } from '@primitivefi/rmm-core/artifacts/contracts/PrimitiveEngine.sol/PrimitiveEngine.json'
 
 const { strike, sigma, maturity, delta, gamma } = DEFAULT_CONFIG
