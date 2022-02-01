@@ -5,8 +5,8 @@ on:
   pull_request:
 
 jobs:
-  lint-test:
-    name: Lint and Test
+  test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
