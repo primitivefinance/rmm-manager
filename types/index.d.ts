@@ -1,7 +1,7 @@
 import { Wallet, BigNumber } from 'ethers'
 import * as ContractTypes from '../typechain'
 import { Fixture } from '@ethereum-waffle/provider'
-import { PrimitiveEngine, PrimitiveFactory } from '@primitivefi/rmm-core/typechain'
+import { PrimitiveEngine, PrimitiveFactory } from '../typechain'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
 export interface Contracts {
