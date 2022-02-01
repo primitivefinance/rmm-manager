@@ -9,7 +9,7 @@ import "./interfaces/IPositionRenderer.sol";
 /// @notice  Manages the visual representation of the Primitive protocol position tokens
 contract PositionRenderer is IPositionRenderer {
     /// @inheritdoc IPositionRenderer
-    function render(address engine, uint256 tokenId) external pure override returns (string memory) {
+    function render(address, uint256) external pure override returns (string memory) {
         return
             string(
                 abi.encodePacked(

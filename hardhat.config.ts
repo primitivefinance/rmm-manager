@@ -9,7 +9,7 @@ import { HardhatUserConfig } from 'hardhat/config'
 import 'hardhat-contract-sizer'
 import '@primitivefi/hardhat-dodoc'
 
-const config: HardhatUserConfig = {
+const config = {
   dodoc: {
     runOnCompile: false,
     include: [
@@ -75,6 +75,12 @@ const config: HardhatUserConfig = {
     tests: './test',
     cache: './cache',
     artifacts: './artifacts',
+  },
+  typechain: {
+    outDir: 'typechain',
+    target: 'ethers-v5',
+    alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
+    externalArtifacts: ['./node_modules/@primitivefi/**/artifacts/contracts/**/*.json'], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
   },
 }
 
