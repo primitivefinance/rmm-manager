@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers'
-import { PrimitiveManager } from '../../../typechain'
+import { PrimitiveManager } from '../../../typechain/PrimitiveManager'
 
 // Chai matchers for the positions of the PrimitiveEngine
 
