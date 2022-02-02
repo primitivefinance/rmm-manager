@@ -68,6 +68,7 @@ runTest('swap', function () {
     delStable = amount.mul(res.reserveStable).div(res.liquidity)
 
     await this.manager.allocate(
+      this.deployer.address,
       poolId,
       this.risky.address,
       this.stable.address,
