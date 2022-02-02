@@ -77,6 +77,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
 
     /// @inheritdoc IPrimitiveManager
     function allocate(
+        address recipient,
         bytes32 poolId,
         address risky,
         address stable,
@@ -104,7 +105,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         if (fromMargin) margins[msg.sender][_engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, _engine, poolId, delLiquidity);
+        _allocate(recipient, _engine, poolId, delLiquidity);
 
         emit Allocate(msg.sender, _engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
 
