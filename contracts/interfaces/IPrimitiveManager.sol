@@ -107,6 +107,7 @@ interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCall
         );
 
     /// @notice               Allocates liquidity into a pool
+    /// @param recipient      Address that receives minted ERC-1155 Primitive liquidity tokens
     /// @param poolId         Id of the pool
     /// @param risky          Address of the risky asset
     /// @param stable         Address of the stable asset
@@ -115,6 +116,7 @@ interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCall
     /// @param fromMargin     True if the funds of the sender should be used
     /// @return delLiquidity  Amount of liquidity allocated into the pool
     function allocate(
+        address recipient,
         bytes32 poolId,
         address risky,
         address stable,
