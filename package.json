@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.1.0",
-    "@primitivefi/rmm-core": "^1.0.0-rc.2",
+    "@primitivefi/rmm-core": "^1.0.0",
     "base64-sol": "^1.1.0"
   },
   "devDependencies": {
@@ -70,7 +70,7 @@
     "numeric": "^1.2.6",
     "prettier": "^2.2.1",
     "prettier-plugin-solidity": "^1.0.0-beta.6",
-    "solhint": "^3.3.6",
+    "solhint": "^1.0.10",
     "solhint-plugin-prettier": "^0.0.5",
     "solidity-coverage": "^0.7.16",
     "stochastic": "^0.0.14",
