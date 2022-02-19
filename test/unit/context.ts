@@ -7,9 +7,14 @@ import { abi as PrimitiveEngineAbi } from '@primitivefi/rmm-core/artifacts/contr
 import FactoryArtifact from '@primitivefi/rmm-core/artifacts/contracts/PrimitiveFactory.sol/PrimitiveFactory.json'
 
 import { Calibration } from '../shared/calibration'
-import { PrimitiveEngine, PrimitiveFactory } from '@primitivefi/rmm-core/typechain'
+import { PrimitiveEngine, PrimitiveFactory } from '../../typechain/index'
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
-export async function deploy(contractName: string, deployer: Wallet, args: any[] = []): Promise<Contract> {
+export async function deploy(
+  contractName: string,
+  deployer: Wallet | SignerWithAddress,
+  args: any[] = []
+): Promise<Contract> {
   const artifact = await hre.artifacts.readArtifact(contractName)
   const contract = await deployContract(deployer, artifact, args, { gasLimit: 9500000 })
   return contract
@@ -22,7 +27,8 @@ export function runTest(description: string, runTests: Function): void {
 
   describe(description, function () {
     beforeEach(async function () {
-      const signers = waffle.provider.getWallets()
+      // const signers = waffle.provider.getWallets()
+      const signers = await ethers.getSigners()
       const [deployer] = signers
 
       const loadedFixture = await loadFixture(async function () {
@@ -43,7 +49,9 @@ export function runTest(description: string, runTests: Function): void {
         const positionRenderer = (await deploy('PositionRenderer', deployer)) as ContractTypes.PositionRenderer
 
         // PositionDescriptor
-        const positionDescriptor = (await deploy('PositionDescriptor', deployer, [positionRenderer.address])) as ContractTypes.PositionDescriptor
+        const positionDescriptor = (await deploy('PositionDescriptor', deployer, [
+          positionRenderer.address,
+        ])) as ContractTypes.PositionDescriptor
 
         // WETH
         const weth = (await deploy('WETH9', deployer)) as ContractTypes.WETH9

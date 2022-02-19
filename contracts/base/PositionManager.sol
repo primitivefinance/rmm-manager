@@ -14,7 +14,7 @@ abstract contract PositionManager is ManagerBase, ERC1155Permit {
     mapping(uint256 => address) private cache;
 
     /// @dev  Empty variable to pass to the _mint function
-    bytes private _empty;
+    bytes constant private _empty = "";
 
     /// @notice         Returns the metadata of a token
     /// @param tokenId  Token id to look for (same as pool id)
