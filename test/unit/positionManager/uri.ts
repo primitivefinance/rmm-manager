@@ -86,9 +86,9 @@ runTest('uri', function () {
       const metadata: Metadata = JSON.parse(Base64.decode(encodedMetadata))
       console.log(Base64.decode(encodedMetadata));
 
-      const riskyName = await this.risky.name()
-      const stableName = await this.stable.name()
-      expect(metadata.name).to.be.equal(`Primitive RMM-01 LP ${riskyName}-${stableName}`)
+      const riskySymbol = await this.risky.symbol()
+      const stableSymbol = await this.stable.symbol()
+      expect(metadata.name).to.be.equal(`Primitive RMM-01 LP ${riskySymbol}-${stableSymbol}`)
 
       const [imageFormat, encodedImage] = metadata.image.split(',')
       expect(imageFormat).to.be.equal('data:image/svg+xml;base64')

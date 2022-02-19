@@ -1,5 +1,5 @@
 import { parseWei } from 'web3-units'
-import { TestPay } from '../../../typechain'
+import { TestPay } from '../../../typechain/TestPay'
 
 import expect from '../../shared/expect'
 import { runTest, deploy } from '../context'

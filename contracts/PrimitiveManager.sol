@@ -50,7 +50,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         )
     {
         address engine = EngineAddress.computeAddress(factory, risky, stable);
-        if (EngineAddress.isContract(engine) == false) revert EngineAddress.EngineNotDeployedError();
+        if (engine.code.length == 0) revert EngineAddress.EngineNotDeployedError();
 
         if (delLiquidity == 0) revert ZeroLiquidityError();
 
@@ -70,13 +70,14 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         uint256 MIN_LIQUIDITY = IPrimitiveEngineView(engine).MIN_LIQUIDITY();
         _allocate(msg.sender, engine, poolId, delLiquidity - MIN_LIQUIDITY);
 
-        emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma);
+        emit Create(msg.sender, engine, poolId, strike, sigma, maturity, gamma, delLiquidity - MIN_LIQUIDITY);
     }
 
     address private _engine;
 
     /// @inheritdoc IPrimitiveManager
     function allocate(
+        address recipient,
         bytes32 poolId,
         address risky,
         address stable,
@@ -86,7 +87,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         uint256 minLiquidityOut
     ) external payable override lock returns (uint256 delLiquidity) {
         _engine = EngineAddress.computeAddress(factory, risky, stable);
-        if (EngineAddress.isContract(_engine) == false) revert EngineAddress.EngineNotDeployedError();
+        if (_engine.code.length == 0) revert EngineAddress.EngineNotDeployedError();
 
         if (delRisky == 0 && delStable == 0) revert ZeroLiquidityError();
 
@@ -104,7 +105,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         if (fromMargin) margins[msg.sender][_engine].withdraw(delRisky, delStable);
 
         // Mints {delLiquidity} of liquidity tokens
-        _allocate(msg.sender, _engine, poolId, delLiquidity);
+        _allocate(recipient, _engine, poolId, delLiquidity);
 
         emit Allocate(msg.sender, _engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
 
@@ -143,8 +144,8 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky != 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable != 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 
     /// @inheritdoc IPrimitiveLiquidityCallback
@@ -158,7 +159,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         address engine = EngineAddress.computeAddress(factory, decoded.risky, decoded.stable);
         if (msg.sender != engine) revert NotEngineError();
 
-        if (delRisky > 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
-        if (delStable > 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
+        if (delRisky != 0) pay(decoded.risky, decoded.payer, msg.sender, delRisky);
+        if (delStable != 0) pay(decoded.stable, decoded.payer, msg.sender, delStable);
     }
 }

@@ -9,7 +9,7 @@ library EngineAddress {
 
     /// @notice Hash of the bytecode of the PrimitiveEngine
     bytes32 internal constant ENGINE_INIT_CODE_HASH =
-        0x119fdc99474b26a5c0738ff86abfdc6fe8177f9d6b7e20c2da41dc57103b9762;
+        0xf8e63833fcbf190bd32bc64a1c450bd59b356b4b7cf79cad298a369fb369aaae;
 
     /// @notice         Computes the address of an engine
     /// @param factory  Address of the factory
@@ -30,21 +30,5 @@ library EngineAddress {
                 )
             )
         );
-    }
-
-    /// @notice        Checks if the target address is a contract, this function is used
-    ///                to verify if a PrimitiveEngine was deployed before calling it
-    /// @param target  Address of the contract to check
-    /// @return        True if the target is a contract
-    function isContract(address target) internal view returns (bool) {
-        // This method relies on extcodesize, which returns 0 for contracts in
-        // construction, since the code is only stored at the end of the
-        // constructor execution.
-
-        uint256 size;
-        assembly {
-            size := extcodesize(target)
-        }
-        return size > 0;
     }
 }
