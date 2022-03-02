@@ -14,6 +14,8 @@ import { config as dotenvConfig } from 'dotenv'
 import { NetworkUserConfig } from 'hardhat/types'
 dotenvConfig({ path: resolve(__dirname, './.env') })
 
+import './scripts/checkEngineHash'
+
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || ''
 const INFURA_API_KEY = process.env.INFURA_API_KEY || ''
 
