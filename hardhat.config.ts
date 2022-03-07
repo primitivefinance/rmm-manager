@@ -1,3 +1,4 @@
+import { HardhatUserConfig } from 'hardhat/types'
 import '@typechain/hardhat'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
@@ -43,7 +44,7 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
   }
 }
 
-const config = {
+const config: HardhatUserConfig = {
   dodoc: {
     runOnCompile: false,
     include: [
