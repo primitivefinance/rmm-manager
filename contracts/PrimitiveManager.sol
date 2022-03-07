@@ -107,7 +107,7 @@ contract PrimitiveManager is IPrimitiveManager, Multicall, CashManager, SelfPerm
         // Mints {delLiquidity} of liquidity tokens
         _allocate(recipient, _engine, poolId, delLiquidity);
 
-        emit Allocate(msg.sender, _engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
+        emit Allocate(msg.sender, recipient, _engine, poolId, delLiquidity, delRisky, delStable, fromMargin);
 
         _engine = address(0);
     }

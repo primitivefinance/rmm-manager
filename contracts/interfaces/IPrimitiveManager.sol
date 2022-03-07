@@ -42,6 +42,7 @@ interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCall
 
     /// @notice              Emitted when liquidity is allocated
     /// @param payer         Payer sending liquidity
+    /// @param recipient     Address that receives minted ERC-1155 Primitive liquidity tokens
     /// @param engine        Primitive Engine receiving liquidity
     /// @param poolId        Id of the pool receiving liquidity
     /// @param delLiquidity  Amount of liquidity allocated
@@ -49,7 +50,8 @@ interface IPrimitiveManager is IPrimitiveCreateCallback, IPrimitiveLiquidityCall
     /// @param delStable     Amount of stable tokens allocated
     /// @param fromMargin    True if liquidity was paid from margin
     event Allocate(
-        address indexed payer,
+        address payer,
+        address indexed recipient,
         address indexed engine,
         bytes32 indexed poolId,
         uint256 delLiquidity,
