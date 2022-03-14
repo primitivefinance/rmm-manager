@@ -115,7 +115,7 @@ runTest('allocate', function () {
           )
         )
           .to.emit(this.manager, 'Allocate')
-          .withArgs(this.deployer.address, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, true)
+          .withArgs(this.deployer.address, recipient, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, true)
       })
 
       it('does not reduces the balances of the sender', async function () {
@@ -221,7 +221,7 @@ runTest('allocate', function () {
           )
         )
           .to.emit(this.manager, 'Allocate')
-          .withArgs(this.deployer.address, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false)
+          .withArgs(this.deployer.address, recipient, this.engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false)
       })
     })
 
@@ -343,7 +343,7 @@ runTest('allocate', function () {
           )
         )
           .to.emit(this.manager, 'Allocate')
-          .withArgs(this.deployer.address, engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false)
+          .withArgs(this.deployer.address, recipient, engine.address, poolId, delLiquidity.raw, delRisky.raw, delStable.raw, false)
       })
     })
   })
